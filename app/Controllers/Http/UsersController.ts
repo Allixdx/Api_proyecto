@@ -325,4 +325,20 @@ export default class UsersController {
       })
     }
   }
+
+  public async authuser({request,response}: HttpContextContract){
+    try{
+     const codigoususario =;
+     if(codigoususario == verificationCode){
+
+      return response.status(200).json({message: 'Usuario Verificado Correctamente'})
+     }
+    }
+    catch(error){
+      return response.status(400).json({
+        message: 'Codigo Incorrecto',
+        error: error.message,
+    })
+    }
+  }
 }
