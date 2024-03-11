@@ -1,6 +1,9 @@
+import Mail from '@ioc:Adonis/Addons/Mail'
 import Hash from '@ioc:Adonis/Core/Hash'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
+import Env from '@ioc:Adonis/Core/Env'
+
 
 export default class UsersController {
 /**
@@ -99,35 +102,51 @@ export default class UsersController {
    *                 error:
    *                   type: string
    */
-  public async store({ request, response }: HttpContextContract) {
-    try {
-      const name = request.input('name')
-      const lastname = request.input('lastname')
-      const email = request.input('email')
-      const password = request.input('password')
+ public async store({ request, response }: HttpContextContract) {
+  try {
+    const name = request.input('name')
+    const lastname = request.input('lastname')
+    const email = request.input('email')
+    const password = request.input('password')
 
-      const newUser = new User()
-      newUser.name = name
-      newUser.lastname = lastname
-      newUser.email = email
-      newUser.password = await Hash.make(password)
-      await newUser.save()
-
-      return response.status(201).json({
-        data: {
-          user_id: newUser.id,
-          name: newUser.name,
-          lastname: newUser.lastname,
-          email: newUser.email,
-        },
-      })
-    } catch (error) {
-      return response.status(400).json({
-        message: 'Error al crear usuario',
-        error: error.message,
-      })
+    function generateVerificationCode() {
+      const randomNumber = Math.floor(1000 + Math.random() * 9000);
+      return randomNumber.toString();
     }
+
+    const verificationCode = generateVerificationCode();
+    const emailData = { code: verificationCode };
+
+    const newUser = new User()
+    newUser.name = name
+    newUser.lastname = lastname
+    newUser.email = email
+    newUser.password = await Hash.make(password)
+    await newUser.save()
+
+    await Mail.send((message) => {
+      message
+        .from(Env.get('SMTP_USERNAME'), 'Healthy App')
+        .to(email)
+        .subject('Healthy App - Verificación de cuenta')
+        .htmlView('emails/welcome', emailData)
+    })
+
+    return response.status(201).json({
+      data: {
+        user_id: newUser.id,
+        name: newUser.name,
+        lastname: newUser.lastname,
+        email: newUser.email,
+      },
+    })
+  } catch (error) {
+    return response.status(400).json({
+      message: 'Error al crear usuario',
+      error: error.message,
+    })
   }
+}
 /**
    * @swagger
    * components:
