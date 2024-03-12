@@ -4,6 +4,7 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import Env from '@ioc:Adonis/Core/Env'
 
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 export default class UsersController {
 /**
@@ -349,7 +350,19 @@ private generateVerificationCode() {
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/LoginInput'
+ *             type: object
+ *             properties:
+ *               user_email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *               verification_code:
+ *                 type: string
+ *             required:
+ *               - user_email
+ *               - password
+ *               - verification_code
  *     responses:
  *       200:
  *         description: Inicio de sesión exitoso.
@@ -373,7 +386,6 @@ private generateVerificationCode() {
  *               message: Error al iniciar sesión
  *               error: Descripción del error
  */
-
 public async authLogin({ request, response, auth }: HttpContextContract) {
   try {
     const user_email = request.input('user_email');
@@ -395,10 +407,9 @@ public async authLogin({ request, response, auth }: HttpContextContract) {
       });
     }
 
-    const hashedPass = user.password;
-
-    if (!(await Hash.verify(hashedPass, password))) {
-      // Verificar la contraseña
+    // Verificar la contraseña directamente sin proporcionar el hash
+    if (!(await Hash.verify(password, user.password))) {
+      // Contraseña incorrecta
       return response.status(401).send({
         title: 'Datos inválidos',
         message: 'Contraseña incorrecta',
@@ -421,4 +432,6 @@ public async authLogin({ request, response, auth }: HttpContextContract) {
     });
   }
 }
+
+
 }
