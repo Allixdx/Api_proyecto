@@ -386,7 +386,7 @@ private generateVerificationCode() {
  *               message: Error al iniciar sesión
  *               error: Descripción del error
  */
-public async authLogin({ request, response, auth }: HttpContextContract) {
+public async authLogin({ request, response }: HttpContextContract) {
   try {
     const user_email = request.input('user_email');
     const password = request.input('password');
@@ -411,7 +411,6 @@ public async authLogin({ request, response, auth }: HttpContextContract) {
     console.log({ storedPassword: user.password }); 
 
     if (!(await Hash.verify(user.password, password))) {
-      // Devolver error de contraseña incorrecta
       return response.status(401).send({
         title: 'Datos inválidos',
         message: 'Contraseña incorrecta',
@@ -419,10 +418,6 @@ public async authLogin({ request, response, auth }: HttpContextContract) {
       });
     }
 
-    // Iniciar sesión si todo es correcto
-    await auth.loginViaId(user.id);
-
-    // Limpiar el código de verificación después de iniciar sesión
     user.verification_code = null;
     await user.save();
 
