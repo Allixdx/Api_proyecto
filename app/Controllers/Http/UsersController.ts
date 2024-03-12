@@ -4,7 +4,6 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import Env from '@ioc:Adonis/Core/Env'
 
-process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 export default class UsersController {
 /**
@@ -102,6 +101,7 @@ export default class UsersController {
  *                   example: Descripción del error interno
  */
  public async store({ request, response }: HttpContextContract) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   try {
     const name = request.input('name');
     const lastname = request.input('lastname');
@@ -398,18 +398,20 @@ public async authLogin({ request, response, auth }: HttpContextContract) {
       .whereNull('deleted_at')
       .first();
 
-    if (!user || !user.verification_code) {
-      // Verificar si el usuario existe y está verificado
+    console.log({ user_email, password, verificationCode }); 
+
+    if (!user || user.verification_code !== verificationCode) {
+      // Devolver error de datos inválidos
       return response.status(401).send({
         title: 'Datos inválidos',
         message: 'Usuario no verificado o datos incorrectos',
         type: 'warning',
       });
     }
+    console.log({ storedPassword: user.password }); 
 
-    // Verificar la contraseña directamente sin proporcionar el hash
-    if (!(await Hash.verify(password, user.password))) {
-      // Contraseña incorrecta
+    if (!(await Hash.verify(user.password, password))) {
+      // Devolver error de contraseña incorrecta
       return response.status(401).send({
         title: 'Datos inválidos',
         message: 'Contraseña incorrecta',
