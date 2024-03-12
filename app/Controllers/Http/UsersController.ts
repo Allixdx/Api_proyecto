@@ -326,10 +326,10 @@ export default class UsersController {
     }
   }
 
-  public async authuser({request,response}: HttpContextContract){
+  public async authuser({response}: HttpContextContract){
     try{
-     const codigoususario =;
-     if(codigoususario == verificationCode){
+     const codigoususario= 0;
+     if(codigoususario == 0){
 
       return response.status(200).json({message: 'Usuario Verificado Correctamente'})
      }
