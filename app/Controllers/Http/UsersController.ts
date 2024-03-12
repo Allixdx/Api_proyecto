@@ -123,7 +123,6 @@ export default class UsersController {
     newUser.email = email;
     newUser.password = await Hash.make(password);
 
-    // Generar código de verificación y asignarlo al usuario
     const verificationCode = this.generateVerificationCode();
     newUser.verification_code = verificationCode;
 
