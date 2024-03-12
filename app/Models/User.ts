@@ -1,3 +1,5 @@
+// app/Models/User.ts
+
 import { DateTime } from 'luxon'
 import { BaseModel, column, beforeSave, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
 import Hash from '@ioc:Adonis/Core/Hash'
@@ -15,6 +17,12 @@ export default class User extends BaseModel {
 
   @column()
   public email: string
+
+  @column()
+  public email_verified_at: string
+
+  @column()
+  public verification_code: string | null // Asegúrate de tener esta línea
 
   @column({ serializeAs: null }) // No incluir el campo en las respuestas JSON
   public password: string
@@ -35,5 +43,4 @@ export default class User extends BaseModel {
       user.password = await Hash.make(user.password)
     }
   }
-  
 }
