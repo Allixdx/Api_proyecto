@@ -54,83 +54,89 @@ export default class UsersController {
     }
   }
  /**
-   * @swagger
-   * /api/users:
-   *   post:
-   *     tags:
-   *       - users
-   *     summary: Crear un nuevo usuario
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/UserInput'
-   *     responses:
-   *       201:
-   *         description: Usuario creado exitosamente
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/User'
-   *       400:
-   *         description: Bad Request
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Bad Request
-   *                 errors:
-   *                   type: object
-   *                   additionalProperties:
-   *                     type: array
-   *                     items:
-   *                       type: string
-   *       500:
-   *         description: Error interno del servidor
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Error al crear el usuario
-   *                 error:
-   *                   type: string
-   */
+ * @swagger
+ * /api/users:
+ *   post:
+ *     tags:
+ *       - users
+ *     summary: Crear un nuevo usuario
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/UserInput'
+ *     responses:
+ *       201:
+ *         description: Usuario creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/User'
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Bad Request
+ *                 error:
+ *                   type: string
+ *                   example: Error al crear el usuario
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error al crear el usuario
+ *                 error:
+ *                   type: string
+ *                   example: Descripción del error interno
+ */
  public async store({ request, response }: HttpContextContract) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   try {
-    const name = request.input('name')
-    const lastname = request.input('lastname')
-    const email = request.input('email')
-    const password = request.input('password')
+    const name = request.input('name');
+    const lastname = request.input('lastname');
+    const email = request.input('email');
+    const password = request.input('password');
 
-    function generateVerificationCode() {
-      const randomNumber = Math.floor(1000 + Math.random() * 9000);
-      return randomNumber.toString();
+    // Verificar si el correo electrónico ya existe
+    const existingUser = await User.findBy('email', email);
+    if (existingUser) {
+      return response.status(400).json({
+        message: 'Error al crear usuario',
+        error: 'Correo electrónico ya registrado',
+      });
     }
 
-    const verificationCode = generateVerificationCode();
-    const emailData = { code: verificationCode };
+    const newUser = new User();
+    newUser.name = name;
+    newUser.lastname = lastname;
+    newUser.email = email;
+    newUser.password = await Hash.make(password);
 
-    const newUser = new User()
-    newUser.name = name
-    newUser.lastname = lastname
-    newUser.email = email
-    newUser.password = await Hash.make(password)
-    await newUser.save()
+    const verificationCode = this.generateVerificationCode();
+    newUser.verification_code = verificationCode;
+
+    await newUser.save();
+
+    const emailData = { code: verificationCode };
 
     await Mail.send((message) => {
       message
         .from(Env.get('SMTP_USERNAME'), 'Healthy App')
         .to(email)
         .subject('Healthy App - Verificación de cuenta')
-        .htmlView('emails/welcome', emailData)
-    })
+        .htmlView('emails/welcome', emailData);
+    });
 
     return response.status(201).json({
       data: {
@@ -139,13 +145,18 @@ export default class UsersController {
         lastname: newUser.lastname,
         email: newUser.email,
       },
-    })
+    });
   } catch (error) {
     return response.status(400).json({
       message: 'Error al crear usuario',
       error: error.message,
-    })
+    });
   }
+}
+// Método para generar el código de verificación
+private generateVerificationCode() {
+  const randomNumber = Math.floor(1000 + Math.random() * 9000);
+  return randomNumber.toString();
 }
 /**
    * @swagger
@@ -325,20 +336,98 @@ export default class UsersController {
       })
     }
   }
+/**
+ * @swagger
+ * /api/users/login:
+ *   post:
+ *     tags:
+ *       - users
+ *     summary: Iniciar sesión de usuario.
+ *     description: Inicia sesión de usuario verificando el correo electrónico y el código de verificación.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               user_email:
+ *                 type: string
+ *                 format: email
+ *               password:
+ *                 type: string
+ *               verification_code:
+ *                 type: string
+ *             required:
+ *               - user_email
+ *               - password
+ *               - verification_code
+ *     responses:
+ *       200:
+ *         description: Inicio de sesión exitoso.
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Inicio de sesión exitoso
+ *       401:
+ *         description: Datos inválidos o usuario no verificado.
+ *         content:
+ *           application/json:
+ *             example:
+ *               title: Datos inválidos
+ *               message: Usuario no verificado o datos incorrectos
+ *               type: warning
+ *       400:
+ *         description: Error al iniciar sesión.
+ *         content:
+ *           application/json:
+ *             example:
+ *               message: Error al iniciar sesión
+ *               error: Descripción del error
+ */
+public async authLogin({ request, response }: HttpContextContract) {
+  try {
+    const user_email = request.input('user_email');
+    const password = request.input('password');
+    const verificationCode = request.input('verification_code');
 
-  public async authuser({response}: HttpContextContract){
-    try{
-     const codigoususario= 0;
-     if(codigoususario == 0){
+    const user = await User.query()
+      .where('email', user_email)
+      .where('verification_code', verificationCode)
+      .whereNull('deleted_at')
+      .first();
 
-      return response.status(200).json({message: 'Usuario Verificado Correctamente'})
-     }
+    console.log({ user_email, password, verificationCode }); 
+
+    if (!user || user.verification_code !== verificationCode) {
+      // Devolver error de datos inválidos
+      return response.status(401).send({
+        title: 'Datos inválidos',
+        message: 'Usuario no verificado o datos incorrectos',
+        type: 'warning',
+      });
     }
-    catch(error){
-      return response.status(400).json({
-        message: 'Codigo Incorrecto',
-        error: error.message,
-    })
+    console.log({ storedPassword: user.password }); 
+
+    if (!(await Hash.verify(user.password, password))) {
+      return response.status(401).send({
+        title: 'Datos inválidos',
+        message: 'Contraseña incorrecta',
+        type: 'warning',
+      });
     }
+
+    user.verification_code = null;
+    await user.save();
+
+    return response.status(200).json({ message: 'Inicio de sesión exitoso' });
+  } catch (error) {
+    return response.status(400).json({
+      message: 'Error al iniciar sesión',
+      error: error.message,
+    });
   }
+}
+
+
 }
