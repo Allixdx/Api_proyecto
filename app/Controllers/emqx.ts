@@ -1,5 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import axios, { AxiosResponse } from 'axios';
+import axios from 'axios';
 
 export default class EmqxController {
 
