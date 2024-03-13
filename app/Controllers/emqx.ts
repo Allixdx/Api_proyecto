@@ -2,70 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import axios, { AxiosResponse } from 'axios';
 
 export default class EmqxController {
-/**
- * @swagger
- * /api/publishEMQXTopic:
- *   post:
- *     tags:
- *       - EMQX
- *     summary: Publicar en un topic de EMQX
- *     consumes:
- *       - application/json
- *     produces:
- *       - application/json
- *     responses:
- *       200:
- *         description: Publicación exitosa
- *         schema:
- *           type: object
- *           properties:
- *             title:
- *               type: string
- *               example: Topico enviado
- *             message:
- *               type: string
- *               example: null
- *             type:
- *               type: string
- *               example: success
- *             data:
- *               type: object
- *               example: null
- *       202:
- *         description: Publicación aceptada pero no procesada completamente
- *         schema:
- *           type: object
- *           properties:
- *             title:
- *               type: string
- *               example: Error
- *             message:
- *               type: string
- *               example: Ocurrió un error
- *             type:
- *               type: string
- *               example: error
- *             data:
- *               type: object
- *               example: { error: "Mensaje de error" }
- *       500:
- *         description: Error interno del servidor
- *         schema:
- *           type: object
- *           properties:
- *             title:
- *               type: string
- *               example: Error
- *             message:
- *               type: string
- *               example: Ocurrió un error
- *             type:
- *               type: string
- *               example: error
- *             data:
- *               type: object
- *               example: { error: "Mensaje de error" }
- */
+
 public async publishEMQXTopic({ response }: HttpContextContract) {
     try {
         const url = 'http://143.198.135.231:18083/api/v5/publish';
