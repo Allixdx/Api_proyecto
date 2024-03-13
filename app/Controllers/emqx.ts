@@ -5,7 +5,7 @@ export default class EmqxController {
 
 public async publishEMQXTopic({ response }: HttpContextContract) {
     try {
-        const url = 'http://localhost:18083/api/v5/publish';
+        const url = 'http://143.198.135.231:18083/api/v5/publish';
         const payload = {
             "payload_encoding": "plain",
             "topic": "topicohttp",
