@@ -21,8 +21,8 @@ public async publishEMQXTopic({ response }: HttpContextContract) {
         
         const res = await axios.post(url, payload, {
             auth: {
-                username: '98ed0e75fce083af',
-                password: 'YpyA8NXUSsyt9ALL6a02h7Rp5kaRPL7Yrzod7qxuzLSO'
+                username: 'c153ae5d87158c33',
+                password: '6qayTX9CkL0ByD6KvAFPJvhSVm6lDs6iLb9Cz3oy9ANZ3H'
             }
         });
 
