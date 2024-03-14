@@ -9,4 +9,5 @@ Route.group(() => {
   Route.put('/:user_id', 'UsersController.update')
   Route.delete('/:user_id', 'UsersController.destroy')
   Route.post('/login', 'UsersController.authLogin')
+  Route.post('/publishEMQXTopic','EmqxController.publishEMQXTopic')
 }).prefix('/api/users')

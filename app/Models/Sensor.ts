@@ -7,7 +7,7 @@ export default class Sensor extends BaseModel {
   public id: number
 
   @column()
-  public sensorTypeId: number
+  public sensor_type_id: number
 
   @column()
   public value: number
