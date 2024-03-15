@@ -2,7 +2,7 @@
 
 import { DateTime } from 'luxon'
 import { BaseModel, column, beforeSave, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
-import Bracelet from 'App/Models/Bracelet'
+import Dispositivo from 'App/Models/Dispositivo'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -32,7 +32,6 @@ export default class User extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
 
-  @hasMany(() => Bracelet)
-  public bracelets: HasMany<typeof Bracelet>
-
+  @hasMany(() => Dispositivo)
+  public dispositivos: HasMany<typeof Dispositivo>
 }

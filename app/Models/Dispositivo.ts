@@ -1,20 +1,14 @@
 import { DateTime } from 'luxon'
 import { BaseModel, BelongsTo, HasMany, column, belongsTo, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import User from 'App/Models/User'
-import BraceletSensor from 'App/Models/BraceletSensor'
+import DispositivoSensor from 'App/Models/DispositivoSensor'
 
-export default class Bracelet extends BaseModel {
+export default class Dispositivo extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
-  @column({ columnName: 'user_id' }) 
-  public userId: number
-
   @column()
-  public name: string
-
-  @column()
-  public description: string
+  public tipo_dispositivo_id: number
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
@@ -27,6 +21,6 @@ export default class Bracelet extends BaseModel {
   public user: BelongsTo<typeof User>
 
   // Relación con el modelo BraceletSensor (tiene muchos sensores)
-  @hasMany(() => BraceletSensor)
-  public sensors: HasMany<typeof BraceletSensor>
+  @hasMany(() => DispositivoSensor)
+  public sensors: HasMany<typeof DispositivoSensor>
 }

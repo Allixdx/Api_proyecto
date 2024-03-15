@@ -7,59 +7,13 @@ import Env from '@ioc:Adonis/Core/Env'
 
 export default class UsersController {
 /**
-   * @swagger
-   * /api/users:
-   *   get:
-   *     security:
-   *       - bearerAuth: []
-   *     tags:
-   *       - users
-   *     produces:
-   *       - application/json
-   *     summary: Obtener todos los usuarios
-   *     responses:
-   *       200:
-   *         description: Respuesta exitosa
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 status:
-   *                   type: string
-   *                   example: success
-   *                 message:
-   *                   type: string
-   *                   example: Successfully retrieved all users
-   *                 data:
-   *                   type: array
-   *                   items:
-   *                     $ref: '#/components/schemas/User'
-   */
-  public async index({ response }: HttpContextContract) {
-    try {
-      const users = await User.all()
-
-      return response.status(200).send({
-        status: 'success',
-        message: 'Successfully retrieved all users',
-        data: users,
-      })
-    } catch (error) {
-      return response.status(500).send({
-        status: 'error',
-        message: 'An error occurred while retrieving users',
-        error: error.message,
-      })
-    }
-  }
- /**
  * @swagger
  * /api/users:
  *   post:
  *     tags:
  *       - users
  *     summary: Crear un nuevo usuario
+ *     description: Crea un nuevo usuario con los datos proporcionados y envía un correo electrónico de verificación.
  *     requestBody:
  *       required: true
  *       content:
@@ -68,13 +22,29 @@ export default class UsersController {
  *             $ref: '#/components/schemas/UserInput'
  *     responses:
  *       201:
- *         description: Usuario creado exitosamente
+ *         description: Usuario creado exitosamente. Se ha enviado un correo electrónico de verificación.
  *         content:
  *           application/json:
  *             schema:
- *               $ref: '#/components/schemas/User'
+ *               type: object
+ *               properties:
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     user_id:
+ *                       type: number
+ *                       description: ID del usuario creado.
+ *                     name:
+ *                       type: string
+ *                       description: Nombre del usuario.
+ *                     lastname:
+ *                       type: string
+ *                       description: Apellido del usuario.
+ *                     email:
+ *                       type: string
+ *                       description: Correo electrónico del usuario.
  *       400:
- *         description: Bad Request
+ *         description: Error al crear el usuario. El correo electrónico proporcionado ya está registrado.
  *         content:
  *           application/json:
  *             schema:
@@ -82,12 +52,12 @@ export default class UsersController {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Bad Request
+ *                   example: Error al crear usuario
  *                 error:
  *                   type: string
- *                   example: Error al crear el usuario
+ *                   example: Correo electrónico ya registrado
  *       500:
- *         description: Error interno del servidor
+ *         description: Error interno del servidor al intentar crear el usuario.
  *         content:
  *           application/json:
  *             schema:
@@ -95,12 +65,35 @@ export default class UsersController {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Error al crear el usuario
+ *                   example: Error al crear usuario
  *                 error:
  *                   type: string
  *                   example: Descripción del error interno
+ * components:
+ *   schemas:
+ *     UserInput:
+ *       type: object
+ *       properties:
+ *         name:
+ *           type: string
+ *         lastname:
+ *           type: string
+ *         email:
+ *           type: string
+ *         password:
+ *           type: string
+ *       required:
+ *         - name
+ *         - lastname
+ *         - email
+ *         - password
+ *       example:
+ *         name: John
+ *         lastname: Doe
+ *         email: john.doe@example.com
+ *         password: password123
  */
- public async store({ request, response }: HttpContextContract) {
+ public async register({ request, response }: HttpContextContract) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   try {
     const name = request.input('name');
@@ -159,183 +152,94 @@ private generateVerificationCode() {
   return randomNumber.toString();
 }
 /**
-   * @swagger
-   * components:
-   *   schemas:
-   *     User:
-   *       type: object
-   *       properties:
-   *         id:
-   *           type: integer
-   *         name:
-   *           type: string
-   *         lastname:
-   *           type: string
-   *         email:
-   *           type: string
-   *         createdAt:
-   *           type: string
-   *           format: date-time
-   *         updatedAt:
-   *           type: string
-   *           format: date-time
-   *
-   *     UserInput:
-   *       type: object
-   *       properties:
-   *         name:
-   *           type: string
-   *         lastname:
-   *           type: string
-   *         email:
-   *           type: string
-   *           format: email
-   *         password:
-   *           type: string
-   */
-  public async show({ params, response }: HttpContextContract) {
-    try {
-      const user_id = params.user_id
-      const user = await User.findOrFail(user_id)
-      return response.status(200).send(user)
-    } catch (error) {
-      return response.status(404).json({ message: 'Error al encontrar usuario' })
+ * @swagger
+ * /api/users/{id}:
+ *   put:
+ *     tags:
+ *       - users
+ *     summary: Actualización de datos de usuario
+ *     description: Actualiza los datos de un usuario existente.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del usuario a actualizar.
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *               lastname:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Datos de usuario actualizados exitosamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje indicando el éxito de la actualización.
+ */
+public async update({ auth, request, response }: HttpContextContract) {
+  try {
+    const user = auth.user
+
+    if (!user) {
+      return response.status(401).json({ error: 'Usuario no autenticado' })
     }
+
+    user.merge(request.only(['name', 'lastname', 'email']))
+    await user.save()
+
+    return response.status(200).json({ message: 'Datos de usuario actualizados' })
+  } catch (error) {
+    return response.status(500).json({ error: 'Error interno del servidor al actualizar los datos del usuario' })
   }
+}
 /**
-   * @swagger
-   * /api/users/{user_id}:
-   *   put:
-   *     tags:
-   *       - users
-   *     summary: Actualizar un usuario por su ID
-   *     parameters:
-   *       - name: user_id
-   *         in: path
-   *         required: true
-   *         description: ID del usuario a actualizar
-   *         schema:
-   *           type: integer
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             $ref: '#/components/schemas/UserInput'
-   *     responses:
-   *       200:
-   *         description: Usuario actualizado correctamente
-   *         content:
-   *           application/json:
-   *             schema:
-   *               $ref: '#/components/schemas/User'
-   *       404:
-   *         description: Usuario no encontrado
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Usuario no encontrado
-   *       500:
-   *         description: Error interno del servidor
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Error al actualizar el usuario
-   *                 error:
-   *                   type: string
-   */
-  public async update({ params, request, response }: HttpContextContract) {
-    try {
-      const user_id = params.user_id
-      const user = await User.findOrFail(user_id)
+ * @swagger
+ * /api/users/{id}:
+ *   delete:
+ *    tags:
+ *      - users
+ *     summary: Eliminación de cuenta de usuario
+ *     description: Elimina la cuenta de usuario actual.
+ *     parameters:
+ *       - name: user_id
+ *         in: path
+ *         required: true
+ *         description: ID del usuario a eliminar.
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       '200':
+ *         description: Cuenta de usuario eliminada exitosamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje indicando el éxito de la eliminación.
+ */
+public async destroy({ auth, response }: HttpContextContract) {
+  const user = auth.user!
+  await user.delete()
 
-      const { email } = request.only(['email'])
-
-      user.email = email
-
-      await user.save()
-
-      return response.status(200).send(user)
-    } catch (error) {
-      if (error.code === 'E_ROW_NOT_FOUND') {
-        return response.status(404).json({ message: 'Usuario no encontrado' })
-      }
-      return response.status(500).json({
-        message: 'Error al actualizar el usuario',
-        error: error.message,
-      })
-    }
-  }
-/**
-   * @swagger
-   * /api/users/{user_id}:
-   *   delete:
-   *     tags:
-   *       - users
-   *     summary: Eliminar un usuario por su ID
-   *     parameters:
-   *       - name: user_id
-   *         in: path
-   *         required: true
-   *         description: ID del usuario a eliminar
-   *         schema:
-   *           type: integer
-   *     responses:
-   *       204:
-   *         description: Usuario eliminado correctamente
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Usuario eliminado correctamente
-   *       404:
-   *         description: Usuario no encontrado
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Usuario no encontrado
-   *       500:
-   *         description: Error interno del servidor
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Error al eliminar el usuario
-   *                 error:
-   *                   type: string
-   */
-  public async destroy({ params, response }: HttpContextContract) {
-    try {
-      const user_id = params.user_id
-      const user = await User.findOrFail(user_id)
-      await user.delete()
-
-      return response.status(204).json({ message: 'Usuario eliminado correctamente' })
-    } catch (error) {
-      return response.status(500).json({
-        message: 'Error al eliminar el usuario',
-        error: error.message,
-      })
-    }
-  }
+  return response.json({ message: 'Cuenta de usuario eliminada' })
+}
 /**
  * @swagger
  * /api/users/login:
@@ -428,6 +332,29 @@ public async authLogin({ request, response }: HttpContextContract) {
     });
   }
 }
-
+/**
+ * @swagger
+ * /api/users/logout:
+ *   post:
+ *     tags:
+ *       - users
+ *     summary: Cierre de sesión de usuario
+ *     description: Cierra la sesión actual del usuario.
+ *     responses:
+ *       '200':
+ *         description: Sesión cerrada exitosamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje indicando el éxito del cierre de sesión.
+ */
+public async logout({ auth, response }: HttpContextContract) {
+  await auth.logout()
+  return response.json({ message: 'Cierre de sesión exitoso' })
+}
 
 }
