@@ -1,5 +1,4 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import User from 'App/Models/User'
 import { rules, schema } from '@ioc:Adonis/Core/Validator'
 import Habit from 'App/Models/Habit'
 
@@ -481,10 +480,10 @@ export default class HabitsController {
           if(body.name){
             habit.name = body.name
           }
-          if(body.last_name){
+          if(body.description){
             habit.description = body.description
           }
-          if(body.birth_date){
+          if(body.user_id){
             habit.user_id = body.user_id
           }
         }catch(error){

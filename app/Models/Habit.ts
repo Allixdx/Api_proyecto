@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo,BelongsTo, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, belongsTo,BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Configuration from './Configuration'
 
@@ -7,7 +7,7 @@ export default class Habit extends BaseModel {
   @column({ isPrimary: true })
   public id: number
 
-  public static table = "Habitos"
+  public static table = "habitos"
 
   @column()
   public user_id: number 
@@ -34,6 +34,6 @@ export default class Habit extends BaseModel {
     localKey: 'id',  
     foreignKey: 'habit_id',
   })
-  public configuration: BelongsTo<typeof Configuration>
+  public configuration: HasMany<typeof Configuration>
 
 }
