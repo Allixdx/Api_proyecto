@@ -71,7 +71,7 @@ public async publishEMQXTopic({ response }: HttpContextContract) {
         const url = 'http://143.198.135.231:18083/api/v5/publish';
         const payload = {
             "payload_encoding": "plain",
-            "topic": "topicohttp",
+            "topic": "test/2",
             "qos": 0, // Se cambió "gos" a "qos"
             "payload": "wilvardo",
             "properties": {
@@ -89,17 +89,18 @@ public async publishEMQXTopic({ response }: HttpContextContract) {
             }
         });
 
-        if (res.status === 202) { // Se corrigió el chequeo del estado de respuesta
+        if (res.status === 200) { // Se corrigió el chequeo del estado de respuesta
             return response.status(res.status).send({
                 title: 'Topico enviado',
-                message: null,
+                message: 'prueba',
                 type: 'success',
                 data: null
             });
+
         } else {
-            return response.status(res.status).send({
+            return response.status(500).send({
                 title: 'Error',
-                message: 'Ocurrió un error',
+                message: 'Ocurrio un error',
                 type: 'error',
                 data: { error: res.data } // Se corrigió para tomar res.data en lugar de res.response
             });
@@ -107,7 +108,7 @@ public async publishEMQXTopic({ response }: HttpContextContract) {
     } catch (error) {
         return response.status(500).send({
             title: 'Error',
-            message: 'Ocurrió un error',
+            message: 'Ocurrió dddun error',
             type: 'error',
             data: { error: error.message } // Se corrigió para tomar error.message
         });
