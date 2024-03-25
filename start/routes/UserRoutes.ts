@@ -5,7 +5,7 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.group(() => {
   Route.post('/logout', 'UsersController.logout')
 
-  Route.get('/:id', 'UsersController.show')
+ // Route.get('/:id', 'UsersController.show')
 
   Route.post('/', 'UsersController.register')
 
@@ -20,6 +20,6 @@ Route.group(() => {
 
   Route.post('/publishEMQXTopic','EmqxController.publishEMQXTopic')
 
-  Route.post('/suscripcionEMQX','EmqxController.suscripcionEMQX')
-  
+  Route.get('/obtenerMensajesDelTopico','EmqxController.obtenerMensajesDelTopico')
+
 }).prefix('/api/users')
