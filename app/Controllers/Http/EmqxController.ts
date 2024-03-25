@@ -113,5 +113,93 @@ public async publishEMQXTopic({ response }: HttpContextContract) {
         });
     }
 }
+ /**
+   * @swagger
+   * /api/users/suscripcionEMQX:
+   *   post:
+   *     tags:
+   *       - EMQX
+   *     summary: Suscribirse a un tópico de EMQX
+   *     responses:
+   *       200:
+   *         description: Suscripción exitosa
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                   example: Suscripción exitosa
+   *                 message:
+   *                   type: string
+   *                   example: Te has suscrito al tópico exitosamente
+   *                 type:
+   *                   type: string
+   *                   example: success
+   *                 data:
+   *                   type: object
+   *                   example: null
+   *       500:
+   *         description: Error al suscribirse al tópico
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                   example: Error
+   *                 message:
+   *                   type: string
+   *                   example: Ocurrió un error al suscribirse al tópico
+   *                 type:
+   *                   type: string
+   *                   example: error
+   *                 data:
+   *                   type: object
+   *                   example: { error: "Mensaje de error" }
+   */
+  public async suscripcionEMQX({ response }: HttpContextContract) {
+    try {
+      const url = 'http://143.198.135.231:18083/api/v5/subscribe';
+      const payload = {
+        "topics": ["#"], // Suscribirse a todos los tópicos
+        "qos": 0
+      };
+      const res = await axios.post(url, payload, {
+        auth: {
+          username: 'c153ae5d87158c33',
+          password: '6qayTX9CkL0ByD6KvAFPJvhSVm6lDs6iLb9Cz3oy9ANZ3H'
+        }
+      });
 
-}
+      if (res.status === 200 || res.status === 204) {
+        console.log('Suscripción exitosa al tópico:', payload.topics);
+        return response.status(200).send({
+          title: 'Suscripción exitosa',
+          message: 'Te has suscrito al tópico exitosamente',
+          type: 'success',
+          data: null
+        });
+      } else {
+        console.error('Error en la suscripción al tópico:', payload.topics);
+        return response.status(500).send({
+          title: 'Error',
+          message: 'Ocurrió un error al suscribirse al tópico',
+          type: 'error',
+          data: null
+        });
+      }
+    } catch (error) {
+      console.error('Error al suscribirse al tópico:', error);
+      return response.status(500).send({
+        title: 'Error',
+        message: 'Ocurrió un error al suscribirse al tópico',
+        type: 'error',
+        data: { error: error.message }
+      });
+    }
+  }
+    }    
+

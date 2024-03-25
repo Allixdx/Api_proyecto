@@ -4,7 +4,6 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import Env from '@ioc:Adonis/Core/Env'
 
-
 export default class UsersController {
 /**
  * @swagger
