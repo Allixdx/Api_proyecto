@@ -1,7 +1,7 @@
 // app/Models/User.ts
 
 import { DateTime } from 'luxon'
-import { BaseModel, column, beforeSave, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
 import Dispositivo from 'App/Models/Dispositivo'
 
 export default class User extends BaseModel {
