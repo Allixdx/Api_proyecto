@@ -4,6 +4,7 @@ import Sensor from 'App/Models/Sensor'
 import Dispositivo from 'App/Models/Dispositivo'
 
 export default class DispositivoSensor extends BaseModel {
+  public static table ='dispositivo_sensors'
   @column({ isPrimary: true })
   public id: number
 

@@ -116,7 +116,7 @@ export default class UsersController {
     newUser.password = await Hash.make(password);
 
     const verificationCode = this.generateVerificationCode();
-    newUser.verification_code = verificationCode;
+    newUser.verificationCode = verificationCode;
 
     await newUser.save();
 
@@ -300,9 +300,7 @@ public async authLogin({ request, response }: HttpContextContract) {
       .whereNull('deleted_at')
       .first();
 
-    console.log({ user_email, password, verificationCode }); 
-
-    if (!user || user.verification_code !== verificationCode) {
+    if (!user || user.verificationCode !== verificationCode) {
       // Devolver error de datos inválidos
       return response.status(401).send({
         title: 'Datos inválidos',
@@ -310,7 +308,6 @@ public async authLogin({ request, response }: HttpContextContract) {
         type: 'warning',
       });
     }
-    console.log({ storedPassword: user.password }); 
 
     if (!(await Hash.verify(user.password, password))) {
       return response.status(401).send({
@@ -320,7 +317,7 @@ public async authLogin({ request, response }: HttpContextContract) {
       });
     }
 
-    user.verification_code = null;
+    user.verificationCode = null;
     await user.save();
 
     return response.status(200).json({ message: 'Inicio de sesión exitoso' });
@@ -354,6 +351,32 @@ public async authLogin({ request, response }: HttpContextContract) {
 public async logout({ auth, response }: HttpContextContract) {
   await auth.logout()
   return response.json({ message: 'Cierre de sesión exitoso' })
+}
+public async login({ request, auth, response }: HttpContextContract) {
+  try {
+    const email = request.input('email');
+    const password = request.input('password');
+
+    // Verificar las credenciales del usuario
+    const user = await User.query().where('email', email).first();
+
+    if (!user) {
+      return response.status(401).json({ message: 'Usuario no encontrado' });
+    }
+
+    const isPasswordValid = await Hash.verify(user.password, password);
+
+    if (!isPasswordValid) {
+      return response.status(401).json({ message: 'Contraseña incorrecta' });
+    }
+
+    // Generar y devolver el token de autenticación
+    const token = await auth.use('api').generate(user, { expiresIn: '7 days' });
+
+    return response.status(200).json({ token });
+  } catch (error) {
+    return response.status(500).json({ message: 'Error al iniciar sesión', error: error.message });
+  }
 }
 
 }

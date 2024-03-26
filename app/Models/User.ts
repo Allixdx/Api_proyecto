@@ -1,37 +1,38 @@
 // app/Models/User.ts
-
-import { DateTime } from 'luxon'
-import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
-import Dispositivo from 'App/Models/Dispositivo'
+import { DateTime } from 'luxon';
+import { BaseModel, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm';
+import Habito from './Habito';
 
 export default class User extends BaseModel {
+  public static table='users'
+  
   @column({ isPrimary: true })
-  public id: number
+  public id: number;
 
   @column()
-  public name: string
+  public name: string;
 
   @column()
-  public lastname: string
+  public lastname: string;
 
   @column()
-  public email: string
-
-  @column()
-  public email_verified_at: string
-
-  @column()
-  public verification_code: string | null // Asegúrate de tener esta línea
-
-  @column({ serializeAs: null }) // No incluir el campo en las respuestas JSON
-  public password: string
+  public email: string;
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public emailVerifiedAt: DateTime;
+
+  @column()
+  public verificationCode: string | null;
+
+  @column()
+  public password: string;
+
+  @column.dateTime({ autoCreate: true })
+  public createdAt: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  public updatedAt: DateTime;
 
-  @hasMany(() => Dispositivo)
-  public dispositivos: HasMany<typeof Dispositivo>
+  @hasMany(() => Habito)
+  public habitos: HasMany<typeof Habito>;
 }
