@@ -7,6 +7,7 @@ Route.group(()=> {
   Route.get('/:id', 'DispositivosController.show');
   Route.put('/:id', 'DispositivosController.update');
   Route.delete('/:id', 'DispositivosController.destroy');
+  Route.post('/creardispositivo','DispositivosController.creardispositivo');
 }).prefix('/api/dispositivos')
 
 

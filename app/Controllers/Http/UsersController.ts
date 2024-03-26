@@ -41,8 +41,6 @@ export default class UsersController {
  * @swagger
  * /api/users:
  *  post:
- *    security:
- *      - bearerAuth: []
  *      tags:
  *        - Users
  *      summary: Crear un nuevo usuario
@@ -637,7 +635,7 @@ public async correorecuperacion({ request, response }: HttpContextContract) {
 
     await Mail.send((message) => {
       message
-        .from(Env.get('SMTP_USERNAME'), 'Nombre de la Aplicación')
+        .from(Env.get('SMTP_USERNAME'), 'Healthy App')
         .to(email)
         .subject('Recuperación de Contraseña')
         .htmlView('emails/recuperacion', { verificationCode }) 
