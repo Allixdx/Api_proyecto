@@ -24,6 +24,7 @@ Route.group(() => {
   Route.get('/obtenerMensajesDelTopico','EmqxController.obtenerMensajesDelTopico')
 
   Route.post('/login','UsersController.login')
+  Route.post('/recuperar-contra','UsersController.correorecuperacion')
 
   Route.put('/update-password/:id','UsersController.updatePassword')
 

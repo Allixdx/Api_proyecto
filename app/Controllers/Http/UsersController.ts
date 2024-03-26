@@ -5,134 +5,126 @@ import User from 'App/Models/User'
 import Env from '@ioc:Adonis/Core/Env'
 
 export default class UsersController {
-    /**
+  /**
    * @swagger
    * /api/users:
-   *   get:
-   *     tags:
-   *       - Users
-   *     summary: Obtener todos los usuarios
-   *     responses:
-   *       200:
-   *         description: Respuesta exitosa
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 status:
-   *                   type: string
-   *                   example: success
-   *                 message:
-   *                   type: string
-   *                   example: Successfully retrieved all users
-   *                 data:
-   *                   type: array
-   *                   items:
-   *                     $ref: '#/components/schemas/users'
+   *  get:
+   *    tags:
+   *      - users
+   *    summary: list of sensors
+   *    produces:
+   *      - application/json
+   *    responses:
+   *      200:
+   *        description: Success!!
+   *        content:
+   *          application/json:
+   *            schema:
+   *              type: object
+   *              properties:
+   *                title:
+   *                  type: string
+   *                  description: title 
+   *                data:
+   *                  type: string 
+   *                  description: jajajaj
    */
-  public async index({ response }: HttpContextContract) {
-    try {
-      const users = await User.all();
-      return response.status(200).send({
-        status: 'success',
-        message: 'Successfully retrieved all users',
-        data: users,
-      });
-    } catch (error) {
-      return response.status(500).send({
-        status: 'error',
-        message: 'An error occurred while retrieving users',
-        error: error.message,
-      });
-    }
-  } 
+  public async index({response}:HttpContextContract){
+    const users = await User.all()
+    return response.status(200).send({
+      title:'Success!!',
+      messgae:'Lista de usuarios',
+      data:users
+    })
+  }
 /**
  * @swagger
  * /api/users:
- *   post:
- *     tags:
- *       - Users
- *     summary: Crear un nuevo usuario
- *     description: Crea un nuevo usuario con los datos proporcionados y envía un correo electrónico de verificación.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             $ref: '#/components/schemas/UserInput'
- *     responses:
- *       201:
- *         description: Usuario creado exitosamente. Se ha enviado un correo electrónico de verificación.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 data:
- *                   type: object
- *                   properties:
- *                     user_id:
- *                       type: number
- *                       description: ID del usuario creado.
- *                     name:
- *                       type: string
- *                       description: Nombre del usuario.
- *                     lastname:
- *                       type: string
- *                       description: Apellido del usuario.
- *                     email:
- *                       type: string
- *                       description: Correo electrónico del usuario.
- *       400:
- *         description: Error al crear el usuario. El correo electrónico proporcionado ya está registrado.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Error al crear usuario
- *                 error:
- *                   type: string
- *                   example: Correo electrónico ya registrado
- *       500:
- *         description: Error interno del servidor al intentar crear el usuario.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Error al crear usuario
- *                 error:
- *                   type: string
- *                   example: Descripción del error interno
- * components:
- *   schemas:
- *     UserInput:
- *       type: object
- *       properties:
- *         name:
- *           type: string
- *         lastname:
- *           type: string
- *         email:
- *           type: string
- *         password:
- *           type: string
- *       required:
- *         - name
- *         - lastname
- *         - email
- *         - password
- *       example:
- *         name: John
- *         lastname: Doe
- *         email: john.doe@example.com
- *         password: password123
+ *  post:
+ *    security:
+ *      - bearerAuth: []
+ *      tags:
+ *        - users
+ *      summary: Crear un nuevo usuario
+ *      description: Crea un nuevo usuario con los datos proporcionados y envía un correo electrónico de verificación.
+ *      requestBody:
+ *        required: true
+ *        content:
+ *          application/json:
+ *            schema:
+ *              $ref: '#/components/schemas/UserInput'
+ *      responses:
+ *        201:
+ *          description: Usuario creado exitosamente. Se ha enviado un correo electrónico de verificación.
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  data:
+ *                    type: object
+ *                    properties:
+ *                      user_id:
+ *                        type: number
+ *                        description: ID del usuario creado.
+ *                      name:
+ *                        type: string
+ *                        description: Nombre del usuario.
+ *                      lastname:
+ *                        type: string
+ *                        description: Apellido del usuario.
+ *                      email:
+ *                        type: string
+ *                        description: Correo electrónico del usuario.
+ *        400:
+ *          description: Error al crear el usuario. El correo electrónico proporcionado ya está registrado.
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    example: Error al crear usuario
+ *                  error:
+ *                    type: string
+ *                    example: Correo electrónico ya registrado
+ *        500:
+ *          description: Error interno del servidor al intentar crear el usuario.
+ *          content:
+ *            application/json:
+ *              schema:
+ *                type: object
+ *                properties:
+ *                  message:
+ *                    type: string
+ *                    example: Error al crear usuario
+ *                  error:
+ *                    type: string
+ *                    example: Descripción del error interno
+ *  components:
+ *    schemas:
+ *      UserInput:
+ *        type: object
+ *        properties:
+ *          name:
+ *            type: string
+ *          lastname:
+ *            type: string
+ *          email:
+ *            type: string
+ *          password:
+ *            type: string
+ *        required:
+ *          - name
+ *          - lastname
+ *          - email
+ *          - password
+ *        example:
+ *          name: John
+ *          lastname: Doe
+ *          email: john.doe@example.com
+ *          password: password123
  */
  public async register({ request, response }: HttpContextContract) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -492,7 +484,6 @@ public async logout({ auth, response }: HttpContextContract) {
   await auth.logout()
   return response.json({ message: 'Cierre de sesión exitoso' })
 }
-
 /**
  * @swagger
  * /api/users/login:
@@ -573,4 +564,192 @@ public async login({ request, auth, response }: HttpContextContract) {
   }
 }
 
+/**dahdjahdahjdajdhajdhajdhjadjahdjadjahdjahdjahjhjahajhdjahd */
+/**
+ * @swagger
+ * /api/users/recuperar-contra:
+ *   post:
+ *     tags:
+ *       - users
+ *     summary: Solicitar recuperación de contraseña
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Correo electrónico del administrador para recuperar la contraseña
+ *     responses:
+ *       200:
+ *         description: Correo electrónico enviado con éxito
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Se ha enviado un correo electrónico con un código de recuperación.
+ *       400:
+ *         description: Correo electrónico no encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: No se encontró un administrador con este correo electrónico.
+ *       500:
+ *         description: Error del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error al enviar el correo electrónico de recuperación.
+ *                 error:
+ *                   type: string
+ *                   example: Mensaje de error detallado
+ */
+public async correorecuperacion({ request, response }: HttpContextContract) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  try {
+    const email = request.input('email')
+    const user = await User.findBy('email', email)
+
+    if (!user) {
+      return response.status(400).json({
+        message: 'No se encontró un usuario con este correo electrónico.',
+      })
+    }
+
+    const verificationCode = this.generarcodigo()
+
+    user.verificationCode = verificationCode
+    await user.save()
+
+    await Mail.send((message) => {
+      message
+        .from(Env.get('SMTP_USERNAME'), 'Nombre de la Aplicación')
+        .to(email)
+        .subject('Recuperación de Contraseña')
+        .htmlView('emails/recuperacion', { verificationCode }) 
+    })
+
+    return response.status(200).json({
+      message: 'Se ha enviado un correo electrónico con un código de recuperación.',
+    })
+  } catch (error) {
+    return response.status(500).json({
+      message: 'Error al enviar el correo electrónico de recuperación.',
+      error: error.message,
+    })
+  }
+}
+public generarcodigo() {
+  const randomNumber = Math.floor(1000 + Math.random() * 9000)
+  return randomNumber.toString()
+}
+/**
+* @swagger
+* /api/users/actualizarpassword:
+*   post:
+*     tags:
+*       - users
+*     summary: Actualizar la contraseña del administrador utilizando un código de recuperación
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             required:
+*               - email
+*               - recoveryCode
+*               - newPassword
+*             properties:
+*               email:
+*                 type: string
+*                 format: email
+*               recoveryCode:
+*                 type: string
+*               newPassword:
+*                 type: string
+*                 format: password
+*     responses:
+*       200:
+*         description: Contraseña actualizada exitosamente
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 message:
+*                   type: string
+*                   example: Contraseña actualizada exitosamente.
+*       400:
+*         description: Código de recuperación no válido
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 message:
+*                   type: string
+*                   example: El código de recuperación no es válido.
+*       404:
+*         description: Administrador no encontrado
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 message:
+*                   type: string
+*                   example: No se encontró un administrador con este correo electrónico.
+*       500:
+*         description: Error del servidor
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 message:
+*                   type: string
+*                   example: Error al actualizar la contraseña.
+*                 error:
+*                   type: string
+*                   example: Mensaje de error detallado
+*/
+public async actualizarPassword({ request, response }: HttpContextContract) {
+  try {
+    const { email, recoveryCode, newPassword } = request.only(['email', 'recoveryCode', 'newPassword'])
+    const user = await User.findByOrFail('email', email)
+
+    if (user.verificationCode!== recoveryCode || !user.verificationCode) {
+      return response.status(400).json({
+        message: 'El código de recuperación no es válido.',
+      });
+    }      
+    user.password = await Hash.make(newPassword)
+    user.verificationCode = null
+    await user.save()
+
+    return response.status(200).json({
+      message: 'Contraseña actualizada exitosamente.',
+    })
+  } catch (error) {
+    return response.status(500).json({
+      message: 'Error al actualizar la contraseña.',
+      error: error.message,
+    })
+  }
+}
 }
