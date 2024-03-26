@@ -10,7 +10,7 @@ export default class UsersController {
    * /api/users:
    *  get:
    *    tags:
-   *      - users
+   *      - Users
    *    summary: list of sensors
    *    produces:
    *      - application/json
@@ -44,7 +44,7 @@ export default class UsersController {
  *    security:
  *      - bearerAuth: []
  *      tags:
- *        - users
+ *        - Users
  *      summary: Crear un nuevo usuario
  *      description: Crea un nuevo usuario con los datos proporcionados y envía un correo electrónico de verificación.
  *      requestBody:
@@ -570,7 +570,7 @@ public async login({ request, auth, response }: HttpContextContract) {
  * /api/users/recuperar-contra:
  *   post:
  *     tags:
- *       - users
+ *       - Users
  *     summary: Solicitar recuperación de contraseña
  *     requestBody:
  *       required: true
@@ -662,7 +662,7 @@ public generarcodigo() {
 * /api/users/actualizarpassword:
 *   post:
 *     tags:
-*       - users
+*       - Users
 *     summary: Actualizar la contraseña del administrador utilizando un código de recuperación
 *     requestBody:
 *       required: true
