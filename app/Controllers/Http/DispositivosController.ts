@@ -7,7 +7,7 @@ export default class DispositivosController {
    * /api/dispositivos:
    *   get:
    *     tags:
-   *       - dispositivos
+   *       - Dispositivos
    *     summary: Obtener todos los dispositivos
    *     responses:
    *       200:
@@ -49,7 +49,7 @@ export default class DispositivosController {
  * /api/dispositivos:
  *   post:
  *     tags:
- *       - dispositivos
+ *       - Dispositivos
  *     summary: Crear un nuevo dispositivo
  *     requestBody:
  *       required: true
@@ -135,7 +135,7 @@ public async store({ request, response, auth }: HttpContextContract) {
    * /api/dispositivos/{id}:
    *   get:
    *     tags:
-   *       - dispositivos
+   *       - Dispositivos
    *     summary: Obtener un dispositivo por su ID
    *     parameters:
    *       - name: id
@@ -176,7 +176,7 @@ public async show({ params, response }: HttpContextContract) {
    * /api/dispositivos/{id}:
    *   put:
    *     tags:
-   *       - dispositivos
+   *       - Dispositivos
    *     summary: Actualizar un dispositivo por su ID
    *     parameters:
    *       - name: id
@@ -244,7 +244,7 @@ public async show({ params, response }: HttpContextContract) {
    * /api/dispositivos/{id}:
    *   delete:
    *     tags:
-   *       - dispositivos
+   *       - Dispositivos
    *     summary: Eliminar un dispositivo por su ID
    *     parameters:
    *       - name: id

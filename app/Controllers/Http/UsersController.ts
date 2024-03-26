@@ -5,12 +5,54 @@ import User from 'App/Models/User'
 import Env from '@ioc:Adonis/Core/Env'
 
 export default class UsersController {
+    /**
+   * @swagger
+   * /api/users:
+   *   get:
+   *     tags:
+   *       - Users
+   *     summary: Obtener todos los usuarios
+   *     responses:
+   *       200:
+   *         description: Respuesta exitosa
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 status:
+   *                   type: string
+   *                   example: success
+   *                 message:
+   *                   type: string
+   *                   example: Successfully retrieved all users
+   *                 data:
+   *                   type: array
+   *                   items:
+   *                     $ref: '#/components/schemas/users'
+   */
+  public async index({ response }: HttpContextContract) {
+    try {
+      const users = await User.all();
+      return response.status(200).send({
+        status: 'success',
+        message: 'Successfully retrieved all users',
+        data: users,
+      });
+    } catch (error) {
+      return response.status(500).send({
+        status: 'error',
+        message: 'An error occurred while retrieving users',
+        error: error.message,
+      });
+    }
+  } 
 /**
  * @swagger
  * /api/users:
  *   post:
  *     tags:
- *       - users
+ *       - Users
  *     summary: Crear un nuevo usuario
  *     description: Crea un nuevo usuario con los datos proporcionados y envía un correo electrónico de verificación.
  *     requestBody:
@@ -154,7 +196,7 @@ private generateVerificationCode() {
  * /api/users/{id}:
  *   put:
  *     tags:
- *       - users
+ *       - Users
  *     summary: Actualización de datos de usuario
  *     description: Actualiza los datos de un usuario existente.
  *     parameters:
@@ -207,10 +249,109 @@ public async update({ auth, request, response }: HttpContextContract) {
 }
 /**
  * @swagger
+ * /api/users/update-password/{id}:
+ *   put:
+ *     tags:
+ *       - Users
+ *     summary: Actualización de contraseña de usuario
+ *     description: Actualiza la contraseña de un usuario existente.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del usuario cuya contraseña se va a actualizar.
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Correo electrónico del usuario.
+ *               password:
+ *                 type: string
+ *                 description: Nueva contraseña del usuario.
+ *     responses:
+ *       '200':
+ *         description: Contraseña de usuario actualizada exitosamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje indicando el éxito de la actualización de contraseña.
+ *       '400':
+ *         description: La contraseña debe tener al menos 8 caracteres.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ *       '404':
+ *         description: Usuario no encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ *       '500':
+ *         description: Error interno del servidor al actualizar la contraseña del usuario.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ */
+
+public async updatePassword({ params, request, response }: HttpContextContract) {
+  try {
+    const userId = params.id; // Obtener el ID del usuario de los parámetros de la solicitud
+    const email = request.input('email'); // Obtener el correo electrónico del usuario de la solicitud
+    const newPassword = request.input('password'); // Obtener la nueva contraseña del cuerpo de la solicitud
+
+    // Verificar que la nueva contraseña tenga al menos 8 caracteres
+    if (newPassword.length < 8) {
+      return response.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });
+    }
+
+    // Intentar encontrar al usuario por ID o correo electrónico
+    const user = userId ? await User.find(userId) : await User.findBy('email', email);
+
+    if (!user) {
+      return response.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // Actualizar la contraseña del usuario
+    user.password = await Hash.make(newPassword);
+    await user.save();
+
+    return response.status(200).json({ message: 'Contraseña de usuario actualizada' });
+  } catch (error) {
+    return response.status(500).json({ error: 'Error interno del servidor al actualizar la contraseña del usuario' });
+  }
+}
+/**
+ * @swagger
  * /api/users/{id}:
  *   delete:
  *    tags:
- *      - users
+ *      - Users
  *     summary: Eliminación de cuenta de usuario
  *     description: Elimina la cuenta de usuario actual.
  *     parameters:
@@ -243,7 +384,7 @@ public async destroy({ auth, response }: HttpContextContract) {
  * /api/users/authlogin:
  *   post:
  *     tags:
- *       - users
+ *       - Users
  *     summary: Iniciar sesión de usuario.
  *     description: Inicia sesión de usuario verificando el correo electrónico y el código de verificación.
  *     requestBody:
@@ -332,7 +473,7 @@ public async authLogin({ request, response }: HttpContextContract) {
  * /api/users/logout:
  *   post:
  *     tags:
- *       - users
+ *       - Users
  *     summary: Cierre de sesión de usuario
  *     description: Cierra la sesión actual del usuario.
  *     responses:
@@ -357,7 +498,7 @@ public async logout({ auth, response }: HttpContextContract) {
  * /api/users/login:
  *   post:
  *     tags:
- *       - users
+ *       - Users
  *     summary: Iniciar sesión de usuario
  *     requestBody:
  *       required: true
@@ -431,6 +572,5 @@ public async login({ request, auth, response }: HttpContextContract) {
     return response.status(500).json({ message: 'Error al iniciar sesión', error: error.message });
   }
 }
-
 
 }

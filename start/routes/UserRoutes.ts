@@ -3,6 +3,7 @@
 import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
+  Route.get('/','UsersController.index')
   
   Route.post('/logout', 'UsersController.logout')
 
@@ -23,5 +24,7 @@ Route.group(() => {
   Route.get('/obtenerMensajesDelTopico','EmqxController.obtenerMensajesDelTopico')
 
   Route.post('/login','UsersController.login')
+
+  Route.put('/update-password/:id','UsersController.updatePassword')
 
 }).prefix('/api/users')
