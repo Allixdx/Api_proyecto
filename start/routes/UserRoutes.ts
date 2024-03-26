@@ -7,7 +7,7 @@ Route.group(() => {
   
   Route.post('/logout', 'UsersController.logout')
 
- //Route.get('/:id', 'UsersController.show')
+ Route.get('/:id', 'UsersController.show')
 
   Route.post('/', 'UsersController.register')
 
