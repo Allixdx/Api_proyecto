@@ -10,13 +10,16 @@ export default class Sensor extends BaseModel {
   public sensor_type_id: number
 
   @column()
+  public activo: number
+
+  @column()
   public value: number
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public createda_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  public updateda_at: DateTime
 
   // Relación con el modelo SensorType (pertenece a un tipo de sensor)
   @belongsTo(() => SensorType)
