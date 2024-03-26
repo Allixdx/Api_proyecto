@@ -197,7 +197,7 @@ public async update({ auth, request, response }: HttpContextContract) {
       return response.status(401).json({ error: 'Usuario no autenticado' })
     }
 
-    user.merge(request.only(['name', 'lastname', 'email']))
+    user.merge(request.only(['name', 'lastname', 'email',]))
     await user.save()
 
     return response.status(200).json({ message: 'Datos de usuario actualizados' })
