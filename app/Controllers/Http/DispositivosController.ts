@@ -58,12 +58,9 @@ export default class DispositivosController {
  *           schema:
  *             type: object
  *             properties:
- *               tipoDispositivoId:
- *                 type: integer
- *                 description: ID del tipo de dispositivo
- *               idUsuario:
- *                 type: integer
- *                 description: ID del usuario asociado al dispositivo
+ *               tipoDispositivo:
+ *                 type: string
+ *                 description: Tipo de dispositivo ('pesa' o 'reloj')
  *     responses:
  *       201:
  *         description: Dispositivo creado exitosamente
@@ -89,13 +86,7 @@ export default class DispositivosController {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: Bad Request
- *                 errors:
- *                   type: object
- *                   additionalProperties:
- *                     type: array
- *                     items:
- *                       type: string
+ *                   example: Tipo de dispositivo inválido
  *       500:
  *         description: Error interno del servidor
  *         content:

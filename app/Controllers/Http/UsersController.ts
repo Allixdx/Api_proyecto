@@ -145,7 +145,6 @@ export default class UsersController {
     });
   }
 }
-// Método para generar el código de verificación
 private generateVerificationCode() {
   const randomNumber = Math.floor(1000 + Math.random() * 9000);
   return randomNumber.toString();
@@ -241,7 +240,7 @@ public async destroy({ auth, response }: HttpContextContract) {
 }
 /**
  * @swagger
- * /api/users/login:
+ * /api/users/authlogin:
  *   post:
  *     tags:
  *       - users
@@ -353,7 +352,60 @@ public async logout({ auth, response }: HttpContextContract) {
   return response.json({ message: 'Cierre de sesión exitoso' })
 }
 
-
+/**
+ * @swagger
+ * /api/users/login:
+ *   post:
+ *     tags:
+ *       - users
+ *     summary: Iniciar sesión de usuario
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: Correo electrónico del usuario
+ *               password:
+ *                 type: string
+ *                 description: Contraseña del usuario
+ *     responses:
+ *       200:
+ *         description: Inicio de sesión exitoso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token de autenticación generado
+ *       401:
+ *         description: Credenciales inválidas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Usuario no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error al iniciar sesión
+ *                 error:
+ *                   type: string
+ */
 public async login({ request, auth, response }: HttpContextContract) {
   try {
     const email = request.input('email');
@@ -372,10 +424,8 @@ public async login({ request, auth, response }: HttpContextContract) {
       return response.status(401).json({ message: 'Contraseña incorrecta' });
     }
 
-    // Generar y devolver el token de autenticación
     const token = await auth.use('api').generate(user, { expiresIn: '3 days' });
 
-    // Devolver solo el token sin envolverlo en un objeto
     return response.status(200).json(token);
   } catch (error) {
     return response.status(500).json({ message: 'Error al iniciar sesión', error: error.message });
