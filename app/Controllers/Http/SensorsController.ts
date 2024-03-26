@@ -54,9 +54,6 @@ export default class SensorsController {
   *               sensor_type_id:
   *                 type: number
   *                 description: Type sensor
-  *               activo: 
-  *                 type: number
-  *                 description: status
   *               value:
   *                 type: number
   *                 description: value
@@ -76,11 +73,11 @@ export default class SensorsController {
   *                   description: datos de respuesta
   */ 
   public async store({request, response}: HttpContextContract) {
-    const {sensor_type_id, activo, value} = request.body()
+    const {sensor_type_id, value} = request.body()
     const newSensor = new Sensor()
 
     newSensor.sensor_type_id = sensor_type_id
-    newSensor.activo = activo
+    newSensor.activo = 1
     newSensor.value = value
 
     await newSensor.save()
@@ -93,8 +90,103 @@ export default class SensorsController {
   }
 
   public async show({}: HttpContextContract) {}
-
-  public async update({}: HttpContextContract) {}
-
-  public async destroy({}: HttpContextContract) {}
+  /**
+   * 
+   * @swagger
+   * /api/sensor/{id}:
+   *  put:
+   *    tags:
+   *      - Sensors
+   *    summary:  Activate sensor by id
+   *    parameters:
+   *      - name: id
+   *        in: path
+   *        required: true
+   *        description: id sensor
+   *        schema: 
+   *          type: integer 
+   *    produces:
+   *      - application/json
+   *    responses:
+   *      200:
+   *        description: Success! Tout va bien :)
+   *        content:
+   *          application/json:
+   *            schema:
+   *              type: object
+   *              properties:
+   *                title:
+   *                  type: string
+   *                  description: Titulo de la respuestinha sinha sinha
+   *                data:
+   *                  type: string
+   *                  description: datos de respuesta
+   */
+  public async update({response, request, params}: HttpContextContract) {
+    try {
+      const {} = request.body()
+      const updateSensor = await Sensor.findOrFail(params.id)
+      updateSensor.activo = 0
+      await updateSensor.save()
+  
+      return response.status(200).send({
+        title:'Success!!',
+        message:'Sensor disable',
+        data:updateSensor
+      })  
+    } catch (error) {
+      if(error.code === 'E_ROW_NOT_FOUND'){
+        return response.status(200).send({
+          title:'ERROR',
+          message:'Sensor no found :C'
+        })
+      }
+    }
+     
+  }
+  /**
+   * 
+   * @swagger
+   * /api/sensor/{id}:
+   *  delete:
+   *    tags:
+   *      - Sensors
+   *    summary:  Drop sensor by id
+   *    parameters:
+   *      - name: id
+   *        in: path
+   *        required: true
+   *        description: id sensor
+   *        schema: 
+   *          type: integer 
+   *    produces:
+   *      - application/json
+   *    responses:
+   *      200:
+   *        description: Success! Tout va bien :)
+   *        content:
+   *          application/json:
+   *            schema:
+   *              type: object
+   *              properties:
+   *                title:
+   *                  type: string
+   *                  description: Titulo de la respuestinha sinha sinha
+   *                data:
+   *                  type: string
+   *                  description: datos de respuesta
+   */
+  public async destroy({response, params}: HttpContextContract) {
+    try {
+      const delSensor = await Sensor.findOrFail(params.id)
+      await delSensor.delete()
+    } catch (error) {
+      if(error.code === 'E_ROW_NOT_FOUND'){
+        return response.status(200).send({
+          title:'ERROR',
+          message:'Sensor no found for delete D:'
+        })
+      }
+    }
+  }
 }
