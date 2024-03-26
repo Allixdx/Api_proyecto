@@ -1,26 +1,31 @@
-import { DateTime } from 'luxon'
-import { BaseModel, BelongsTo, HasMany, column, belongsTo, hasMany } from '@ioc:Adonis/Lucid/Orm'
-import User from 'App/Models/User'
-import DispositivoSensor from 'App/Models/DispositivoSensor'
+import { DateTime } from 'luxon';
+import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm';
+import User from './User';
+import TipoDispositivo from './TipoDispositivo';
 
 export default class Dispositivo extends BaseModel {
+
+  // Especificar el nombre de la tabla como una variable estática
+  public static table = 'dispositivo';
+
   @column({ isPrimary: true })
-  public id: number
+  public id: number;
 
   @column()
-  public tipo_dispositivo_id: number
+  public tipoDispositivoId: number;
+
+  @column()
+  public idUsuario: number;
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public createdAt: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  public updatedAt: DateTime;
 
-  // Relación con el modelo User (pertenece a un usuario)
   @belongsTo(() => User)
-  public user: BelongsTo<typeof User>
+  public usuario: BelongsTo<typeof User>;
 
-  // Relación con el modelo BraceletSensor (tiene muchos sensores)
-  @hasMany(() => DispositivoSensor)
-  public sensors: HasMany<typeof DispositivoSensor>
+  @belongsTo(() => TipoDispositivo)
+  public tipoDispositivo: BelongsTo<typeof TipoDispositivo>;
 }

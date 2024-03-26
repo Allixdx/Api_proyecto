@@ -3,6 +3,8 @@ import { BaseModel, column, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm'
 import SensorType from 'App/Models/SensorType'
 
 export default class Sensor extends BaseModel {
+  public static table ='sensors'
+
   @column({ isPrimary: true })
   public id: number
 

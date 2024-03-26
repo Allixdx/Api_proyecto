@@ -116,7 +116,7 @@ export default class UsersController {
     newUser.password = await Hash.make(password);
 
     const verificationCode = this.generateVerificationCode();
-    newUser.verification_code = verificationCode;
+    newUser.verificationCode = verificationCode;
 
     await newUser.save();
 
@@ -145,7 +145,6 @@ export default class UsersController {
     });
   }
 }
-// Método para generar el código de verificación
 private generateVerificationCode() {
   const randomNumber = Math.floor(1000 + Math.random() * 9000);
   return randomNumber.toString();
@@ -198,7 +197,7 @@ public async update({ auth, request, response }: HttpContextContract) {
       return response.status(401).json({ error: 'Usuario no autenticado' })
     }
 
-    user.merge(request.only(['name', 'lastname', 'email']))
+    user.merge(request.only(['name', 'lastname', 'email',]))
     await user.save()
 
     return response.status(200).json({ message: 'Datos de usuario actualizados' })
@@ -241,7 +240,7 @@ public async destroy({ auth, response }: HttpContextContract) {
 }
 /**
  * @swagger
- * /api/users/login:
+ * /api/users/authlogin:
  *   post:
  *     tags:
  *       - users
@@ -300,9 +299,7 @@ public async authLogin({ request, response }: HttpContextContract) {
       .whereNull('deleted_at')
       .first();
 
-    console.log({ user_email, password, verificationCode }); 
-
-    if (!user || user.verification_code !== verificationCode) {
+    if (!user || user.verificationCode !== verificationCode) {
       // Devolver error de datos inválidos
       return response.status(401).send({
         title: 'Datos inválidos',
@@ -310,7 +307,6 @@ public async authLogin({ request, response }: HttpContextContract) {
         type: 'warning',
       });
     }
-    console.log({ storedPassword: user.password }); 
 
     if (!(await Hash.verify(user.password, password))) {
       return response.status(401).send({
@@ -320,10 +316,10 @@ public async authLogin({ request, response }: HttpContextContract) {
       });
     }
 
-    user.verification_code = null;
+    user.verificationCode = null;
     await user.save();
 
-    return response.status(200).json({ message: 'Inicio de sesión exitoso' });
+    return response.status(200).json({ message: 'Cuenta Verificada Correctamente' });
   } catch (error) {
     return response.status(400).json({
       message: 'Error al iniciar sesión',
@@ -355,5 +351,86 @@ public async logout({ auth, response }: HttpContextContract) {
   await auth.logout()
   return response.json({ message: 'Cierre de sesión exitoso' })
 }
+
+/**
+ * @swagger
+ * /api/users/login:
+ *   post:
+ *     tags:
+ *       - users
+ *     summary: Iniciar sesión de usuario
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 description: Correo electrónico del usuario
+ *               password:
+ *                 type: string
+ *                 description: Contraseña del usuario
+ *     responses:
+ *       200:
+ *         description: Inicio de sesión exitoso
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                   description: Token de autenticación generado
+ *       401:
+ *         description: Credenciales inválidas
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Usuario no encontrado
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error al iniciar sesión
+ *                 error:
+ *                   type: string
+ */
+public async login({ request, auth, response }: HttpContextContract) {
+  try {
+    const email = request.input('email');
+    const password = request.input('password');
+
+    // Verificar las credenciales del usuario
+    const user = await User.query().where('email', email).first();
+
+    if (!user) {
+      return response.status(401).json({ message: 'Usuario no encontrado' });
+    }
+
+    const isPasswordValid = await Hash.verify(user.password, password);
+
+    if (!isPasswordValid) {
+      return response.status(401).json({ message: 'Contraseña incorrecta' });
+    }
+
+    const token = await auth.use('api').generate(user, { expiresIn: '3 days' });
+
+    return response.status(200).json(token);
+  } catch (error) {
+    return response.status(500).json({ message: 'Error al iniciar sesión', error: error.message });
+  }
+}
+
 
 }

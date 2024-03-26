@@ -5,8 +5,6 @@
  * file.
  */
 
-import Auth from 'App/Models/Auth'
-
 declare module '@ioc:Adonis/Addons/Auth' {
   /*
   |--------------------------------------------------------------------------
@@ -26,16 +24,16 @@ declare module '@ioc:Adonis/Addons/Auth' {
     | User Provider
     |--------------------------------------------------------------------------
     |
-    | The following provider uses Lucid models as a driver for fetching user
-    | details from the database for authentication.
+    | The following provider directlly uses Database query builder for fetching
+    | user details from the database for authentication.
     |
     | You can create multiple providers using the same underlying driver with
-    | different Lucid models.
+    | different database tables.
     |
     */
     user: {
-      implementation: LucidProviderContract<typeof Auth>
-      config: LucidProviderConfig<typeof Auth>
+      implementation: DatabaseProviderContract<DatabaseProviderRow>
+      config: DatabaseProviderConfig
     }
   }
 
