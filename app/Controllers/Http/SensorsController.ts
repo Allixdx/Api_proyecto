@@ -151,7 +151,7 @@ export default class SensorsController {
    *  delete:
    *    tags:
    *      - Sensors
-   *    summary:  Drop sensor by id
+   *    summary:  drop sensor by id
    *    parameters:
    *      - name: id
    *        in: path
