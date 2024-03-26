@@ -319,7 +319,7 @@ public async authLogin({ request, response }: HttpContextContract) {
     user.verificationCode = null;
     await user.save();
 
-    return response.status(200).json({ message: 'Inicio de sesión exitoso' });
+    return response.status(200).json({ message: 'Cuenta Verificada Correctamente' });
   } catch (error) {
     return response.status(400).json({
       message: 'Error al iniciar sesión',
