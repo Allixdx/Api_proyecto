@@ -1,7 +1,14 @@
 // app/Models/User.ts
+<<<<<<< HEAD
 import { DateTime } from 'luxon';
 import { BaseModel, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm';
 import Habito from './Habito';
+=======
+
+import { DateTime } from 'luxon'
+import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import Dispositivo from 'App/Models/Dispositivo'
+>>>>>>> 76a7df716ac4ac2eeacab74a0c6ae7e45b483c0b
 
 export default class User extends BaseModel {
   public static table='users'
