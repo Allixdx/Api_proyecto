@@ -352,6 +352,8 @@ public async logout({ auth, response }: HttpContextContract) {
   await auth.logout()
   return response.json({ message: 'Cierre de sesión exitoso' })
 }
+
+
 public async login({ request, auth, response }: HttpContextContract) {
   try {
     const email = request.input('email');
@@ -371,12 +373,14 @@ public async login({ request, auth, response }: HttpContextContract) {
     }
 
     // Generar y devolver el token de autenticación
-    const token = await auth.use('api').generate(user, { expiresIn: '7 days' });
+    const token = await auth.use('api').generate(user, { expiresIn: '3 days' });
 
-    return response.status(200).json({ token });
+    // Devolver solo el token sin envolverlo en un objeto
+    return response.status(200).json(token);
   } catch (error) {
     return response.status(500).json({ message: 'Error al iniciar sesión', error: error.message });
   }
 }
+
 
 }
