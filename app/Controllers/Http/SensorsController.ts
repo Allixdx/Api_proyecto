@@ -189,4 +189,13 @@ export default class SensorsController {
       }
     }
   }
+
+  public async pesa({response} :HttpContextContract){
+    const pesaData = await Sensor.all()
+    return response.status(200).send({
+      title:'Success!!',
+      message:'Pesa data',
+      data:pesaData
+    })
+  }
 }

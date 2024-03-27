@@ -1,7 +1,6 @@
 import EdamamResource from "App/Resources/EdamamResource";
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import axios from "axios";
-import env from "env";
 
 export default class EdamamsController {
   /**
@@ -83,8 +82,6 @@ export default class EdamamsController {
    *                  description:  data  
    */
   public async comida({response, params}:HttpContextContract){
-    const app_id = '0ca38ce0'
-    const app_key = '6d1af65e035c952a1ab92ee42668d728'
     const res = await axios.get(`https://api.edamam.com/api/food-database/v2/parser?app_id=682c72ac&app_key=%20b1f12eef79856885a89a3787aeb39a9e&nutrition-type=logging`)
     return response.status(200).send({
       title:'Success!!',
@@ -94,10 +91,7 @@ export default class EdamamsController {
   }
 }
 
-  //todos alimentos
-  //categorias 
-  //alimentos de una categoria
-  //endpoint para peso en la pesa 
+
 
   
 
