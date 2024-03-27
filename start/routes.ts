@@ -23,6 +23,7 @@ import './routes/UserRoutes.ts'
 import './routes/DispositivoRoutes.ts'
 import './routes/SensorRoutes.ts'
 import './routes/HabitRoutes.ts'
+import './routes/EdamamRoute.ts'
 
 Route.get('/', async () => {
   return { hello: 'world' }
