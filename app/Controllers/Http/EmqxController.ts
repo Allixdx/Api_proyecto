@@ -117,84 +117,83 @@ public async publishEMQXTopic({ response }: HttpContextContract) {
     }
 }
 /**
-    * @swagger
-    * /api/emqx/topic-retained:
-    *   post:
-    *     tags:
-    *       - EMQX
-    *     produces:
-    *       - application/json
-    *     requestBody:
-    *       content:
-    *         application/json:
-    *           schema:
-    *             type: object
-    *             properties:
-    *               topic_name:
-    *                 topic: string
-    *             required:
-    *               - topic_name
-    *     responses:
-    *       200:
-    *         description: Todo salió bien cuando mandamos este estatus
-    *         content:
-    *           application/json:
-    *             schema:
-    *               type: object
-    *               properties:
-    *                 type:
-    *                   type: string
-    *                 title:
-    *                   type: string
-    *                   description: Titulo de la respuesta
-    *                 message:
-    *                   type: string
-    *                 data:
-    *                   type: object
-    *                   description: Datos de respuesta
-    *                   properties:
-    *                     user:
-    *                       type: object
-    *                       $ref: '#/components/schemas/User'
-    */
+* @swagger
+* /api/emqx/topic-retained:
+*   post:
+*     tags:
+*       - EMQX
+*     produces:
+*       - application/json
+*     parameters:
+*       - name: topic_name
+*         in: query
+*         required: true
+*         schema:
+*           type: string
+*     responses:
+*       200:
+*         description: Todo salió bien cuando mandamos este estatus
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 type:
+*                   type: string
+*                 title:
+*                   type: string
+*                   description: Titulo de la respuesta
+*                 message:
+*                   type: string
+*                 data:
+*                   type: object
+*                   description: Datos de respuesta
+*                   properties:
+*                     user:
+*                       type: object
+*                       $ref: '#/components/schemas/User'
+*/
 public async getEMQXTopic({ request, response }: HttpContextContract) {
   try {
-    const body = request.all()
-    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/' + body.topic_name
+    const topicName = request.input('topic_name');
+    const url = `http://143.198.135.231:18083/mqtt/retainer/message/${topicName}`;
 
     const res = await axios.get(url, {
       auth: {
-        username: Env.get('MQTT_API_KEY'),
-        password: Env.get('MQTT_SECRET_KEY')
+        username: Env.get('MQTT_API_KEY') || '',
+        password: Env.get('MQTT_SECRET_KEY') || ''
       }
-    }).catch((error) => error)
-    if (!res.status && res.response.status !== 202) {
-      return response.status(res.response.status).send({
+    });
+
+    if (res.status !== 200) {
+      return response.status(res.status).send({
         title: 'Error',
-        message: 'Ocurrio un error',
+        message: 'Ocurrió un error al procesar la solicitud',
         type: 'error',
         data: {
-          error: res.response
+          error: res.statusText
         },
-      })
+      });
     }
 
-    return response.status(200).send({
-      title: 'Topico enviado',
+    const responseData = {
+      title: 'Tópico enviado',
       message: '',
       type: 'success',
-      data: {...res.data, message_decoded: atob(res.data.payload)},
-    })
+      data: { ...res.data, message_decoded: res.data.payload ? atob(res.data.payload) : '' },
+    };
+
+    return response.status(200).send(responseData);
 
   } catch (error) {
     return response.status(500).send({
       title: 'Error',
-      message: 'Ocurrio un error',
+      message: 'Ocurrió un error al procesar la solicitud',
       type: 'error',
       data: {
         error: error.message
       },
-    })
+    });
   }
 }
 

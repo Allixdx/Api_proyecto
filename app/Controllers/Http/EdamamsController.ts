@@ -106,22 +106,32 @@ export default class EdamamsController {
  */
 public async findFood({ request, response }: HttpContextContract) {
   try {
-      const nombrealimento = request.input('nombrealimento'); // Obtener el nombre del alimento de la consulta
+    // Obtener el nombre del alimento de la consulta
+    const nombrealimento = request.input('nombrealimento'); 
     
-      if (!nombrealimento) {
-          return response.badRequest({ error: 'Por favor, proporciona el nombre del alimento.' });
-      }
+    // Validar si se proporcionó el nombre del alimento
+    if (!nombrealimento) {
+      return response.badRequest({ error: 'Por favor, proporciona el nombre del alimento.' });
+    }
 
-      const alimento = await EdamamResource.getfood(nombrealimento);
-      
-      console.log('Respuesta de la API de Edamam:', alimento); // Agregar este console.log para verificar la respuesta de la API
+    // Realizar la búsqueda del alimento
+    const alimento = await EdamamResource.getfood(nombrealimento);
+    
+    // Verificar si se encontró algún alimento
+    if (!alimento || (alimento.parsed.length === 0 && alimento.hints.length === 0)) {
+      // Devolver un código de estado 404 indicando que el alimento no existe
+      return response.notFound({ error: 'El alimento no existe.' });
+    }
 
-      return response.ok(alimento);
+    // Devolver la respuesta exitosa con los datos del alimento
+    return response.ok(alimento);
   } catch (error) {
-      console.error('Error al buscar el alimento:', error.message);
-      return response.status(500).json({ error: 'Ocurrió un error al buscar el alimento.' });
+    // Capturar y manejar errores
+    console.error('Error al buscar el alimento:', error.message);
+    return response.status(500).json({ error: 'Ocurrió un error al buscar el alimento.' });
   }
 }
+
 }
 
   //todos alimentos
