@@ -8,6 +8,6 @@ Route.group(()=> {
   Route.put('/:id', 'DispositivosController.update');
   Route.delete('/:id', 'DispositivosController.destroy');
   Route.post('/creardispositivo','DispositivosController.creardispositivo');
-}).prefix('/api/dispositivos')
+}).prefix('/api/dispositivos').middleware('auth:api')
 
 

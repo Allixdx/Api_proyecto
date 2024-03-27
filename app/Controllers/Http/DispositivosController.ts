@@ -7,6 +7,8 @@ export default class DispositivosController {
    * @swagger
    * /api/dispositivos:
    *   get:
+   *     security:
+   *       - bearerAuth: []
    *     tags:
    *       - Dispositivos
    *     summary: Obtener todos los dispositivos
@@ -49,6 +51,8 @@ export default class DispositivosController {
  * @swagger
  * /api/dispositivos:
  *   post:
+ *     security:
+ *       - bearerAuth: []
  *     tags:
  *       - Dispositivos
  *     summary: Crear un nuevo tipo dispositivo
@@ -101,10 +105,9 @@ export default class DispositivosController {
  *                 error:
  *                   type: string
  */
-public async store({ request, response, auth }: HttpContextContract) {
+public async store({ request, response }: HttpContextContract) {
   try {
     const name = request.input('tipoDispositivo');
-    const id = auth.user?.id
 
     // Validar el tipo de dispositivo seleccionado
     if (name !== 'pesa' && name !== 'brazalete') {
@@ -133,6 +136,8 @@ public async store({ request, response, auth }: HttpContextContract) {
  * @swagger
  * /api/dispositivos/creardispositivo:
  *   post:
+ *     security:
+ *       - bearerAuth: []
  *     tags:
  *       - Dispositivos
  *     summary: Crear un nuevo dispositivo
@@ -201,7 +206,7 @@ public async creardispositivo({ request, response, auth }: HttpContextContract) 
     // Crear el dispositivo basado en la selección
     const dispositivo = await Dispositivo.create({
       tipoDispositivoId: tipoDispositivo === 'pesa' ? 1 : 2,
-      idUsuario: userId,
+      id_usuario: userId,
     });
 
     return response.status(201).json({
@@ -221,6 +226,8 @@ public async creardispositivo({ request, response, auth }: HttpContextContract) 
    * @swagger
    * /api/dispositivos/{id}:
    *   get:
+   *     security:
+   *       - bearerAuth: []
    *     tags:
    *       - Dispositivos
    *     summary: Obtener un dispositivo por su ID
@@ -262,6 +269,8 @@ public async show({ params, response }: HttpContextContract) {
    * @swagger
    * /api/dispositivos/{id}:
    *   put:
+   *     security:
+   *       - bearerAuth: []
    *     tags:
    *       - Dispositivos
    *     summary: Actualizar un dispositivo por su ID
@@ -330,6 +339,8 @@ public async show({ params, response }: HttpContextContract) {
    * @swagger
    * /api/dispositivos/{id}:
    *   delete:
+   *     security:
+   *       - bearerAuth: []
    *     tags:
    *       - Dispositivos
    *     summary: Eliminar un dispositivo por su ID

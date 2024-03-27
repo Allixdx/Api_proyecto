@@ -15,7 +15,7 @@ export default class Dispositivo extends BaseModel {
   public tipoDispositivoId: number;
 
   @column()
-  public idUsuario: number;
+  public id_usuario: number;
 
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime;
