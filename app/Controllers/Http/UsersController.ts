@@ -566,7 +566,12 @@ public async login({ request, auth, response }: HttpContextContract) {
 
     const token = await auth.use('api').generate(user, { expiresIn: '3 days' });
 
-    return response.status(200).json(token);
+    return response.status(200).json({
+      data:{
+        token,
+        user,
+      },
+    });
   } catch (error) {
     return response.status(500).json({ message: 'Error al iniciar sesión', error: error.message });
   }
