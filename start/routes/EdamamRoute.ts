@@ -2,4 +2,5 @@ import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(()=>{
     Route.get('/','EdamamsController.comida')
-}).prefix('/api/edamam')
+    Route.get('/obteneralimento','EdamamsController.findFood')
+}).prefix('/api/foods')

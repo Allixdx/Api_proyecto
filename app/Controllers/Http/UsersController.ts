@@ -51,6 +51,11 @@ export default class UsersController {
  *          application/json:
  *            schema:
  *              $ref: '#/components/schemas/UserInput'
+ *            example:
+ *              name: John
+ *              lastname: Doe
+ *              email: john.doe@example.com
+ *              password: password123
  *      responses:
  *        201:
  *          description: Usuario creado exitosamente. Se ha enviado un correo electrónico de verificación.
@@ -118,11 +123,6 @@ export default class UsersController {
  *          - lastname
  *          - email
  *          - password
- *        example:
- *          name: John
- *          lastname: Doe
- *          email: john.doe@example.com
- *          password: password123
  */
  public async register({ request, response }: HttpContextContract) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -138,6 +138,13 @@ export default class UsersController {
       return response.status(400).json({
         message: 'Error al crear usuario',
         error: 'Correo electrónico ya registrado',
+      });
+    }
+ 
+    if (password.length < 8) {
+      return response.status(400).json({
+        message: 'Error al crear usuario',
+        error: 'La contraseña debe tener al menos 8 caracteres',
       });
     }
 
@@ -379,8 +386,6 @@ public async destroy({ auth, response }: HttpContextContract) {
  * @swagger
  * /api/users/authlogin:
  *  post:
- *    security:
- *      - bearerAuth: []
  *    tags:
  *      - users
  *    summary: Verificar sesión de usuario.
@@ -563,10 +568,19 @@ public async login({ request, auth, response }: HttpContextContract) {
     if (!isPasswordValid) {
       return response.status(401).json({ message: 'Contraseña incorrecta' });
     }
+  // Verificar si el usuario ya está verificado con su código
+  if (user.verificationCode) {
+    return response.status(401).json({ message: 'El usuario aún no está verificado. Por favor, verifique su cuenta.' });
+  }
 
     const token = await auth.use('api').generate(user, { expiresIn: '3 days' });
 
-    return response.status(200).json(token);
+    return response.status(200).json({
+      data:{
+        token,
+        user,
+      },
+    });
   } catch (error) {
     return response.status(500).json({ message: 'Error al iniciar sesión', error: error.message });
   }

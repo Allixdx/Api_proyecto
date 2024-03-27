@@ -15,7 +15,7 @@ Route.group(() => {
 
   Route.delete('/:id', 'UsersController.destroy').middleware('auth:api')
 
-  Route.post('/authlogin', 'UsersController.authLogin').middleware('auth:api')
+  Route.post('/authlogin', 'UsersController.authLogin')
 
   Route.get('/foods','EdamamsController.obtenerAlimentos')
 
