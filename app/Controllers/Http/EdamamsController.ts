@@ -1,10 +1,12 @@
 import EdamamResource from "App/Resources/EdamamResource";
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import axios from "axios";
+import Env from '@ioc:Adonis/Core/Env';
 
 export default class EdamamsController {
   /**
    * @swagger
-   * /api/users/foods:
+   * /api/foods:
    *   get:
    *     tags:
    *       - Foods
@@ -57,7 +59,7 @@ export default class EdamamsController {
   }
 /**
  * @swagger
- * /api/users/foods:
+ * /api/foods/obteneralimento:
  *   get:
  *     tags:
  *       - Foods
@@ -65,7 +67,7 @@ export default class EdamamsController {
  *     description: Obtiene información sobre un alimento específico basado en el nombre proporcionado.
  *     parameters:
  *       - in: query
- *         name: nombreAlimento
+ *         name: nombrealimento
  *         description: Nombre del alimento que se desea buscar.
  *         required: true
  *         schema:
@@ -106,21 +108,58 @@ export default class EdamamsController {
  */
   public async findFood({ request, response }: HttpContextContract) {
     try {
-      const { nombreAlimento } = request.qs() // Obtener el nombre del alimento de la consulta
+      const  nombrealimento  = request.input('nombrealimento') // Obtener el nombre del alimento de la consulta
       
-      if (!nombreAlimento) {
+      if (!nombrealimento) {
         return response.badRequest({ error: 'Por favor, proporciona el nombre del alimento.' })
       }
 
-      const alimentos = await EdamamResource.getfood(nombreAlimento)
+      const alimento = await EdamamResource.getfood(nombrealimento)
 
-      return response.ok(alimentos)
+      return response.ok(alimento)
     } catch (error) {
       console.error('Error al buscar el alimento:', error.message)
       return response.status(500).json({ error: 'Ocurrió un error al buscar el alimento.' })
     }
+  /**
+   * 
+   * @swagger
+   * /api/edamam:
+   *  get:
+   *    tags:
+   *      - Edamam
+   *    summary:  List food 
+   *    produces:
+   *      - application/json
+   *    responses:
+   *      200:
+   *        description:  Success!!
+   *        content:
+   *          application/json:
+   *            schema:
+   *              type: object
+   *              properties:
+   *                title:
+   *                  type: string
+   *                  description: title
+   *                data:
+   *                  type: string
+   *                  description:  data  
+   */
+  public async comida({response, params}:HttpContextContract){
+    const res = await axios.get(`https://api.edamam.com/api/food-database/v2/parser?app_id=682c72ac&app_key=%20b1f12eef79856885a89a3787aeb39a9e&nutrition-type=logging`)
+    return response.status(200).send({
+      title:'Success!!',
+      message:'List of food',
+      data:res.data
+    })
   }
 }
+
+  //todos alimentos
+  //categorias 
+  //alimentos de una categoria
+  //endpoint para peso en la pesa 
 
   
 
