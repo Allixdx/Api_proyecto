@@ -379,8 +379,6 @@ public async destroy({ auth, response }: HttpContextContract) {
  * @swagger
  * /api/users/authlogin:
  *  post:
- *    security:
- *      - bearerAuth: []
  *    tags:
  *      - users
  *    summary: Verificar sesión de usuario.
