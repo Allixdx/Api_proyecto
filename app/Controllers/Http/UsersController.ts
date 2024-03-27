@@ -5,8 +5,7 @@ import User from 'App/Models/User'
 import Env from '@ioc:Adonis/Core/Env'
 
 export default class UsersController {
-   /**
-   * 
+  /**
    * @swagger
    * /api/users:
    *  get:
@@ -242,6 +241,107 @@ public async update({ auth, request, response }: HttpContextContract) {
 }
 /**
  * @swagger
+ * /api/users/update-password/{id}:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - users
+ *     summary: Actualización de contraseña de usuario
+ *     description: Actualiza la contraseña de un usuario existente.
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del usuario cuya contraseña se va a actualizar.
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 format: email
+ *                 description: Correo electrónico del usuario.
+ *               password:
+ *                 type: string
+ *                 description: Nueva contraseña del usuario.
+ *     responses:
+ *       '200':
+ *         description: Contraseña de usuario actualizada exitosamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje indicando el éxito de la actualización de contraseña.
+ *       '400':
+ *         description: La contraseña debe tener al menos 8 caracteres.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ *       '404':
+ *         description: Usuario no encontrado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ *       '500':
+ *         description: Error interno del servidor al actualizar la contraseña del usuario.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error.
+ */
+
+public async updatePassword({ params, request, response }: HttpContextContract) {
+  try {
+    const userId = params.id; // Obtener el ID del usuario de los parámetros de la solicitud
+    const email = request.input('email'); // Obtener el correo electrónico del usuario de la solicitud
+    const newPassword = request.input('password'); // Obtener la nueva contraseña del cuerpo de la solicitud
+
+    // Verificar que la nueva contraseña tenga al menos 8 caracteres
+    if (newPassword.length < 8) {
+      return response.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });
+    }
+
+    // Intentar encontrar al usuario por ID o correo electrónico
+    const user = userId ? await User.find(userId) : await User.findBy('email', email);
+
+    if (!user) {
+      return response.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    // Actualizar la contraseña del usuario
+    user.password = await Hash.make(newPassword);
+    await user.save();
+
+    return response.status(200).json({ message: 'Contraseña de usuario actualizada' });
+  } catch (error) {
+    return response.status(500).json({ error: 'Error interno del servidor al actualizar la contraseña del usuario' });
+  }
+}
+/**
+ * @swagger
  * /api/users/{id}:
  *  delete:
  *    security:
@@ -371,7 +471,7 @@ public async authLogin({ request, response }: HttpContextContract) {
  * /api/users/logout:
  *  post:
  *    security:
- *      - beareAuth: []
+ *      - bearerAuth: []
  *    tags:
  *      - users
  *    summary: Cierre de sesión de usuario
@@ -543,7 +643,7 @@ public async correorecuperacion({ request, response }: HttpContextContract) {
 
     await Mail.send((message) => {
       message
-        .from(Env.get('SMTP_USERNAME'), 'Nombre de la Aplicación')
+        .from(Env.get('SMTP_USERNAME'), 'Healthy App')
         .to(email)
         .subject('Recuperación de Contraseña')
         .htmlView('emails/recuperacion', { verificationCode }) 

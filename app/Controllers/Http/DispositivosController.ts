@@ -1,13 +1,16 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Dispositivo from 'App/Models/Dispositivo';
+import TipoDispositivo from 'App/Models/TipoDispositivo';
 
 export default class DispositivosController {
   /**
    * @swagger
    * /api/dispositivos:
    *   get:
+   *     security:
+   *       - bearerAuth: []
    *     tags:
-   *       - dispositivos
+   *       - Dispositivos
    *     summary: Obtener todos los dispositivos
    *     responses:
    *       200:
@@ -48,9 +51,11 @@ export default class DispositivosController {
  * @swagger
  * /api/dispositivos:
  *   post:
+ *     security:
+ *       - bearerAuth: []
  *     tags:
- *       - dispositivos
- *     summary: Crear un nuevo dispositivo
+ *       - Dispositivos
+ *     summary: Crear un nuevo tipo dispositivo
  *     requestBody:
  *       required: true
  *       content:
@@ -100,42 +105,131 @@ export default class DispositivosController {
  *                 error:
  *                   type: string
  */
-public async store({ request, response, auth }: HttpContextContract) {
-    try {
-      const tipoDispositivo = request.input('tipoDispositivo');
-      const idUsuario = auth.user?.id; // Obtener el ID del usuario autenticado desde el token
+public async store({ request, response }: HttpContextContract) {
+  try {
+    const name = request.input('tipoDispositivo');
 
-      // Validar el tipo de dispositivo seleccionado
-      if (tipoDispositivo !== 'pesa' && tipoDispositivo !== 'reloj') {
-        return response.status(400).json({
-          message: 'Tipo de dispositivo inválido',
-        });
-      }
-
-      // Crear el dispositivo basado en la selección
-      const dispositivo = await Dispositivo.create({
-        tipoDispositivoId: tipoDispositivo === 'pesa' ? 1 : 2, // Suponiendo que 'pesa' tiene ID 1 y 'reloj' tiene ID 2 en la tabla de tipos de dispositivo
-        idUsuario,
-      });
-
-      return response.status(201).json({
-        status: 'success',
-        message: 'Device created successfully',
-        data: dispositivo,
-      });
-    } catch (error) {
-      return response.status(500).json({
-        message: 'Error creating device',
-        error: error.message,
+    // Validar el tipo de dispositivo seleccionado
+    if (name !== 'pesa' && name !== 'brazalete') {
+      return response.status(400).json({
+        message: 'Tipo de dispositivo inválido',
       });
     }
+    // Crear el dispositivo basado en la selección
+    const tipodispositivo = await TipoDispositivo.create({
+      name,
+    });
+
+    return response.status(201).json({
+      status: 'success',
+      message: 'Dispositivo creado exitosamente',
+      data: tipodispositivo,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: 'Error al crear el dispositivo',
+      error: error.message,
+    });
   }
+}
+/**
+ * @swagger
+ * /api/dispositivos/creardispositivo:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Dispositivos
+ *     summary: Crear un nuevo dispositivo
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tipoDispositivo:
+ *                 type: string
+ *                 description: Tipo de dispositivo ('pesa' o 'brazalete')
+ *     responses:
+ *       201:
+ *         description: Dispositivo creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Dispositivo creado exitosamente
+ *                 data:
+ *                   $ref: '#/components/schemas/TipoDispositivo'
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Tipo de dispositivo inválido
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error al crear el dispositivo
+ *                 error:
+ *                   type: string
+ */
+
+public async creardispositivo({ request, response, auth }: HttpContextContract) {
+  try {
+    const tipoDispositivo = request.input('tipoDispositivo');
+    const userId = auth.user?.id;
+
+    // Validar el tipo de dispositivo seleccionado
+    if (tipoDispositivo !== 'pesa' && tipoDispositivo !== 'brazalete') {
+      return response.status(400).json({
+        message: 'Tipo de dispositivo inválido',
+      });
+    }
+
+    // Crear el dispositivo basado en la selección
+    const dispositivo = await Dispositivo.create({
+      tipoDispositivoId: tipoDispositivo === 'pesa' ? 1 : 2,
+      id_usuario: userId,
+    });
+
+    return response.status(201).json({
+      status: 'success',
+      message: 'Dispositivo creado exitosamente',
+      data: dispositivo,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: 'Error al crear el dispositivo',
+      error: error.message,
+    });
+  }
+}
+
 /**
    * @swagger
    * /api/dispositivos/{id}:
    *   get:
+   *     security:
+   *       - bearerAuth: []
    *     tags:
-   *       - dispositivos
+   *       - Dispositivos
    *     summary: Obtener un dispositivo por su ID
    *     parameters:
    *       - name: id
@@ -175,8 +269,10 @@ public async show({ params, response }: HttpContextContract) {
    * @swagger
    * /api/dispositivos/{id}:
    *   put:
+   *     security:
+   *       - bearerAuth: []
    *     tags:
-   *       - dispositivos
+   *       - Dispositivos
    *     summary: Actualizar un dispositivo por su ID
    *     parameters:
    *       - name: id
@@ -243,8 +339,10 @@ public async show({ params, response }: HttpContextContract) {
    * @swagger
    * /api/dispositivos/{id}:
    *   delete:
+   *     security:
+     *       - bearerAuth: []
    *     tags:
-   *       - dispositivos
+   *       - Dispositivos
    *     summary: Eliminar un dispositivo por su ID
    *     parameters:
    *       - name: id
