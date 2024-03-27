@@ -561,7 +561,11 @@ public async login({ request, auth, response }: HttpContextContract) {
     if (!isPasswordValid) {
       return response.status(401).json({ message: 'Contraseña incorrecta' });
     }
-
+  // Verificar si el usuario ya está verificado con su código
+  if (!user.verificationCode) {
+    return response.status(401).json({ message: 'El usuario aún no está verificado. Por favor, verifique su cuenta.' });
+  }
+  
     const token = await auth.use('api').generate(user, { expiresIn: '3 days' });
 
     return response.status(200).json({
