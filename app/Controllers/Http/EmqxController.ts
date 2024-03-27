@@ -1,10 +1,12 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import axios from 'axios';
+import Env from '@ioc:Adonis/Core/Env'
+
 
 export default class EmqxController {
 /**
  * @swagger
- * /api/users/publishEMQXTopic:
+ * /api/emqx/publishEMQXTopic:
  *   post:
  *     tags:
  *       - EMQX
@@ -115,83 +117,94 @@ public async publishEMQXTopic({ response }: HttpContextContract) {
     }
 }
 /**
- * @swagger
- * /api/users/obtenerMensajesDelTopico:
- *   get:
- *     tags:
- *       - EMQX
- *     summary: Suscribirse a un tópico de EMQX y obtener mensajes retenidos
- *     responses:
- *       200:
- *         description: Suscripción exitosa
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 title:
- *                   type: string
- *                   example: Suscripción exitosa
- *                 message:
- *                   type: string
- *                   example: Te has suscrito al tópico exitosamente
- *                 type:
- *                   type: string
- *                   example: success
- *                 data:
- *                   type: object
- *                   example: null
- *       500:
- *         description: Error al suscribirse al tópico
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 title:
- *                   type: string
- *                   example: Error
- *                 message:
- *                   type: string
- *                   example: Ocurrió un error al suscribirse al tópico
- *                 type:
- *                   type: string
- *                   example: error
- *                 data:
- *                   type: object
- *                   example: { error: "Mensaje de error" }
- */
- public async obtenerMensajesDelTopico({ response }: HttpContextContract) {
-    try {
-      const url = 'http://143.198.135.231:18083/api/v5/messages/retained/test2';
-      const res = await axios.get(url, {
-        auth: {
-          username: 'admin2', 
-          password: 'admin2waos' 
-        }
-      });
+    * @swagger
+    * /api/emqx/topic-retained:
+    *   post:
+    *     tags:
+    *       - EMQX
+    *     produces:
+    *       - application/json
+    *     requestBody:
+    *       content:
+    *         application/json:
+    *           schema:
+    *             type: object
+    *             properties:
+    *               topic_name:
+    *                 topic: string
+    *             required:
+    *               - topic_name
+    *     responses:
+    *       200:
+    *         description: Todo salió bien cuando mandamos este estatus
+    *         content:
+    *           application/json:
+    *             schema:
+    *               type: object
+    *               properties:
+    *                 type:
+    *                   type: string
+    *                 title:
+    *                   type: string
+    *                   description: Titulo de la respuesta
+    *                 message:
+    *                   type: string
+    *                 data:
+    *                   type: object
+    *                   description: Datos de respuesta
+    *                   properties:
+    *                     user:
+    *                       type: object
+    *                       $ref: '#/components/schemas/User'
+    */
+public async getEMQXTopic({ request, response }: HttpContextContract) {
+  try {
+    const body = request.all()
+    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/' + body.topic_name
 
-      if (res.status === 200) {
-        console.log('Mensajes retenidos en el tópico:', res.data);
-        return response.status(200).send(res.data);
-      } else {
-        console.error('Error al obtener los mensajes del tópico:', res.data);
-        return response.status(500).send({
-          title: 'Error',
-          message: 'Ocurrió un error al obtener los mensajes del tópico',
-          type: 'error',
-          data: { error: res.data }
-        });
+    const res = await axios.get(url, {
+      auth: {
+        username: Env.get('MQTT_API_KEY'),
+        password: Env.get('MQTT_SECRET_KEY')
       }
-    } catch (error) {
-      console.error('Error al obtener los mensajes del tópico:', error);
-      return response.status(500).send({
+    }).catch((error) => error)
+    if (!res.status && res.response.status !== 202) {
+      return response.status(res.response.status).send({
         title: 'Error',
-        message: 'Ocurrió un error al obtener los mensajes catch del tópico',
+        message: 'Ocurrio un error',
         type: 'error',
-        data: { error: error.message }
-      });
+        data: {
+          error: res.response
+        },
+      })
     }
+
+    return response.status(200).send({
+      title: 'Topico enviado',
+      message: '',
+      type: 'success',
+      data: {...res.data, message_decoded: atob(res.data.payload)},
+    })
+
+  } catch (error) {
+    return response.status(500).send({
+      title: 'Error',
+      message: 'Ocurrio un error',
+      type: 'error',
+      data: {
+        error: error.message
+      },
+    })
   }
+}
+
+public async webhookRes ({ request, response }: HttpContextContract) {
+  const body = request.all()
+  console.log('============================= INICIA LOG DE WEBHOOK ============================')
+  console.log(body)
+  console.log('============================= TERMINA =============================')
+  return response.send(body)
+}
+
     }    
 
