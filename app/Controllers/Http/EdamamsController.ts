@@ -1,7 +1,6 @@
 import EdamamResource from "App/Resources/EdamamResource";
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import axios from "axios";
-import Env from '@ioc:Adonis/Core/Env';
 
 export default class EdamamsController {
   /**
@@ -106,21 +105,24 @@ export default class EdamamsController {
  *                   type: string
  *                   description: Descripción del error.
  */
-  public async findFood({ request, response }: HttpContextContract) {
-    try {
-      const  nombrealimento  = request.input('nombrealimento') // Obtener el nombre del alimento de la consulta
-      
+public async findFood({ request, response }: HttpContextContract) {
+  try {
+      const nombrealimento = request.input('nombrealimento'); // Obtener el nombre del alimento de la consulta
+    
       if (!nombrealimento) {
-        return response.badRequest({ error: 'Por favor, proporciona el nombre del alimento.' })
+          return response.badRequest({ error: 'Por favor, proporciona el nombre del alimento.' });
       }
 
-      const alimento = await EdamamResource.getfood(nombrealimento)
+      const alimento = await EdamamResource.getfood(nombrealimento);
+      
+      console.log('Respuesta de la API de Edamam:', alimento); // Agregar este console.log para verificar la respuesta de la API
 
-      return response.ok(alimento)
-    } catch (error) {
-      console.error('Error al buscar el alimento:', error.message)
-      return response.status(500).json({ error: 'Ocurrió un error al buscar el alimento.' })
-    }
+      return response.ok(alimento);
+  } catch (error) {
+      console.error('Error al buscar el alimento:', error.message);
+      return response.status(500).json({ error: 'Ocurrió un error al buscar el alimento.' });
+  }
+}
   /**
    * 
    * @swagger
@@ -146,7 +148,7 @@ export default class EdamamsController {
    *                  type: string
    *                  description:  data  
    */
-  public async comida({response, params}:HttpContextContract){
+  public async comida({response}:HttpContextContract){
     const res = await axios.get(`https://api.edamam.com/api/food-database/v2/parser?app_id=682c72ac&app_key=%20b1f12eef79856885a89a3787aeb39a9e&nutrition-type=logging`)
     return response.status(200).send({
       title:'Success!!',
