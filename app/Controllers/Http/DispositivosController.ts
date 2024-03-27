@@ -340,7 +340,7 @@ public async show({ params, response }: HttpContextContract) {
    * /api/dispositivos/{id}:
    *   delete:
    *     security:
-   *       - bearerAuth: []
+     *       - bearerAuth: []
    *     tags:
    *       - Dispositivos
    *     summary: Eliminar un dispositivo por su ID
