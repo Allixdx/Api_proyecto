@@ -22,6 +22,7 @@ import Route from '@ioc:Adonis/Core/Route'
 import './routes/UserRoutes.ts'
 import './routes/DispositivoRoutes.ts'
 import './routes/SensorRoutes.ts'
+import './routes/HabitRoutes.ts'
 
 Route.get('/', async () => {
   return { hello: 'world' }

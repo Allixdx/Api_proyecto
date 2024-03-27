@@ -184,42 +184,44 @@ private generateVerificationCode() {
 /**
  * @swagger
  * /api/users/{id}:
- *   put:
- *     tags:
- *       - Users
- *     summary: Actualización de datos de usuario
- *     description: Actualiza los datos de un usuario existente.
- *     parameters:
- *       - name: id
- *         in: path
- *         required: true
- *         description: ID del usuario a actualizar.
- *         schema:
- *           type: integer
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               name:
- *                 type: string
- *               lastname:
- *                 type: string
- *               email:
- *                 type: string
- *     responses:
- *       '200':
- *         description: Datos de usuario actualizados exitosamente.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Mensaje indicando el éxito de la actualización.
+ *  put:
+ *    security:
+ *      - bearerAuth: []
+ *    tags:
+ *      - users
+ *    summary: Actualización de datos de usuario
+ *    description: Actualiza los datos de un usuario existente.
+ *    parameters:
+ *      - name: id
+ *        in: path
+ *        required: true
+ *        description: ID del usuario a actualizar.
+ *        schema:
+ *          type: integer
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              name:
+ *                type: string
+ *              lastname:
+ *                type: string
+ *              email:
+ *                type: string
+ *    responses:
+ *       200:
+ *        description: Datos de usuario actualizados exitosamente.
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: Mensaje indicando el éxito de la actualización.
  */
 public async update({ auth, request, response }: HttpContextContract) {
   try {
@@ -339,29 +341,31 @@ public async updatePassword({ params, request, response }: HttpContextContract) 
 /**
  * @swagger
  * /api/users/{id}:
- *   delete:
+ *  delete:
+ *    security:
+ *      - bearerAuth: []
  *    tags:
- *      - Users
- *     summary: Eliminación de cuenta de usuario
- *     description: Elimina la cuenta de usuario actual.
- *     parameters:
- *       - name: user_id
- *         in: path
- *         required: true
- *         description: ID del usuario a eliminar.
- *         schema:
- *           type: integer
- *     responses:
- *       '200':
- *         description: Cuenta de usuario eliminada exitosamente.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Mensaje indicando el éxito de la eliminación.
+ *      - users
+ *    summary: Eliminación de cuenta de usuario
+ *    description: Elimina la cuenta de usuario actual.
+ *    parameters:
+ *      - name: user_id
+ *        in: path
+ *        required: true
+ *        description: ID del usuario a eliminar.
+ *        schema:
+ *          type: integer
+ *    responses:
+ *      '200':
+ *        description: Cuenta de usuario eliminada exitosamente.
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: Mensaje indicando el éxito de la eliminación.
  */
 public async destroy({ auth, response }: HttpContextContract) {
   const user = auth.user!
@@ -372,51 +376,53 @@ public async destroy({ auth, response }: HttpContextContract) {
 /**
  * @swagger
  * /api/users/authlogin:
- *   post:
- *     tags:
- *       - Users
- *     summary: Iniciar sesión de usuario.
- *     description: Inicia sesión de usuario verificando el correo electrónico y el código de verificación.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               user_email:
- *                 type: string
- *                 format: email
- *               password:
- *                 type: string
- *               verification_code:
- *                 type: string
- *             required:
- *               - user_email
- *               - password
- *               - verification_code
- *     responses:
- *       200:
- *         description: Inicio de sesión exitoso.
- *         content:
- *           application/json:
- *             example:
- *               message: Inicio de sesión exitoso
- *       401:
- *         description: Datos inválidos o usuario no verificado.
- *         content:
- *           application/json:
- *             example:
- *               title: Datos inválidos
- *               message: Usuario no verificado o datos incorrectos
- *               type: warning
- *       400:
- *         description: Error al iniciar sesión.
- *         content:
- *           application/json:
- *             example:
- *               message: Error al iniciar sesión
- *               error: Descripción del error
+ *  post:
+ *    security:
+ *      - bearerAuth: []
+ *    tags:
+ *      - users
+ *    summary: Verificar sesión de usuario.
+ *    description: Inicia sesión de usuario verificando el correo electrónico y el código de verificación.
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              user_email:
+ *                type: string
+ *                format: email
+ *              password:
+ *                type: string
+ *              verification_code:
+ *                type: string
+ *            required:
+ *              - user_email
+ *              - password
+ *              - verification_code
+ *    responses:
+ *      200:
+ *        description: Inicio de sesión exitoso.
+ *        content:
+ *          application/json:
+ *            example:
+ *              message: Inicio de sesión exitoso
+ *      401:
+ *        description: Datos inválidos o usuario no verificado.
+ *        content:
+ *          application/json:
+ *            example:
+ *              title: Datos inválidos
+ *              message: Usuario no verificado o datos incorrectos
+ *              type: warning
+ *      400:
+ *        description: Error al iniciar sesión.
+ *        content:
+ *          application/json:
+ *            example:
+ *              message: Error al iniciar sesión
+ *              error: Descripción del error
  */
 public async authLogin({ request, response }: HttpContextContract) {
   try {
@@ -461,22 +467,24 @@ public async authLogin({ request, response }: HttpContextContract) {
 /**
  * @swagger
  * /api/users/logout:
- *   post:
- *     tags:
- *       - Users
- *     summary: Cierre de sesión de usuario
- *     description: Cierra la sesión actual del usuario.
- *     responses:
- *       '200':
- *         description: Sesión cerrada exitosamente.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Mensaje indicando el éxito del cierre de sesión.
+ *  post:
+ *    security:
+ *      - beareAuth: []
+ *    tags:
+ *      - users
+ *    summary: Cierre de sesión de usuario
+ *    description: Cierra la sesión actual del usuario.
+ *    responses:
+ *       200:
+ *        description: Sesión cerrada exitosamente.
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: Mensaje indicando el éxito del cierre de sesión.
  */
 public async logout({ auth, response }: HttpContextContract) {
   await auth.logout()
@@ -485,56 +493,56 @@ public async logout({ auth, response }: HttpContextContract) {
 /**
  * @swagger
  * /api/users/login:
- *   post:
- *     tags:
- *       - Users
- *     summary: Iniciar sesión de usuario
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               email:
- *                 type: string
- *                 description: Correo electrónico del usuario
- *               password:
- *                 type: string
- *                 description: Contraseña del usuario
- *     responses:
- *       200:
- *         description: Inicio de sesión exitoso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                   description: Token de autenticación generado
- *       401:
- *         description: Credenciales inválidas
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Usuario no encontrado
- *       500:
- *         description: Error interno del servidor
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: Error al iniciar sesión
- *                 error:
- *                   type: string
+ *  post:
+ *    tags:
+ *      - users
+ *    summary: Iniciar sesión de usuario
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              email:
+ *                type: string
+ *                description: Correo electrónico del usuario
+ *              password:
+ *                type: string
+ *                description: Contraseña del usuario
+ *    responses:
+ *      200:
+ *        description: Inicio de sesión exitoso
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                token:
+ *                  type: string
+ *                  description: Token de autenticación generado
+ *      401:
+ *        description: Credenciales inválidas
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  example: Usuario no encontrado
+ *      500:
+ *        description: Error interno del servidor
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  example: Error al iniciar sesión
+ *                error:
+ *                  type: string
  */
 public async login({ request, auth, response }: HttpContextContract) {
   try {
@@ -561,8 +569,6 @@ public async login({ request, auth, response }: HttpContextContract) {
     return response.status(500).json({ message: 'Error al iniciar sesión', error: error.message });
   }
 }
-
-/**dahdjahdahjdajdhajdhajdhjadjahdjadjahdjahdjahjhjahajhdjahd */
 /**
  * @swagger
  * /api/users/recuperar-contra:
