@@ -177,13 +177,25 @@ public async getEMQXTopic({ request, response }: HttpContextContract) {
     }
 
     const retainedMessage = axiosResponse.data;
-    
+
+    // Decodificar el payload del mensaje retenido
+    const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
+
+    // Intentar analizar el contenido decodificado como JSON
+    let parsedPayload;
+    try {
+      parsedPayload = JSON.parse(decodedPayload);
+    } catch (error) {
+      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
+      parsedPayload = decodedPayload;
+    }
+
     return response.status(200).send({
       title: 'Mensaje retenido más reciente obtenido con éxito',
       message: 'El último mensaje retenido del tema ha sido recuperado correctamente.',
       type: 'success',
       data: {
-        retained_message: retainedMessage
+        retained_message: parsedPayload
       },
     });
   } catch (error) {
@@ -205,6 +217,8 @@ public async getEMQXTopic({ request, response }: HttpContextContract) {
     });
   }
 }
+
+
 
  /**
     * @swagger
