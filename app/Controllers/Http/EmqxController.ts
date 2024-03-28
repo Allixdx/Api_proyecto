@@ -91,7 +91,7 @@ export default class EmqxController {
         }
       });
 
-      if (res.status === 202) { // Se corrigió el chequeo del estado de respuesta
+      if (res.status === 200) { // Se corrigió el chequeo del estado de respuesta
         return response.status(res.status).send({
           title: 'Topico enviado',
           message: 'prueba',
