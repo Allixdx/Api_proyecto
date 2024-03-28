@@ -155,7 +155,7 @@ public async publishEMQXTopic1({ response }: HttpContextContract) {
 */
 public async getEMQXTopic({ request, response }: HttpContextContract) {
   try {
-    const topic = request.input('topic_name');
+    const topic = request.input('topic');
     const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/' + topic;
 
     const axiosResponse = await axios.get(url, {
@@ -211,7 +211,7 @@ public async getEMQXTopic({ request, response }: HttpContextContract) {
     * /api/emqx/publishEMQXTopic:
     *   post:
     *     tags:
-    *       - MQTT
+    *       - EMQX
     *     produces:
     *       - application/json
     *     requestBody:
