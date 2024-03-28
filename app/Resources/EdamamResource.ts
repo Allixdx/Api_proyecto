@@ -16,4 +16,19 @@ export default class EdamamResource {
       throw new Error('Error al obtener información sobre los alimentos');
     }
   }
+  public static async getfood(nombrealimento: string) {
+    try {
+      const baseURL = 'https://api.edamam.com/api/food-database/v2/parser';
+      const params = {
+        app_id: '682c72ac',
+        app_key:'b1f12eef79856885a89a3787aeb39a9e',
+        ingr: nombrealimento,
+      };
+      const response = await axios.get(baseURL, { params });
+      return response.data;
+    } catch (error) {
+      console.error('Error al obtener información sobre los alimentos:', error.response.data);
+      throw new Error('Error al obtener información sobre los alimentos');
+    }
+  }
 }
