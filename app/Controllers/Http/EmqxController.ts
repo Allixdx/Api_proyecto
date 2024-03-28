@@ -156,39 +156,37 @@ public async publishEMQXTopic({ response }: HttpContextContract) {
 public async getEMQXTopic({ request, response }: HttpContextContract) {
   try {
     const topicName = request.input('topic_name');
-    const url = `http://143.198.135.231:18083/mqtt/retainer/message/${topicName}`;
+    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/' + topicName;
 
-    const res = await axios.get(url, {
+    const axiosResponse = await axios.get(url, {
       auth: {
-        username: Env.get('MQTT_API_KEY') || '',
-        password: Env.get('MQTT_SECRET_KEY') || ''
+        username: Env.get('MQTT_API_KEY'),
+        password: Env.get('MQTT_SECRET_KEY')
       }
-    });
+    }).catch((error) => error);
 
-    if (res.status !== 200) {
-      return response.status(res.status).send({
+    if (!axiosResponse.status && axiosResponse.response.status !== 200) {
+      return response.status(axiosResponse.response.status).send({
         title: 'Error',
-        message: 'Ocurrió un error al procesar la solicitud',
+        message: 'Ocurrio un error',
         type: 'error',
         data: {
-          error: res.statusText
+          error: axiosResponse.response
         },
       });
     }
 
-    const responseData = {
-      title: 'Tópico enviado',
+    return response.status(200).send({
+      title: 'Topico enviado',
       message: '',
       type: 'success',
-      data: { ...res.data, message_decoded: res.data.payload ? atob(res.data.payload) : '' },
-    };
-
-    return response.status(200).send(responseData);
+      data: {...axiosResponse.data, message_decoded: atob(axiosResponse.data.payload)},
+    });
 
   } catch (error) {
     return response.status(500).send({
       title: 'Error',
-      message: 'Ocurrió un error al procesar la solicitud',
+      message: 'Ocurrio un error',
       type: 'error',
       data: {
         error: error.message
@@ -196,6 +194,7 @@ public async getEMQXTopic({ request, response }: HttpContextContract) {
     });
   }
 }
+
 
 public async webhookRes ({ request, response }: HttpContextContract) {
   const body = request.all()
