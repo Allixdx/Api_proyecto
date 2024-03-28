@@ -324,16 +324,16 @@ public async webhookRes ({ request, response }: HttpContextContract) {
 }
 /**
  * @swagger
- * /api/emqx/obtenerPasos:
+ * /api/emqx/obtenerRitmo:
  *   post:
  *     tags:
  *       - EMQX
- *     summary: Obtener el último mensaje retenido de pasos.
+ *     summary: Obtener el último mensaje retenido de ritmo cardiaco.
  *     description: |
- *       Esta ruta permite obtener el último mensaje retenido de pasos desde el servidor EMQX.
+ *       Esta ruta permite obtener el último mensaje retenido de ritmo cardiaco desde el servidor EMQX.
  *     responses:
  *       200:
- *         description: Último mensaje retenido de pasos obtenido correctamente.
+ *         description: Último mensaje retenido del ritmo cardiaco obtenido correctamente.
  *         content:
  *           application/json:
  *             schema:
@@ -378,9 +378,9 @@ public async webhookRes ({ request, response }: HttpContextContract) {
  *                       type: string
  *                       description: Mensaje de error detallado.
  */
-public async obtenerPasos({  response }: HttpContextContract) {
+public async obtenerRitmo({  response }: HttpContextContract) {
   try {
-    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/ritmo';
+    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePulso';
 
     const axiosResponse = await axios.get(url, {
       auth: {
@@ -443,16 +443,16 @@ public async obtenerPasos({  response }: HttpContextContract) {
 }
 /**
  * @swagger
- * /api/emqx/obtenerRitmo:
+ * /api/emqx/obtenerPasos:
  *   post:
  *     tags:
  *       - EMQX
- *     summary: Obtener el último mensaje retenido del ritmo cardíaco.
+ *     summary: Obtener el último mensaje retenido de pasos.
  *     description: |
- *       Esta ruta permite obtener el último mensaje retenido del ritmo cardíaco desde el servidor EMQX.
+ *       Esta ruta permite obtener el último mensaje retenido de pasos desde el servidor EMQX.
  *     responses:
  *       200:
- *         description: Último mensaje retenido del ritmo cardíaco obtenido correctamente.
+ *         description: Último mensaje retenido de pasos obtenido correctamente.
  *         content:
  *           application/json:
  *             schema:
@@ -497,9 +497,9 @@ public async obtenerPasos({  response }: HttpContextContract) {
  *                       type: string
  *                       description: Mensaje de error detallado.
  */
-public async obtenerRitmo({  response }: HttpContextContract) {
+public async obtenerPasos({  response }: HttpContextContract) {
   try {
-    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/pasos';
+    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePasos';
 //aun no esta creado el topico ritmo
 
     const axiosResponse = await axios.get(url, {
@@ -619,7 +619,7 @@ public async obtenerRitmo({  response }: HttpContextContract) {
  */
 public async obtenerDistancia({  response }: HttpContextContract) {
   try {
-    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/distancia';
+    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteDistancia';
 //aun no esta creado el topico distancia
 
     const axiosResponse = await axios.get(url, {
