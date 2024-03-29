@@ -2,7 +2,6 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import axios from 'axios';
 import Env from '@ioc:Adonis/Core/Env'
 
-
 export default class EmqxController {
   /**
   * @swagger
@@ -173,7 +172,7 @@ export default class EmqxController {
           password: Env.get('MQTT_SECRET_KEY')
         }
       }).catch((error) => error)
-      if (!res.status && res.response.status !== 202) {
+      if (!res.status && res.response.status !== 200) {
         return response.status(res.response.status).send({
           title: 'Error',
           message: 'Ocurrio un error',
@@ -569,5 +568,4 @@ export default class EmqxController {
       });
     }
   }
-}
-
+}    
