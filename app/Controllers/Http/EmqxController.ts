@@ -70,12 +70,12 @@ export default class EmqxController {
    */
   public async publishEMQXTopic1({ response }: HttpContextContract) {
     try {
-      const url = 'http://143.198.135.231:18083/api/v5/publish';
+      const url = Env.get('MQTT_HOST') + '/api/v5/publish'
       const payload = {
         "payload_encoding": "plain",
         "topic": "test/2",
         "qos": 0, // Se cambió "gos" a "qos"
-        "payload": "wilvardo",
+        "payload": "Bolillo tu patron compra",
         "properties": {
           "user_properties": {
             "foo": "bar"
@@ -125,8 +125,8 @@ export default class EmqxController {
   *     produces:
   *       - application/json
   *     parameters:
-  *       - name: topic
-  *         in: query
+  *       - name: topic_name
+  *         in: path
   *         required: true
   *         schema:
   *           type: string
@@ -155,8 +155,9 @@ export default class EmqxController {
   */
   public async getEMQXTopic({ request, response }: HttpContextContract) {
     try {
-      const topic = request.input('topic');
-      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/' + topic;
+
+      const body = request.all()
+      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/' + body.topic_name
 
       const axiosResponse = await axios.get(url, {
         auth: {
@@ -215,102 +216,6 @@ export default class EmqxController {
           error: error.message
         },
       });
-    }
-  }
-  /**
-     * @swagger
-     * /api/emqx/publishEMQXTopic:
-     *   post:
-     *     tags:
-     *       - EMQX
-     *     produces:
-     *       - application/json
-     *     requestBody:
-     *       content:
-     *         application/json:
-     *           schema:
-     *             type: object
-     *             properties:
-     *               topic_name:
-     *                 topic: string
-     *               topic_message:
-     *                 topic: string
-     *             required:
-     *               - topic_name
-     *               - topic_message
-     *     responses:
-     *       200:
-     *         description: Todo salió bien cuando mandamos este estatus
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 type:
-     *                   type: string
-     *                 title:
-     *                   type: string
-     *                   description: Titulo de la respuesta
-     *                 message:
-     *                   type: string
-     *                 data:
-     *                   type: object
-     *                   description: Datos de respuesta
-     *                   properties:
-     *                     user:
-     *                       type: object
-     *                       $ref: '#/components/schemas/User'
-     */
-  public async publishEMQXTopic({ request, response }: HttpContextContract) {
-    try {
-      const body = request.all()
-      const url = Env.get('MQTT_HOST') + '/publish'
-      const payload = {
-        "payload_encoding": "plain",
-        "topic": body.topic_name,
-        "qos": 0,
-        "payload": body.topic_message,
-        "properties": {
-          "user_properties": {
-            "foo": "bar"
-          }
-        },
-        "retain": true
-      }
-
-      const res = await axios.post(url, payload, {
-        auth: {
-          username: Env.get('MQTT_API_KEY'),
-          password: Env.get('MQTT_SECRET_KEY')
-        }
-      }).catch((error) => error)
-      if (!res.status && res.response.status !== 202) {
-        return response.status(res.response.status).send({
-          title: 'Error',
-          message: 'Ocurrio un error',
-          type: 'error',
-          data: {
-            error: res.response
-          },
-        })
-      }
-
-      return response.status(200).send({
-        title: 'Topico enviado',
-        message: '',
-        type: 'success',
-        data: res.data,
-      })
-
-    } catch (error) {
-      return response.status(500).send({
-        title: 'Error',
-        message: 'Ocurrio un error',
-        type: 'error',
-        data: {
-          error: error.message
-        },
-      })
     }
   }
 
