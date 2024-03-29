@@ -322,23 +322,19 @@ public async update({ auth, request, response }: HttpContextContract) {
 
 public async updatePassword({ params, request, response }: HttpContextContract) {
   try {
-    const userId = params.id; // Obtener el ID del usuario de los parámetros de la solicitud
-    const email = request.input('email'); // Obtener el correo electrónico del usuario de la solicitud
-    const newPassword = request.input('password'); // Obtener la nueva contraseña del cuerpo de la solicitud
-
-    // Verificar que la nueva contraseña tenga al menos 8 caracteres
+    const userId = params.id; 
+    const email = request.input('email'); 
+    const newPassword = request.input('password'); 
     if (newPassword.length < 8) {
       return response.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });
     }
 
-    // Intentar encontrar al usuario por ID o correo electrónico
     const user = userId ? await User.find(userId) : await User.findBy('email', email);
 
     if (!user) {
       return response.status(404).json({ error: 'Usuario no encontrado' });
     }
 
-    // Actualizar la contraseña del usuario
     user.password = await Hash.make(newPassword);
     await user.save();
 
@@ -677,99 +673,5 @@ public generarcodigo() {
   const randomNumber = Math.floor(1000 + Math.random() * 9000)
   return randomNumber.toString()
 }
-/**
-* @swagger
-* /api/users/actualizarpassword:
-*   post:
-*     tags:
-*       - users
-*     summary: Actualizar la contraseña del administrador utilizando un código de recuperación
-*     requestBody:
-*       required: true
-*       content:
-*         application/json:
-*           schema:
-*             type: object
-*             required:
-*               - email
-*               - recoveryCode
-*               - newPassword
-*             properties:
-*               email:
-*                 type: string
-*                 format: email
-*               recoveryCode:
-*                 type: string
-*               newPassword:
-*                 type: string
-*                 format: password
-*     responses:
-*       200:
-*         description: Contraseña actualizada exitosamente
-*         content:
-*           application/json:
-*             schema:
-*               type: object
-*               properties:
-*                 message:
-*                   type: string
-*                   example: Contraseña actualizada exitosamente.
-*       400:
-*         description: Código de recuperación no válido
-*         content:
-*           application/json:
-*             schema:
-*               type: object
-*               properties:
-*                 message:
-*                   type: string
-*                   example: El código de recuperación no es válido.
-*       404:
-*         description: Administrador no encontrado
-*         content:
-*           application/json:
-*             schema:
-*               type: object
-*               properties:
-*                 message:
-*                   type: string
-*                   example: No se encontró un administrador con este correo electrónico.
-*       500:
-*         description: Error del servidor
-*         content:
-*           application/json:
-*             schema:
-*               type: object
-*               properties:
-*                 message:
-*                   type: string
-*                   example: Error al actualizar la contraseña.
-*                 error:
-*                   type: string
-*                   example: Mensaje de error detallado
-*/
-public async actualizarPassword({ request, response }: HttpContextContract) {
-  try {
-    const { email, recoveryCode, newPassword } = request.only(['email', 'recoveryCode', 'newPassword'])
-    const user = await User.findByOrFail('email', email)
 
-    if (user.verificationCode!== recoveryCode || !user.verificationCode) {
-      return response.status(400).json({
-        message: 'El código de recuperación no es válido.',
-      });
-    }      
-    user.password = await Hash.make(newPassword)
-    user.verificationCode = null
-    await user.save()
-
-    return response.status(200).json({
-      message: 'Contraseña actualizada exitosamente.',
-    })
-  } catch (error) {
-    return response.status(500).json({
-      message: 'Error al actualizar la contraseña.',
-      error: error.message,
-    })
-  }
-}
 }

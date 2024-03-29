@@ -27,6 +27,6 @@ Route.group(() => {
 
   Route.post('/recuperar-contra','UsersController.correorecuperacion')
 
-  Route.post('/actualizarpassword','UsersController.actualizarPassword')
+  Route.post('/update-password/:id','UsersController.updatePassword')
 
 }).prefix('/api/users')
