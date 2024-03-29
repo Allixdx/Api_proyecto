@@ -5,118 +5,6 @@ import Env from '@ioc:Adonis/Core/Env'
 
 export default class EmqxController {
   /**
-   * @swagger
-   * /api/emqx/publishEMQXTopic1:
-   *   post:
-   *     tags:
-   *       - EMQX
-   *     summary: Publicar en un topic de EMQX
-   *     consumes:
-   *       - application/json
-   *     produces:
-   *       - application/json
-   *     responses:
-   *       200:
-   *         description: Publicación exitosa
-   *         schema:
-   *           type: object
-   *           properties:
-   *             title:
-   *               type: string
-   *               example: Topico enviado
-   *             message:
-   *               type: string
-   *               example: null
-   *             type:
-   *               type: string
-   *               example: success
-   *             data:
-   *               type: object
-   *               example: null
-   *       202:
-   *         description: Publicación aceptada pero no procesada completamente
-   *         schema:
-   *           type: object
-   *           properties:
-   *             title:
-   *               type: string
-   *               example: Error
-   *             message:
-   *               type: string
-   *               example: Ocurrió un error
-   *             type:
-   *               type: string
-   *               example: error
-   *             data:
-   *               type: object
-   *               example: { error: "Mensaje de error" }
-   *       500:
-   *         description: Error interno del servidor
-   *         schema:
-   *           type: object
-   *           properties:
-   *             title:
-   *               type: string
-   *               example: Error
-   *             message:
-   *               type: string
-   *               example: Ocurrió un error
-   *             type:
-   *               type: string
-   *               example: error
-   *             data:
-   *               type: object
-   *               example: { error: "Mensaje de error" }
-   */
-  public async publishEMQXTopic1({ response }: HttpContextContract) {
-    try {
-      const url = Env.get('MQTT_HOST') + '/api/v5/publish'
-      const payload = {
-        "payload_encoding": "plain",
-        "topic": "test/2",
-        "qos": 0, // Se cambió "gos" a "qos"
-        "payload": "Bolillo tu patron compra",
-        "properties": {
-          "user_properties": {
-            "foo": "bar"
-          }
-        },
-        "retain": true // Se movió el parámetro "retain" dentro del payload
-      };
-
-      const res = await axios.post(url, payload, {
-        auth: {
-          username: 'c153ae5d87158c33',
-          password: '6qayTX9CkL0ByD6KvAFPJvhSVm6lDs6iLb9Cz3oy9ANZ3H'
-        }
-      });
-
-      if (res.status === 202) { // Se corrigió el chequeo del estado de respuesta
-        return response.status(res.status).send({
-          title: 'Topico enviado',
-          message: 'prueba',
-          type: 'success',
-          data: null
-        });
-
-      } else {
-        return response.status(500).send({
-          title: 'Error',
-          message: 'Ocurrio un error',
-          type: 'error',
-          data: { error: res.data } // Se corrigió para tomar res.data en lugar de res.response
-        });
-      }
-    } catch (error) {
-      return response.status(500).send({
-        title: 'Error',
-        message: 'Ocurrió dddun error',
-        type: 'error',
-        data: { error: error.message } // Se corrigió para tomar error.message
-      });
-    }
-  }
-  /**
   * @swagger
   * /api/emqx/topic-retained:
   *   post:
@@ -125,8 +13,8 @@ export default class EmqxController {
   *     produces:
   *       - application/json
   *     parameters:
-  *       - name: topic_name
-  *         in: path
+  *       - name: topic
+  *         in: query
   *         required: true
   *         schema:
   *           type: string
@@ -155,9 +43,8 @@ export default class EmqxController {
   */
   public async getEMQXTopic({ request, response }: HttpContextContract) {
     try {
-
-      const body = request.all()
-      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/' + body.topic_name
+      const topic = request.input('topic');
+      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/' + topic;
 
       const axiosResponse = await axios.get(url, {
         auth: {
@@ -219,6 +106,103 @@ export default class EmqxController {
     }
   }
 
+  /**
+     * @swagger
+     * /api/emqx/publishEMQXTopic:
+     *   post:
+     *     tags:
+     *       - EMQX
+     *     produces:
+     *       - application/json
+     *     requestBody:
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               topic_name:
+     *                 topic: string
+     *               topic_message:
+     *                 topic: string
+     *             required:
+     *               - topic_name
+     *               - topic_message
+     *     responses:
+     *       200:
+     *         description: Todo salió bien cuando mandamos este estatus
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 type:
+     *                   type: string
+     *                 title:
+     *                   type: string
+     *                   description: Titulo de la respuesta
+     *                 message:
+     *                   type: string
+     *                 data:
+     *                   type: object
+     *                   description: Datos de respuesta
+     *                   properties:
+     *                     user:
+     *                       type: object
+     *                       $ref: '#/components/schemas/User'
+     */
+  public async publishEMQXTopic({ request, response }: HttpContextContract) {
+    try {
+      const body = request.all()
+      const url = Env.get('MQTT_HOST') + '/publish'
+      const payload = {
+        "payload_encoding": "plain",
+        "topic": body.topic_name,
+        "qos": 0,
+        "payload": body.topic_message,
+        "properties": {
+          "user_properties": {
+            "foo": "bar"
+          }
+        },
+        "retain": true
+      }
+
+      const res = await axios.post(url, payload, {
+        auth: {
+          username: Env.get('MQTT_API_KEY'),
+          password: Env.get('MQTT_SECRET_KEY')
+        }
+      }).catch((error) => error)
+      if (!res.status && res.response.status !== 202) {
+        return response.status(res.response.status).send({
+          title: 'Error',
+          message: 'Ocurrio un error',
+          type: 'error',
+          data: {
+            error: res.response
+          },
+        })
+      }
+
+      return response.status(200).send({
+        title: 'Topico enviado',
+        message: '',
+        type: 'success',
+        data: res.data,
+      })
+
+    } catch (error) {
+      return response.status(500).send({
+        title: 'Error',
+        message: 'Ocurrio un error',
+        type: 'error',
+        data: {
+          error: error.message
+        },
+      })
+    }
+  }
+
   public async webhookRes({ request, response }: HttpContextContract) {
     const body = request.all()
     console.log('============================= INICIA LOG DE WEBHOOK ============================')
@@ -228,16 +212,16 @@ export default class EmqxController {
   }
   /**
    * @swagger
-   * /api/emqx/obtenerPasos:
+   * /api/emqx/obtenerRitmo:
    *   post:
    *     tags:
    *       - EMQX
-   *     summary: Obtener el último mensaje retenido de pasos.
+   *     summary: Obtener el último mensaje retenido de ritmo cardiaco.
    *     description: |
-   *       Esta ruta permite obtener el último mensaje retenido de pasos desde el servidor EMQX.
+   *       Esta ruta permite obtener el último mensaje retenido de ritmo cardiaco desde el servidor EMQX.
    *     responses:
    *       200:
-   *         description: Último mensaje retenido de pasos obtenido correctamente.
+   *         description: Último mensaje retenido del ritmo cardiaco obtenido correctamente.
    *         content:
    *           application/json:
    *             schema:
@@ -282,9 +266,9 @@ export default class EmqxController {
    *                       type: string
    *                       description: Mensaje de error detallado.
    */
-  public async obtenerPasos({ response }: HttpContextContract) {
+  public async obtenerRitmo({ response }: HttpContextContract) {
     try {
-      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/ritmo';
+      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePulso';
 
       const axiosResponse = await axios.get(url, {
         auth: {
@@ -347,16 +331,16 @@ export default class EmqxController {
   }
   /**
    * @swagger
-   * /api/emqx/obtenerRitmo:
+   * /api/emqx/obtenerPasos:
    *   post:
    *     tags:
    *       - EMQX
-   *     summary: Obtener el último mensaje retenido del ritmo cardíaco.
+   *     summary: Obtener el último mensaje retenido de pasos.
    *     description: |
-   *       Esta ruta permite obtener el último mensaje retenido del ritmo cardíaco desde el servidor EMQX.
+   *       Esta ruta permite obtener el último mensaje retenido de pasos desde el servidor EMQX.
    *     responses:
    *       200:
-   *         description: Último mensaje retenido del ritmo cardíaco obtenido correctamente.
+   *         description: Último mensaje retenido de pasos obtenido correctamente.
    *         content:
    *           application/json:
    *             schema:
@@ -401,9 +385,9 @@ export default class EmqxController {
    *                       type: string
    *                       description: Mensaje de error detallado.
    */
-  public async obtenerRitmo({ response }: HttpContextContract) {
+  public async obtenerPasos({ response }: HttpContextContract) {
     try {
-      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/pasos';
+      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePasos';
       //aun no esta creado el topico ritmo
 
       const axiosResponse = await axios.get(url, {
@@ -523,7 +507,7 @@ export default class EmqxController {
    */
   public async obtenerDistancia({ response }: HttpContextContract) {
     try {
-      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/distancia';
+      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteDistancia';
       //aun no esta creado el topico distancia
 
       const axiosResponse = await axios.get(url, {
@@ -585,5 +569,5 @@ export default class EmqxController {
       });
     }
   }
-}    
+}
 
