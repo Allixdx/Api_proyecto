@@ -4,572 +4,571 @@ import Env from '@ioc:Adonis/Core/Env'
 
 
 export default class EmqxController {
-/**
-* @swagger
-* /api/emqx/topic-retained:
-*   post:
-*     tags:
-*       - EMQX
-*     produces:
-*       - application/json
-*     parameters:
-*       - name: topic
-*         in: query
-*         required: true
-*         schema:
-*           type: string
-*     responses:
-*       200:
-*         description: Todo salió bien cuando mandamos este estatus
-*         content:
-*           application/json:
-*             schema:
-*               type: object
-*               properties:
-*                 type:
-*                   type: string
-*                 title:
-*                   type: string
-*                   description: Titulo de la respuesta
-*                 message:
-*                   type: string
-*                 data:
-*                   type: object
-*                   description: Datos de respuesta
-*                   properties:
-*                     user:
-*                       type: object
-*                       $ref: '#/components/schemas/User'
-*/
-public async getEMQXTopic({ request, response }: HttpContextContract) {
-  try {
-    const topic = request.input('topic');
-    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/' + topic;
+  /**
+  * @swagger
+  * /api/emqx/topic-retained:
+  *   post:
+  *     tags:
+  *       - EMQX
+  *     produces:
+  *       - application/json
+  *     parameters:
+  *       - name: topic
+  *         in: query
+  *         required: true
+  *         schema:
+  *           type: string
+  *     responses:
+  *       200:
+  *         description: Todo salió bien cuando mandamos este estatus
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: object
+  *               properties:
+  *                 type:
+  *                   type: string
+  *                 title:
+  *                   type: string
+  *                   description: Titulo de la respuesta
+  *                 message:
+  *                   type: string
+  *                 data:
+  *                   type: object
+  *                   description: Datos de respuesta
+  *                   properties:
+  *                     user:
+  *                       type: object
+  *                       $ref: '#/components/schemas/User'
+  */
+  public async getEMQXTopic({ request, response }: HttpContextContract) {
+    try {
+      const topic = request.input('topic');
+      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/' + topic;
 
-    const axiosResponse = await axios.get(url, {
-      auth: {
-        username: Env.get('MQTT_API_KEY'),
-        password: Env.get('MQTT_SECRET_KEY')
+      const axiosResponse = await axios.get(url, {
+        auth: {
+          username: Env.get('MQTT_API_KEY'),
+          password: Env.get('MQTT_SECRET_KEY')
+        }
+      });
+
+      if (axiosResponse.status !== 200) {
+        return response.status(axiosResponse.status).send({
+          title: 'Error',
+          message: 'Ocurrió un error al obtener el mensaje retenido más reciente.',
+          type: 'error',
+          data: {
+            error: axiosResponse.statusText
+          },
+        });
       }
-    });
 
-    if (axiosResponse.status !== 200) {
-      return response.status(axiosResponse.status).send({
+      const retainedMessage = axiosResponse.data;
+
+      // Decodificar el payload del mensaje retenido
+      const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
+
+      // Intentar analizar el contenido decodificado como JSON
+      let parsedPayload;
+      try {
+        parsedPayload = JSON.parse(decodedPayload);
+      } catch (error) {
+        // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
+        parsedPayload = decodedPayload;
+      }
+
+      return response.status(200).send({
+        title: 'Mensaje retenido más reciente obtenido con éxito',
+        message: 'El último mensaje retenido del tema ha sido recuperado correctamente.',
+        type: 'success',
+        data: {
+          retained_message: parsedPayload
+        },
+      });
+    } catch (error) {
+      let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
+      if (error.response) {
+        errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
+      } else if (error.request) {
+        errorMessage = 'No se recibió ninguna respuesta del servidor.';
+      } else {
+        errorMessage = `Error al realizar la solicitud: ${error.message}`;
+      }
+      return response.status(500).send({
         title: 'Error',
-        message: 'Ocurrió un error al obtener el mensaje retenido más reciente.',
+        message: errorMessage,
         type: 'error',
         data: {
-          error: axiosResponse.statusText
+          error: error.message
         },
       });
     }
-
-    const retainedMessage = axiosResponse.data;
-
-    // Decodificar el payload del mensaje retenido
-    const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
-
-    // Intentar analizar el contenido decodificado como JSON
-    let parsedPayload;
-    try {
-      parsedPayload = JSON.parse(decodedPayload);
-    } catch (error) {
-      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
-      parsedPayload = decodedPayload;
-    }
-
-    return response.status(200).send({
-      title: 'Mensaje retenido más reciente obtenido con éxito',
-      message: 'El último mensaje retenido del tema ha sido recuperado correctamente.',
-      type: 'success',
-      data: {
-        retained_message: parsedPayload
-      },
-    });
-  } catch (error) {
-    let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
-    if (error.response) {
-      errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
-    } else if (error.request) {
-      errorMessage = 'No se recibió ninguna respuesta del servidor.';
-    } else {
-      errorMessage = `Error al realizar la solicitud: ${error.message}`;
-    }
-    return response.status(500).send({
-      title: 'Error',
-      message: errorMessage,
-      type: 'error',
-      data: {
-        error: error.message
-      },
-    });
   }
-}
 
- /**
-    * @swagger
-    * /api/emqx/publishEMQXTopic:
-    *   post:
-    *     tags:
-    *       - EMQX
-    *     produces:
-    *       - application/json
-    *     requestBody:
-    *       content:
-    *         application/json:
-    *           schema:
-    *             type: object
-    *             properties:
-    *               topic_name:
-    *                 topic: string
-    *               topic_message:
-    *                 topic: string
-    *             required:
-    *               - topic_name
-    *               - topic_message
-    *     responses:
-    *       200:
-    *         description: Todo salió bien cuando mandamos este estatus
-    *         content:
-    *           application/json:
-    *             schema:
-    *               type: object
-    *               properties:
-    *                 type:
-    *                   type: string
-    *                 title:
-    *                   type: string
-    *                   description: Titulo de la respuesta
-    *                 message:
-    *                   type: string
-    *                 data:
-    *                   type: object
-    *                   description: Datos de respuesta
-    *                   properties:
-    *                     user:
-    *                       type: object
-    *                       $ref: '#/components/schemas/User'
-    */
-public async publishEMQXTopic({ request, response }: HttpContextContract) {
-  try {
-    const body = request.all()
-    const url = Env.get('MQTT_HOST') + '/publish'
-    const payload = {
-      "payload_encoding": "plain",
-      "topic": body.topic_name,
-      "qos": 0,
-      "payload": body.topic_message,
-      "properties": {
-        "user_properties": {
-          "foo": "bar"
-        }
-      },
-      "retain": true
-    }
-
-    const res = await axios.post(url, payload, {
-      auth: {
-        username: Env.get('MQTT_API_KEY'),
-        password: Env.get('MQTT_SECRET_KEY')
+  /**
+     * @swagger
+     * /api/emqx/publishEMQXTopic:
+     *   post:
+     *     tags:
+     *       - EMQX
+     *     produces:
+     *       - application/json
+     *     requestBody:
+     *       content:
+     *         application/json:
+     *           schema:
+     *             type: object
+     *             properties:
+     *               topic_name:
+     *                 topic: string
+     *               topic_message:
+     *                 topic: string
+     *             required:
+     *               - topic_name
+     *               - topic_message
+     *     responses:
+     *       200:
+     *         description: Todo salió bien cuando mandamos este estatus
+     *         content:
+     *           application/json:
+     *             schema:
+     *               type: object
+     *               properties:
+     *                 type:
+     *                   type: string
+     *                 title:
+     *                   type: string
+     *                   description: Titulo de la respuesta
+     *                 message:
+     *                   type: string
+     *                 data:
+     *                   type: object
+     *                   description: Datos de respuesta
+     *                   properties:
+     *                     user:
+     *                       type: object
+     *                       $ref: '#/components/schemas/User'
+     */
+  public async publishEMQXTopic({ request, response }: HttpContextContract) {
+    try {
+      const body = request.all()
+      const url = Env.get('MQTT_HOST') + '/publish'
+      const payload = {
+        "payload_encoding": "plain",
+        "topic": body.topic_name,
+        "qos": 0,
+        "payload": body.topic_message,
+        "properties": {
+          "user_properties": {
+            "foo": "bar"
+          }
+        },
+        "retain": true
       }
-    }).catch((error) => error)
-    if (!res.status && res.response.status !== 202) {
-      return response.status(res.response.status).send({
+
+      const res = await axios.post(url, payload, {
+        auth: {
+          username: Env.get('MQTT_API_KEY'),
+          password: Env.get('MQTT_SECRET_KEY')
+        }
+      }).catch((error) => error)
+      if (!res.status && res.response.status !== 200) {
+        return response.status(res.response.status).send({
+          title: 'Error',
+          message: 'Ocurrio un error',
+          type: 'error',
+          data: {
+            error: res.response
+          },
+        })
+      }
+
+      return response.status(200).send({
+        title: 'Topico enviado',
+        message: '',
+        type: 'success',
+        data: res.data,
+      })
+
+    } catch (error) {
+      return response.status(500).send({
         title: 'Error',
         message: 'Ocurrio un error',
         type: 'error',
         data: {
-          error: res.response
+          error: error.message
         },
       })
     }
-
-    return response.status(200).send({
-      title: 'Topico enviado',
-      message: '',
-      type: 'success',
-      data: res.data,
-    })
-
-  } catch (error) {
-    return response.status(500).send({
-      title: 'Error',
-      message: 'Ocurrio un error',
-      type: 'error',
-      data: {
-        error: error.message
-      },
-    })
   }
-}
 
-public async webhookRes ({ request, response }: HttpContextContract) {
-  const body = request.all()
-  console.log('============================= INICIA LOG DE WEBHOOK ============================')
-  console.log(body)
-  console.log('============================= TERMINA =============================')
-  return response.send(body)
-}
-/**
- * @swagger
- * /api/emqx/obtenerRitmo:
- *   post:
- *     tags:
- *       - EMQX
- *     summary: Obtener el último mensaje retenido de ritmo cardiaco.
- *     description: |
- *       Esta ruta permite obtener el último mensaje retenido de ritmo cardiaco desde el servidor EMQX.
- *     responses:
- *       200:
- *         description: Último mensaje retenido del ritmo cardiaco obtenido correctamente.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 title:
- *                   type: string
- *                   description: Título de la respuesta.
- *                 message:
- *                   type: string
- *                   description: Mensaje de éxito.
- *                 type:
- *                   type: string
- *                   description: Tipo de respuesta.
- *                 data:
- *                   type: object
- *                   description: Datos de respuesta.
- *                   properties:
- *                     retained_message:
- *                       type: object
- *                       description: Último mensaje retenido de pasos.
- *       500:
- *         description: Error interno al procesar la solicitud.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 title:
- *                   type: string
- *                 message:
- *                   type: string
- *                   description: Descripción del error.
- *                 type:
- *                   type: string
- *                   description: Tipo de error.
- *                 data:
- *                   type: object
- *                   description: Datos adicionales relacionados con el error.
- *                   properties:
- *                     error:
- *                       type: string
- *                       description: Mensaje de error detallado.
- */
-public async obtenerRitmo({  response }: HttpContextContract) {
-  try {
-    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePulso';
+  public async webhookRes({ request, response }: HttpContextContract) {
+    const body = request.all()
+    console.log('============================= INICIA LOG DE WEBHOOK ============================')
+    console.log(body)
+    console.log('============================= TERMINA =============================')
+    return response.send(body)
+  }
+  /**
+   * @swagger
+   * /api/emqx/obtenerRitmo:
+   *   post:
+   *     tags:
+   *       - EMQX
+   *     summary: Obtener el último mensaje retenido de ritmo cardiaco.
+   *     description: |
+   *       Esta ruta permite obtener el último mensaje retenido de ritmo cardiaco desde el servidor EMQX.
+   *     responses:
+   *       200:
+   *         description: Último mensaje retenido del ritmo cardiaco obtenido correctamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                   description: Título de la respuesta.
+   *                 message:
+   *                   type: string
+   *                   description: Mensaje de éxito.
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de respuesta.
+   *                 data:
+   *                   type: object
+   *                   description: Datos de respuesta.
+   *                   properties:
+   *                     retained_message:
+   *                       type: object
+   *                       description: Último mensaje retenido de pasos.
+   *       500:
+   *         description: Error interno al procesar la solicitud.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                 message:
+   *                   type: string
+   *                   description: Descripción del error.
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de error.
+   *                 data:
+   *                   type: object
+   *                   description: Datos adicionales relacionados con el error.
+   *                   properties:
+   *                     error:
+   *                       type: string
+   *                       description: Mensaje de error detallado.
+   */
+  public async obtenerRitmo({ response }: HttpContextContract) {
+    try {
+      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePulso';
 
-    const axiosResponse = await axios.get(url, {
-      auth: {
-        username: Env.get('MQTT_API_KEY'),
-        password: Env.get('MQTT_SECRET_KEY')
+      const axiosResponse = await axios.get(url, {
+        auth: {
+          username: Env.get('MQTT_API_KEY'),
+          password: Env.get('MQTT_SECRET_KEY')
+        }
+      });
+      //aun no esta creado el topico paso
+      if (axiosResponse.status !== 200) {
+        return response.status(axiosResponse.status).send({
+          title: 'Error',
+          message: 'Ocurrió un error al obtener el ritmo cardiaco más reciente.',
+          type: 'error',
+          data: {
+            error: axiosResponse.statusText
+          },
+        });
       }
-    });
-//aun no esta creado el topico paso
-    if (axiosResponse.status !== 200) {
-      return response.status(axiosResponse.status).send({
+
+      const retainedMessage = axiosResponse.data;
+
+      // Decodificar el payload del mensaje retenido
+      const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
+
+      // Intentar analizar el contenido decodificado como JSON
+      let parsedPayload;
+      try {
+        parsedPayload = JSON.parse(decodedPayload);
+      } catch (error) {
+        // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
+        parsedPayload = decodedPayload;
+      }
+
+      return response.status(200).send({
+        title: 'ritmo cardiaco más reciente obtenido con éxito',
+        message: 'El último ritmo cardiaco ha sido recuperado correctamente.',
+        type: 'success',
+        data: {
+          retained_message: parsedPayload
+        },
+      });
+    } catch (error) {
+      let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
+      if (error.response) {
+        errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
+      } else if (error.request) {
+        errorMessage = 'No se recibió ninguna respuesta del servidor.';
+      } else {
+        errorMessage = `Error al realizar la solicitud: ${error.message}`;
+      }
+      return response.status(500).send({
         title: 'Error',
-        message: 'Ocurrió un error al obtener el ritmo cardiaco más reciente.',
+        message: errorMessage,
         type: 'error',
         data: {
-          error: axiosResponse.statusText
+          error: error.message
         },
       });
     }
-
-    const retainedMessage = axiosResponse.data;
-
-    // Decodificar el payload del mensaje retenido
-    const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
-
-    // Intentar analizar el contenido decodificado como JSON
-    let parsedPayload;
-    try {
-      parsedPayload = JSON.parse(decodedPayload);
-    } catch (error) {
-      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
-      parsedPayload = decodedPayload;
-    }
-
-    return response.status(200).send({
-      title: 'ritmo cardiaco más reciente obtenido con éxito',
-      message: 'El último ritmo cardiaco ha sido recuperado correctamente.',
-      type: 'success',
-      data: {
-        retained_message: parsedPayload
-      },
-    });
-  } catch (error) {
-    let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
-    if (error.response) {
-      errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
-    } else if (error.request) {
-      errorMessage = 'No se recibió ninguna respuesta del servidor.';
-    } else {
-      errorMessage = `Error al realizar la solicitud: ${error.message}`;
-    }
-    return response.status(500).send({
-      title: 'Error',
-      message: errorMessage,
-      type: 'error',
-      data: {
-        error: error.message
-      },
-    });
   }
-}
-/**
- * @swagger
- * /api/emqx/obtenerPasos:
- *   post:
- *     tags:
- *       - EMQX
- *     summary: Obtener el último mensaje retenido de pasos.
- *     description: |
- *       Esta ruta permite obtener el último mensaje retenido de pasos desde el servidor EMQX.
- *     responses:
- *       200:
- *         description: Último mensaje retenido de pasos obtenido correctamente.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 title:
- *                   type: string
- *                   description: Título de la respuesta.
- *                 message:
- *                   type: string
- *                   description: Mensaje de éxito.
- *                 type:
- *                   type: string
- *                   description: Tipo de respuesta.
- *                 data:
- *                   type: object
- *                   description: Datos de respuesta.
- *                   properties:
- *                     retained_message:
- *                       type: object
- *                       description: Último mensaje retenido del ritmo cardíaco.
- *       500:
- *         description: Error interno al procesar la solicitud.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 title:
- *                   type: string
- *                 message:
- *                   type: string
- *                   description: Descripción del error.
- *                 type:
- *                   type: string
- *                   description: Tipo de error.
- *                 data:
- *                   type: object
- *                   description: Datos adicionales relacionados con el error.
- *                   properties:
- *                     error:
- *                       type: string
- *                       description: Mensaje de error detallado.
- */
-public async obtenerPasos({  response }: HttpContextContract) {
-  try {
-    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePasos';
-//aun no esta creado el topico ritmo
+  /**
+   * @swagger
+   * /api/emqx/obtenerPasos:
+   *   post:
+   *     tags:
+   *       - EMQX
+   *     summary: Obtener el último mensaje retenido de pasos.
+   *     description: |
+   *       Esta ruta permite obtener el último mensaje retenido de pasos desde el servidor EMQX.
+   *     responses:
+   *       200:
+   *         description: Último mensaje retenido de pasos obtenido correctamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                   description: Título de la respuesta.
+   *                 message:
+   *                   type: string
+   *                   description: Mensaje de éxito.
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de respuesta.
+   *                 data:
+   *                   type: object
+   *                   description: Datos de respuesta.
+   *                   properties:
+   *                     retained_message:
+   *                       type: object
+   *                       description: Último mensaje retenido del ritmo cardíaco.
+   *       500:
+   *         description: Error interno al procesar la solicitud.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                 message:
+   *                   type: string
+   *                   description: Descripción del error.
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de error.
+   *                 data:
+   *                   type: object
+   *                   description: Datos adicionales relacionados con el error.
+   *                   properties:
+   *                     error:
+   *                       type: string
+   *                       description: Mensaje de error detallado.
+   */
+  public async obtenerPasos({ response }: HttpContextContract) {
+    try {
+      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePasos';
+      //aun no esta creado el topico ritmo
 
-    const axiosResponse = await axios.get(url, {
-      auth: {
-        username: Env.get('MQTT_API_KEY'),
-        password: Env.get('MQTT_SECRET_KEY')
+      const axiosResponse = await axios.get(url, {
+        auth: {
+          username: Env.get('MQTT_API_KEY'),
+          password: Env.get('MQTT_SECRET_KEY')
+        }
+      });
+
+      if (axiosResponse.status !== 200) {
+        return response.status(axiosResponse.status).send({
+          title: 'Error',
+          message: 'Ocurrió un error al obtener los pasos más reciente.',
+          type: 'error',
+          data: {
+            error: axiosResponse.statusText
+          },
+        });
       }
-    });
 
-    if (axiosResponse.status !== 200) {
-      return response.status(axiosResponse.status).send({
+      const retainedMessage = axiosResponse.data;
+
+      // Decodificar el payload del mensaje retenido
+      const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
+
+      // Intentar analizar el contenido decodificado como JSON
+      let parsedPayload;
+      try {
+        parsedPayload = JSON.parse(decodedPayload);
+      } catch (error) {
+        // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
+        parsedPayload = decodedPayload;
+      }
+
+      return response.status(200).send({
+        title: 'pasos más recientes obtenido con éxito',
+        message: 'Los pasos han sido recuperado correctamente.',
+        type: 'success',
+        data: {
+          retained_message: parsedPayload
+        },
+      });
+    } catch (error) {
+      let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
+      if (error.response) {
+        errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
+      } else if (error.request) {
+        errorMessage = 'No se recibió ninguna respuesta del servidor.';
+      } else {
+        errorMessage = `Error al realizar la solicitud: ${error.message}`;
+      }
+      return response.status(500).send({
         title: 'Error',
-        message: 'Ocurrió un error al obtener los pasos más reciente.',
+        message: errorMessage,
         type: 'error',
         data: {
-          error: axiosResponse.statusText
+          error: error.message
         },
       });
     }
-
-    const retainedMessage = axiosResponse.data;
-
-    // Decodificar el payload del mensaje retenido
-    const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
-
-    // Intentar analizar el contenido decodificado como JSON
-    let parsedPayload;
-    try {
-      parsedPayload = JSON.parse(decodedPayload);
-    } catch (error) {
-      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
-      parsedPayload = decodedPayload;
-    }
-
-    return response.status(200).send({
-      title: 'pasos más recientes obtenido con éxito',
-      message: 'Los pasos han sido recuperado correctamente.',
-      type: 'success',
-      data: {
-        retained_message: parsedPayload
-      },
-    });
-  } catch (error) {
-    let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
-    if (error.response) {
-      errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
-    } else if (error.request) {
-      errorMessage = 'No se recibió ninguna respuesta del servidor.';
-    } else {
-      errorMessage = `Error al realizar la solicitud: ${error.message}`;
-    }
-    return response.status(500).send({
-      title: 'Error',
-      message: errorMessage,
-      type: 'error',
-      data: {
-        error: error.message
-      },
-    });
   }
-}
-/**
- * @swagger
- * /api/emqx/obtenerDistancia:
- *   post:
- *     tags:
- *       - EMQX
- *     summary: Obtener el último mensaje retenido de distancia.
- *     description: |
- *       Esta ruta permite obtener el último mensaje retenido de distancia desde el servidor EMQX.
- *     responses:
- *       200:
- *         description: Último mensaje retenido de distancia obtenido correctamente.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 title:
- *                   type: string
- *                   description: Título de la respuesta.
- *                 message:
- *                   type: string
- *                   description: Mensaje de éxito.
- *                 type:
- *                   type: string
- *                   description: Tipo de respuesta.
- *                 data:
- *                   type: object
- *                   description: Datos de respuesta.
- *                   properties:
- *                     retained_message:
- *                       type: object
- *                       description: Último mensaje retenido de distancia.
- *       500:
- *         description: Error interno al procesar la solicitud.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 title:
- *                   type: string
- *                 message:
- *                   type: string
- *                   description: Descripción del error.
- *                 type:
- *                   type: string
- *                   description: Tipo de error.
- *                 data:
- *                   type: object
- *                   description: Datos adicionales relacionados con el error.
- *                   properties:
- *                     error:
- *                       type: string
- *                       description: Mensaje de error detallado.
- */
-public async obtenerDistancia({  response }: HttpContextContract) {
-  try {
-    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteDistancia';
-//aun no esta creado el topico distancia
+  /**
+   * @swagger
+   * /api/emqx/obtenerDistancia:
+   *   post:
+   *     tags:
+   *       - EMQX
+   *     summary: Obtener el último mensaje retenido de distancia.
+   *     description: |
+   *       Esta ruta permite obtener el último mensaje retenido de distancia desde el servidor EMQX.
+   *     responses:
+   *       200:
+   *         description: Último mensaje retenido de distancia obtenido correctamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                   description: Título de la respuesta.
+   *                 message:
+   *                   type: string
+   *                   description: Mensaje de éxito.
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de respuesta.
+   *                 data:
+   *                   type: object
+   *                   description: Datos de respuesta.
+   *                   properties:
+   *                     retained_message:
+   *                       type: object
+   *                       description: Último mensaje retenido de distancia.
+   *       500:
+   *         description: Error interno al procesar la solicitud.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                 message:
+   *                   type: string
+   *                   description: Descripción del error.
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de error.
+   *                 data:
+   *                   type: object
+   *                   description: Datos adicionales relacionados con el error.
+   *                   properties:
+   *                     error:
+   *                       type: string
+   *                       description: Mensaje de error detallado.
+   */
+  public async obtenerDistancia({ response }: HttpContextContract) {
+    try {
+      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteDistancia';
+      //aun no esta creado el topico distancia
 
-    const axiosResponse = await axios.get(url, {
-      auth: {
-        username: Env.get('MQTT_API_KEY'),
-        password: Env.get('MQTT_SECRET_KEY')
+      const axiosResponse = await axios.get(url, {
+        auth: {
+          username: Env.get('MQTT_API_KEY'),
+          password: Env.get('MQTT_SECRET_KEY')
+        }
+      });
+
+      if (axiosResponse.status !== 200) {
+        return response.status(axiosResponse.status).send({
+          title: 'Error',
+          message: 'Ocurrió un error al obtener la distancia más reciente.',
+          type: 'error',
+          data: {
+            error: axiosResponse.statusText
+          },
+        });
       }
-    });
 
-    if (axiosResponse.status !== 200) {
-      return response.status(axiosResponse.status).send({
+      const retainedMessage = axiosResponse.data;
+
+      // Decodificar el payload del mensaje retenido
+      const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
+
+      // Intentar analizar el contenido decodificado como JSON
+      let parsedPayload;
+      try {
+        parsedPayload = JSON.parse(decodedPayload);
+      } catch (error) {
+        // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
+        parsedPayload = decodedPayload;
+      }
+
+      return response.status(200).send({
+        title: 'Distancia más reciente obtenida con éxito',
+        message: 'La Distancia ha sido recuperada correctamente.',
+        type: 'success',
+        data: {
+          retained_message: parsedPayload
+        },
+      });
+    } catch (error) {
+      let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
+      if (error.response) {
+        errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
+      } else if (error.request) {
+        errorMessage = 'No se recibió ninguna respuesta del servidor.';
+      } else {
+        errorMessage = `Error al realizar la solicitud: ${error.message}`;
+      }
+      return response.status(500).send({
         title: 'Error',
-        message: 'Ocurrió un error al obtener la distancia más reciente.',
+        message: errorMessage,
         type: 'error',
         data: {
-          error: axiosResponse.statusText
+          error: error.message
         },
       });
     }
-
-    const retainedMessage = axiosResponse.data;
-
-    // Decodificar el payload del mensaje retenido
-    const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
-
-    // Intentar analizar el contenido decodificado como JSON
-    let parsedPayload;
-    try {
-      parsedPayload = JSON.parse(decodedPayload);
-    } catch (error) {
-      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
-      parsedPayload = decodedPayload;
-    }
-
-    return response.status(200).send({
-      title: 'Distancia más reciente obtenida con éxito',
-      message: 'La Distancia ha sido recuperada correctamente.',
-      type: 'success',
-      data: {
-        retained_message: parsedPayload
-      },
-    });
-  } catch (error) {
-    let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
-    if (error.response) {
-      errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
-    } else if (error.request) {
-      errorMessage = 'No se recibió ninguna respuesta del servidor.';
-    } else {
-      errorMessage = `Error al realizar la solicitud: ${error.message}`;
-    }
-    return response.status(500).send({
-      title: 'Error',
-      message: errorMessage,
-      type: 'error',
-      data: {
-        error: error.message
-      },
-    });
   }
-}
 
 
-    }    
-
+}    
