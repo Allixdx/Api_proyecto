@@ -7,6 +7,8 @@ export default class SensorsController {
    * @swagger
    * /api/sensor:
    *  get:
+   *    security:
+   *      - bearerAuth: []
    *    tags:
    *      - Sensors
    *    summary: list of sensors
@@ -39,6 +41,8 @@ export default class SensorsController {
   * @swagger
   * /api/sensor:
   *   post:
+  *     security:
+  *       - bearerAuth: []
   *     tags:
   *       - Sensors
   *     summary: Create new sensor
@@ -88,13 +92,13 @@ export default class SensorsController {
       data: newSensor
     })
   }
-
-  public async show({}: HttpContextContract) {}
   /**
    * 
    * @swagger
    * /api/sensor/{id}:
    *  put:
+   *    security:
+   *    - bearerAuth: []
    *    tags:
    *      - Sensors
    *    summary:  Activate sensor by id
@@ -149,6 +153,8 @@ export default class SensorsController {
    * @swagger
    * /api/sensor/{id}:
    *  delete:
+   *    security:
+   *      - bearerAuth: []
    *    tags:
    *      - Sensors
    *    summary:  drop sensor by id
@@ -188,14 +194,5 @@ export default class SensorsController {
         })
       }
     }
-  }
-
-  public async pesa({response} :HttpContextContract){
-    const pesaData = await Sensor.all()
-    return response.status(200).send({
-      title:'Success!!',
-      message:'Pesa data',
-      data:pesaData
-    })
   }
 }

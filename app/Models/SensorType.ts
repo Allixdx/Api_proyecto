@@ -14,10 +14,10 @@ export default class SensorType extends BaseModel {
   public unit: string
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  public updated_at: DateTime
 
   @hasMany(() => Sensor)
   public sensors: HasMany<typeof Sensor>
