@@ -306,7 +306,7 @@ public async obtenerRitmo({  response }: HttpContextContract) {
       message: 'El último ritmo cardiaco ha sido recuperado correctamente.',
       type: 'success',
       data: {
-        retained_message: parsedPayload
+        retained_message: parsedPayload + ' bpm'
       },
     });
   } catch (error) {
@@ -402,7 +402,7 @@ public async obtenerPasos({  response }: HttpContextContract) {
         message: 'Ocurrió un error al obtener los pasos más reciente.',
         type: 'error',
         data: {
-          error: axiosResponse.statusText
+          error: axiosResponse.statusText 
         },
       });
     }
@@ -426,7 +426,7 @@ public async obtenerPasos({  response }: HttpContextContract) {
       message: 'Los pasos han sido recuperado correctamente.',
       type: 'success',
       data: {
-        retained_message: parsedPayload
+        retained_message: parsedPayload + ' pasos'
       },
     });
   } catch (error) {
@@ -522,7 +522,7 @@ public async obtenerDistancia({  response }: HttpContextContract) {
         message: 'Ocurrió un error al obtener la distancia más reciente.',
         type: 'error',
         data: {
-          error: axiosResponse.statusText
+          error: axiosResponse.statusText 
         },
       });
     }
@@ -544,6 +544,244 @@ public async obtenerDistancia({  response }: HttpContextContract) {
     return response.status(200).send({
       title: 'Distancia más reciente obtenida con éxito',
       message: 'La Distancia ha sido recuperada correctamente.',
+      type: 'success',
+      data: {
+        retained_message: parsedPayload + ' mts'
+      },
+    });
+  } catch (error) {
+    let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
+    if (error.response) {
+      errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
+    } else if (error.request) {
+      errorMessage = 'No se recibió ninguna respuesta del servidor.';
+    } else {
+      errorMessage = `Error al realizar la solicitud: ${error.message}`;
+    }
+    return response.status(500).send({
+      title: 'Error',
+      message: errorMessage,
+      type: 'error',
+      data: {
+        error: error.message
+      },
+    });
+  }
+}
+/**
+ * @swagger
+ * /api/emqx/obtenerAlcohol:
+ *   post:
+ *     tags:
+ *       - EMQX
+ *     summary: Obtener el último mensaje retenido de alcohol.
+ *     description: |
+ *       Esta ruta permite obtener el último mensaje retenido de alcohol desde el servidor EMQX.
+ *     responses:
+ *       200:
+ *         description: Último mensaje retenido de alcohol obtenido correctamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                   description: Título de la respuesta.
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de éxito.
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta.
+ *                 data:
+ *                   type: object
+ *                   description: Datos de respuesta.
+ *                   properties:
+ *                     retained_message:
+ *                       type: object
+ *                       description: Último mensaje retenido de alcohol.
+ *       500:
+ *         description: Error interno al procesar la solicitud.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                 message:
+ *                   type: string
+ *                   description: Descripción del error.
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de error.
+ *                 data:
+ *                   type: object
+ *                   description: Datos adicionales relacionados con el error.
+ *                   properties:
+ *                     error:
+ *                       type: string
+ *                       description: Mensaje de error detallado.
+ */
+public async obtenerAlcohol({ response }: HttpContextContract) {
+  try {
+    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteAlcohol';
+
+    const axiosResponse = await axios.get(url, {
+      auth: {
+        username: Env.get('MQTT_API_KEY'),
+        password: Env.get('MQTT_SECRET_KEY')
+      }
+    });
+
+    if (axiosResponse.status !== 200) {
+      return response.status(axiosResponse.status).send({
+        title: 'Error',
+        message: 'Ocurrió un error al obtener el nivel de alcohol más reciente.',
+        type: 'error',
+        data: {
+          error: axiosResponse.statusText
+        },
+      });
+    }
+
+    const retainedMessage = axiosResponse.data;
+
+    // Decodificar el payload del mensaje retenido
+    const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
+
+    // Intentar analizar el contenido decodificado como JSON
+    let parsedPayload;
+    try {
+      parsedPayload = JSON.parse(decodedPayload);
+    } catch (error) {
+      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
+      parsedPayload = decodedPayload;
+    }
+
+    return response.status(200).send({
+      title: 'Nivel de alcohol más reciente obtenido con éxito',
+      message: 'El nivel de alcohol ha sido recuperado correctamente.',
+      type: 'success',
+      data: {
+        retained_message: parsedPayload + ' mg/L'
+      },
+    });
+  } catch (error) {
+    let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
+    if (error.response) {
+      errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
+    } else if (error.request) {
+      errorMessage = 'No se recibió ninguna respuesta del servidor.';
+    } else {
+      errorMessage = `Error al realizar la solicitud: ${error.message}`;
+    }
+    return response.status(500).send({
+      title: 'Error',
+      message: errorMessage,
+      type: 'error',
+      data: {
+        error: error.message
+      },
+    });
+  }
+}
+/**
+ * @swagger
+ * /api/emqx/obtenerPantalla:
+ *   post:
+ *     tags:
+ *       - EMQX
+ *     summary: Obtener el último mensaje retenido de la pantalla.
+ *     description: |
+ *       Esta ruta permite obtener el último mensaje retenido de la pantalla desde el servidor EMQX.
+ *     responses:
+ *       200:
+ *         description: Último mensaje retenido de la pantalla obtenido correctamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                   description: Título de la respuesta.
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de éxito.
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta.
+ *                 data:
+ *                   type: object
+ *                   description: Datos de respuesta.
+ *                   properties:
+ *                     retained_message:
+ *                       type: object
+ *                       description: Último mensaje retenido de la pantalla.
+ *       500:
+ *         description: Error interno al procesar la solicitud.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                 message:
+ *                   type: string
+ *                   description: Descripción del error.
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de error.
+ *                 data:
+ *                   type: object
+ *                   description: Datos adicionales relacionados con el error.
+ *                   properties:
+ *                     error:
+ *                       type: string
+ *                       description: Mensaje de error detallado.
+ */
+public async obtenerPantalla({ response }: HttpContextContract) {
+  try {
+    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePantalla';
+
+    const axiosResponse = await axios.get(url, {
+      auth: {
+        username: Env.get('MQTT_API_KEY'),
+        password: Env.get('MQTT_SECRET_KEY')
+      }
+    });
+
+    if (axiosResponse.status !== 200) {
+      return response.status(axiosResponse.status).send({
+        title: 'Error',
+        message: 'Ocurrió un error al obtener el último mensaje de la pantalla.',
+        type: 'error',
+        data: {
+          error: axiosResponse.statusText
+        },
+      });
+    }
+
+    const retainedMessage = axiosResponse.data;
+
+    // Decodificar el payload del mensaje retenido
+    const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
+
+    // Intentar analizar el contenido decodificado como JSON
+    let parsedPayload;
+    try {
+      parsedPayload = JSON.parse(decodedPayload);
+    } catch (error) {
+      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
+      parsedPayload = decodedPayload;
+    }
+
+    return response.status(200).send({
+      title: 'Último mensaje de la pantalla obtenido con éxito',
+      message: 'El último mensaje de la pantalla ha sido recuperado correctamente.',
       type: 'success',
       data: {
         retained_message: parsedPayload
@@ -568,6 +806,126 @@ public async obtenerDistancia({  response }: HttpContextContract) {
     });
   }
 }
+/**
+ * @swagger
+ * /api/emqx/obtenerTemperatura:
+ *   post:
+ *     tags:
+ *       - EMQX
+ *     summary: Obtener el último mensaje retenido de temperatura.
+ *     description: |
+ *       Esta ruta permite obtener el último mensaje retenido de temperatura desde el servidor EMQX.
+ *     responses:
+ *       200:
+ *         description: Último mensaje retenido de temperatura obtenido correctamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                   description: Título de la respuesta.
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de éxito.
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta.
+ *                 data:
+ *                   type: object
+ *                   description: Datos de respuesta.
+ *                   properties:
+ *                     retained_message:
+ *                       type: object
+ *                       description: Último mensaje retenido de temperatura.
+ *       500:
+ *         description: Error interno al procesar la solicitud.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                 message:
+ *                   type: string
+ *                   description: Descripción del error.
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de error.
+ *                 data:
+ *                   type: object
+ *                   description: Datos adicionales relacionados con el error.
+ *                   properties:
+ *                     error:
+ *                       type: string
+ *                       description: Mensaje de error detallado.
+ */
+public async obtenerTemperatura({ response }: HttpContextContract) {
+  try {
+    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteTemperatura';
+
+    const axiosResponse = await axios.get(url, {
+      auth: {
+        username: Env.get('MQTT_API_KEY'),
+        password: Env.get('MQTT_SECRET_KEY')
+      }
+    });
+
+    if (axiosResponse.status !== 200) {
+      return response.status(axiosResponse.status).send({
+        title: 'Error',
+        message: 'Ocurrió un error al obtener el último mensaje de temperatura.',
+        type: 'error',
+        data: {
+          error: axiosResponse.statusText 
+        },
+      });
+    }
+
+    const retainedMessage = axiosResponse.data;
+
+    // Decodificar el payload del mensaje retenido
+    const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
+
+    // Intentar analizar el contenido decodificado como JSON
+    let parsedPayload;
+    try {
+      parsedPayload = JSON.parse(decodedPayload);
+    } catch (error) {
+      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
+      parsedPayload = decodedPayload;
+    }
+
+    return response.status(200).send({
+      title: 'Último mensaje de temperatura obtenido con éxito',
+      message: 'El último mensaje de temperatura ha sido recuperado correctamente.',
+      type: 'success',
+      data: {
+        retained_message: parsedPayload + ' °C'
+      },
+    });
+  } catch (error) {
+    let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
+    if (error.response) {
+      errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
+    } else if (error.request) {
+      errorMessage = 'No se recibió ninguna respuesta del servidor.';
+    } else {
+      errorMessage = `Error al realizar la solicitud: ${error.message}`;
+    }
+    return response.status(500).send({
+      title: 'Error',
+      message: errorMessage,
+      type: 'error',
+      data: {
+        error: error.message
+      },
+    });
+  }
+}
+
 
 
     }    
