@@ -134,10 +134,7 @@ public async findFood({ request, response }: HttpContextContract) {
 }
 }
 
-  //todos alimentos
-  //categorias 
-  //alimentos de una categoria
-  //endpoint para peso en la pesa 
+
 
   
 
