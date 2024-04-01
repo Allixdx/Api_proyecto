@@ -7,8 +7,6 @@ export default class SensorTypesController {
  * @swagger
  * /api/sensorType:
  *  get:
- *    security:
- *      - bearerAuth: []
  *    tags:
  *      - SensorsTypes
  *    summary: Lista de tipos de sensores
@@ -30,19 +28,25 @@ export default class SensorTypesController {
  *                  description: descripcion
  */
   public async index({ response }: HttpContextContract) {
-    const SensorTypes = SensorType.all()
+   try{
+    const SensorTypes = await SensorType.all()
     return response.status(200).send({
       title: 'Success!!',
       message: 'Lista de tipos de sensores',
       data: SensorTypes
-    })
+    });
+  }catch(error){
+    return response.status(500).send({
+      status: 'error',
+      message: 'Error al obtener los tipo de sensores',
+      error: error.message,
+    });
   }
+}
   /**
   * @swagger
   * /api/sensorType:
   *   post:
-  *     security:
-  *       - bearerAuth: []
   *     tags:
   *       - SensorsTypes
   *     summary: Crear un nuevo tipo de sensor
@@ -93,8 +97,6 @@ export default class SensorTypesController {
    * @swagger
    * /api/sensorType/{id}:
    *  put:
-   *    security:
-   *      - bearerAuth: []
    *    tags:
    *      - SensorsTypes
    *    summary:  Actualizar tipo de sensor
@@ -160,8 +162,6 @@ export default class SensorTypesController {
  * @swagger
  * /api/sensorType/{id}:
  *  delete:
- *    security:
- *      - bearerAuth: []
  *    tags:
  *      - SensorsTypes
  *    summary: Eliminar tipo de sensor

@@ -1,5 +1,8 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Dispositivo from 'App/Models/Dispositivo';
+import DispositivoSensor from 'App/Models/DispositivoSensor';
+import Sensor from 'App/Models/Sensor';
+import SensorType from 'App/Models/SensorType';
 import TipoDispositivo from 'App/Models/TipoDispositivo';
 
 export default class DispositivosController {
@@ -190,7 +193,6 @@ public async store({ request, response }: HttpContextContract) {
  *                 error:
  *                   type: string
  */
-
 public async creardispositivo({ request, response, auth }: HttpContextContract) {
   try {
     const tipoDispositivo = request.input('tipoDispositivo');
@@ -203,11 +205,45 @@ public async creardispositivo({ request, response, auth }: HttpContextContract) 
       });
     }
 
-    // Crear el dispositivo basado en la selección
+    // Verificar si ya existe un tipo de dispositivo del mismo tipo
+    let tipoDispositivoExistente = await TipoDispositivo.query()
+      .where('name', tipoDispositivo === 'pesa' ? 'pesa' : 'brazalete')
+      .first();
+
+    // Si no existe, crear uno nuevo
+    if (!tipoDispositivoExistente) {
+      tipoDispositivoExistente = await TipoDispositivo.create({
+        name: tipoDispositivo === 'pesa' ? 'pesa' : 'brazalete',
+      });
+    }
+
+    // Crear el dispositivo basado en el tipo de dispositivo existente
     const dispositivo = await Dispositivo.create({
-      tipoDispositivoId: tipoDispositivo === 'pesa' ? 1 : 2,
+      tipoDispositivoId: tipoDispositivoExistente.id,
       id_usuario: userId,
     });
+
+    // Obtener el tipo de sensor correspondiente al tipo de dispositivo
+    const tipoDeSensor = await SensorType.query()
+      .where('name', tipoDispositivo === 'pesa' ? 'Peso' : 'Distancia')
+      .firstOrFail();
+
+    // Determinar el valor del sensor según el tipo de dispositivo
+    let valorSensor = tipoDispositivo === 'pesa' ? 1 : 5;
+
+    // Crear el sensor asociado al tipo de sensor y asignar el valor determinado
+    const sensor = await Sensor.create({
+      sensor_type_id: tipoDeSensor.id,
+      value: valorSensor,
+      activo: 1,
+    });
+
+    // Crear la relación entre el dispositivo y el sensor en la tabla intermedia
+// Crear la relación entre el dispositivo y el sensor en la tabla intermedia
+await DispositivoSensor.create({
+  dispositivo_id: dispositivo.id,
+  sensor_id: sensor.id,
+});
 
     return response.status(201).json({
       status: 'success',
@@ -221,7 +257,6 @@ public async creardispositivo({ request, response, auth }: HttpContextContract) 
     });
   }
 }
-
 /**
    * @swagger
    * /api/dispositivos/{id}:
