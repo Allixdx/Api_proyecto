@@ -8,7 +8,7 @@ Route.group(() => {
     Route.post('/obtenerPasos','EmqxController.obtenerPasos')
     Route.post('/obtenerRitmo','EmqxController.obtenerRitmo')
     Route.post('/obtenerAlcohol','EmqxController.obtenerAlcohol')
-    Route.post('/obtenerPantalla','EmqxController.obtenerPantalla')
+    Route.post('/MandarAPantalla','EmqxController.MandarAPantalla')
     Route.post('/obtenerTemperatura','EmqxController.obtenerTemperatura')
     Route.post('/obtenerPeso','EmqxController.obtenerPeso')
 }).prefix('/api/emqx')

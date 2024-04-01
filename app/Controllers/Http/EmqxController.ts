@@ -1,6 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import axios from 'axios';
 import Env from '@ioc:Adonis/Core/Env'
+import SensorType from 'App/Models/SensorType';
 
 export default class EmqxController {
 /**
@@ -265,9 +266,20 @@ public async webhookRes ({ request, response }: HttpContextContract) {
  *                       type: string
  *                       description: Mensaje de error detallado.
  */
-public async obtenerRitmo({  response }: HttpContextContract) {
+public async obtenerRitmo({ response }: HttpContextContract) {
   try {
     const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePulso';
+    
+    const sensorType = await SensorType.findBy('name', 'Ritmo');
+
+    if (!sensorType) {
+      return response.status(404).send({
+        title: 'Error',
+        message: 'No se encontró el tipo de sensor especificado.',
+        type: 'error',
+      });
+    }
+    const unit = sensorType.unit;
 
     const axiosResponse = await axios.get(url, {
       auth: {
@@ -275,7 +287,7 @@ public async obtenerRitmo({  response }: HttpContextContract) {
         password: Env.get('MQTT_SECRET_KEY')
       }
     });
-//aun no esta creado el topico paso
+
     if (axiosResponse.status !== 200) {
       return response.status(axiosResponse.status).send({
         title: 'Error',
@@ -289,15 +301,12 @@ public async obtenerRitmo({  response }: HttpContextContract) {
 
     const retainedMessage = axiosResponse.data;
 
-    // Decodificar el payload del mensaje retenido
     const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
 
-    // Intentar analizar el contenido decodificado como JSON
     let parsedPayload;
     try {
       parsedPayload = JSON.parse(decodedPayload);
     } catch (error) {
-      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
       parsedPayload = decodedPayload;
     }
 
@@ -306,7 +315,8 @@ public async obtenerRitmo({  response }: HttpContextContract) {
       message: 'El último ritmo cardiaco ha sido recuperado correctamente.',
       type: 'success',
       data: {
-        retained_message: parsedPayload + ' bpm'
+        retained_message: parsedPayload,
+        unit: unit 
       },
     });
   } catch (error) {
@@ -387,7 +397,16 @@ public async obtenerRitmo({  response }: HttpContextContract) {
 public async obtenerPasos({  response }: HttpContextContract) {
   try {
     const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePasos';
-//aun no esta creado el topico ritmo
+    const sensorType = await SensorType.findBy('name', 'Ritmo');
+
+    if (!sensorType) {
+      return response.status(404).send({
+        title: 'Error',
+        message: 'No se encontró el tipo de sensor especificado.',
+        type: 'error',
+      });
+    }
+    const unit = sensorType.unit;
 
     const axiosResponse = await axios.get(url, {
       auth: {
@@ -409,15 +428,12 @@ public async obtenerPasos({  response }: HttpContextContract) {
 
     const retainedMessage = axiosResponse.data;
 
-    // Decodificar el payload del mensaje retenido
     const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
 
-    // Intentar analizar el contenido decodificado como JSON
     let parsedPayload;
     try {
       parsedPayload = JSON.parse(decodedPayload);
     } catch (error) {
-      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
       parsedPayload = decodedPayload;
     }
 
@@ -426,7 +442,8 @@ public async obtenerPasos({  response }: HttpContextContract) {
       message: 'Los pasos han sido recuperado correctamente.',
       type: 'success',
       data: {
-        retained_message: parsedPayload + ' pasos'
+        retained_message: parsedPayload,
+        unit: unit
       },
     });
   } catch (error) {
@@ -507,8 +524,16 @@ public async obtenerPasos({  response }: HttpContextContract) {
 public async obtenerDistancia({  response }: HttpContextContract) {
   try {
     const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteDistancia';
-//aun no esta creado el topico distancia
+    const sensorType = await SensorType.findBy('name', 'Ritmo');
 
+    if (!sensorType) {
+      return response.status(404).send({
+        title: 'Error',
+        message: 'No se encontró el tipo de sensor especificado.',
+        type: 'error',
+      });
+    }
+    const unit = sensorType.unit;
     const axiosResponse = await axios.get(url, {
       auth: {
         username: Env.get('MQTT_API_KEY'),
@@ -529,15 +554,12 @@ public async obtenerDistancia({  response }: HttpContextContract) {
 
     const retainedMessage = axiosResponse.data;
 
-    // Decodificar el payload del mensaje retenido
     const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
 
-    // Intentar analizar el contenido decodificado como JSON
     let parsedPayload;
     try {
       parsedPayload = JSON.parse(decodedPayload);
     } catch (error) {
-      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
       parsedPayload = decodedPayload;
     }
 
@@ -546,7 +568,8 @@ public async obtenerDistancia({  response }: HttpContextContract) {
       message: 'La Distancia ha sido recuperada correctamente.',
       type: 'success',
       data: {
-        retained_message: parsedPayload + ' mts'
+        retained_message: parsedPayload,
+        unit: unit
       },
     });
   } catch (error) {
@@ -627,7 +650,16 @@ public async obtenerDistancia({  response }: HttpContextContract) {
 public async obtenerAlcohol({ response }: HttpContextContract) {
   try {
     const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteAlcohol';
+    const sensorType = await SensorType.findBy('name', 'Ritmo');
 
+    if (!sensorType) {
+      return response.status(404).send({
+        title: 'Error',
+        message: 'No se encontró el tipo de sensor especificado.',
+        type: 'error',
+      });
+    }
+    const unit = sensorType.unit;
     const axiosResponse = await axios.get(url, {
       auth: {
         username: Env.get('MQTT_API_KEY'),
@@ -648,15 +680,12 @@ public async obtenerAlcohol({ response }: HttpContextContract) {
 
     const retainedMessage = axiosResponse.data;
 
-    // Decodificar el payload del mensaje retenido
     const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
 
-    // Intentar analizar el contenido decodificado como JSON
     let parsedPayload;
     try {
       parsedPayload = JSON.parse(decodedPayload);
     } catch (error) {
-      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
       parsedPayload = decodedPayload;
     }
 
@@ -665,7 +694,8 @@ public async obtenerAlcohol({ response }: HttpContextContract) {
       message: 'El nivel de alcohol ha sido recuperado correctamente.',
       type: 'success',
       data: {
-        retained_message: parsedPayload + ' mg/L'
+        retained_message: parsedPayload,
+        unit: unit
       },
     });
   } catch (error) {
@@ -687,125 +717,117 @@ public async obtenerAlcohol({ response }: HttpContextContract) {
     });
   }
 }
-/**
- * @swagger
- * /api/emqx/obtenerPantalla:
- *   post:
- *     tags:
- *       - EMQX
- *     summary: Obtener el último mensaje retenido de la pantalla.
- *     description: |
- *       Esta ruta permite obtener el último mensaje retenido de la pantalla desde el servidor EMQX.
- *     responses:
- *       200:
- *         description: Último mensaje retenido de la pantalla obtenido correctamente.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 title:
- *                   type: string
- *                   description: Título de la respuesta.
- *                 message:
- *                   type: string
- *                   description: Mensaje de éxito.
- *                 type:
- *                   type: string
- *                   description: Tipo de respuesta.
- *                 data:
- *                   type: object
- *                   description: Datos de respuesta.
- *                   properties:
- *                     retained_message:
- *                       type: object
- *                       description: Último mensaje retenido de la pantalla.
- *       500:
- *         description: Error interno al procesar la solicitud.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 title:
- *                   type: string
- *                 message:
- *                   type: string
- *                   description: Descripción del error.
- *                 type:
- *                   type: string
- *                   description: Tipo de error.
- *                 data:
- *                   type: object
- *                   description: Datos adicionales relacionados con el error.
- *                   properties:
- *                     error:
- *                       type: string
- *                       description: Mensaje de error detallado.
- */
-public async obtenerPantalla({ response }: HttpContextContract) {
-  try {
-    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePantalla';
+  /**
+   * @swagger
+   * /api/emqx/MandarAPantalla:
+   *   post:
+   *     summary: Enviar mensaje a pantalla.
+   *     tags: 
+   *     - EMQX
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               topic_message:
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: Tópico enviado correctamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                 message:
+   *                   type: string
+   *                 type:
+   *                   type: string
+   *                 data:
+   *                   type: object
+   *       500:
+   *         description: Error interno al procesar la solicitud.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                 message:
+   *                   type: string
+   *                 type:
+   *                   type: string
+   *                 data:
+   *                   type: object
+   */
+  public async MandarAPantalla({ request, response }: HttpContextContract) {
+    try {
+      const body = request.all()
+      const { topic_message } = body;
 
-    const axiosResponse = await axios.get(url, {
-      auth: {
-        username: Env.get('MQTT_API_KEY'),
-        password: Env.get('MQTT_SECRET_KEY')
+      if (topic_message < 1 || topic_message > 4) {
+        return response.status(400).send({
+          title: 'Error de validación',
+          message: 'El valor debe estar entre 1 y 4.',
+          type: 'error',
+        });
       }
-    });
 
-    if (axiosResponse.status !== 200) {
-      return response.status(axiosResponse.status).send({
+      const url = Env.get('MQTT_HOST') + '/publish/'
+      const payload = {
+        "payload_encoding": "plain",
+        "topic": "BrazaletePantalla", 
+        "qos": 0,
+        "payload": topic_message.toString(),
+        "properties": {
+          "user_properties": {
+            "foo": "bar"
+          }
+        },
+        "retain": true
+      }
+
+      const res = await axios.post(url, payload, {
+        auth: {
+          username: Env.get('MQTT_API_KEY'),
+          password: Env.get('MQTT_SECRET_KEY')
+        }
+      });
+
+      if (res.status !== 202) {
+        return response.status(res.status).send({
+          title: 'Error',
+          message: 'Ocurrió un error al enviar el mensaje al tópico.',
+          type: 'error',
+          data: {
+            error: res.statusText
+          },
+        });
+      }
+
+      return response.status(200).send({
+        title: 'Tópico enviado',
+        message: 'Mensaje enviado correctamente al tópico.',
+        type: 'success',
+        data: res.data,
+      });
+
+    } catch (error) {
+      return response.status(500).send({
         title: 'Error',
-        message: 'Ocurrió un error al obtener el último mensaje de la pantalla.',
+        message: 'Ocurrió un error interno al procesar la solicitud.',
         type: 'error',
         data: {
-          error: axiosResponse.statusText
+          error: error.message
         },
       });
     }
-
-    const retainedMessage = axiosResponse.data;
-
-    // Decodificar el payload del mensaje retenido
-    const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
-
-    // Intentar analizar el contenido decodificado como JSON
-    let parsedPayload;
-    try {
-      parsedPayload = JSON.parse(decodedPayload);
-    } catch (error) {
-      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
-      parsedPayload = decodedPayload;
-    }
-
-    return response.status(200).send({
-      title: 'Último mensaje de la pantalla obtenido con éxito',
-      message: 'El último mensaje de la pantalla ha sido recuperado correctamente.',
-      type: 'success',
-      data: {
-        retained_message: parsedPayload
-      },
-    });
-  } catch (error) {
-    let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
-    if (error.response) {
-      errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
-    } else if (error.request) {
-      errorMessage = 'No se recibió ninguna respuesta del servidor.';
-    } else {
-      errorMessage = `Error al realizar la solicitud: ${error.message}`;
-    }
-    return response.status(500).send({
-      title: 'Error',
-      message: errorMessage,
-      type: 'error',
-      data: {
-        error: error.message
-      },
-    });
   }
-}
 /**
  * @swagger
  * /api/emqx/obtenerTemperatura:
@@ -865,7 +887,16 @@ public async obtenerPantalla({ response }: HttpContextContract) {
 public async obtenerTemperatura({ response }: HttpContextContract) {
   try {
     const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteTemperatura';
+    const sensorType = await SensorType.findBy('name', 'Ritmo');
 
+    if (!sensorType) {
+      return response.status(404).send({
+        title: 'Error',
+        message: 'No se encontró el tipo de sensor especificado.',
+        type: 'error',
+      });
+    }
+    const unit = sensorType.unit;
     const axiosResponse = await axios.get(url, {
       auth: {
         username: Env.get('MQTT_API_KEY'),
@@ -886,15 +917,12 @@ public async obtenerTemperatura({ response }: HttpContextContract) {
 
     const retainedMessage = axiosResponse.data;
 
-    // Decodificar el payload del mensaje retenido
     const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
 
-    // Intentar analizar el contenido decodificado como JSON
     let parsedPayload;
     try {
       parsedPayload = JSON.parse(decodedPayload);
     } catch (error) {
-      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
       parsedPayload = decodedPayload;
     }
 
@@ -903,7 +931,8 @@ public async obtenerTemperatura({ response }: HttpContextContract) {
       message: 'El último mensaje de temperatura ha sido recuperado correctamente.',
       type: 'success',
       data: {
-        retained_message: parsedPayload + ' °C'
+        retained_message: parsedPayload,
+        unit: unit
       },
     });
   } catch (error) {
@@ -984,7 +1013,16 @@ public async obtenerTemperatura({ response }: HttpContextContract) {
 public async obtenerPeso({ response }: HttpContextContract) {
   try {
     const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/peso';
+    const sensorType = await SensorType.findBy('name', 'Ritmo');
 
+    if (!sensorType) {
+      return response.status(404).send({
+        title: 'Error',
+        message: 'No se encontró el tipo de sensor especificado.',
+        type: 'error',
+      });
+    }
+    const unit = sensorType.unit;
     const axiosResponse = await axios.get(url, {
       auth: {
         username: Env.get('MQTT_API_KEY'),
@@ -1005,15 +1043,12 @@ public async obtenerPeso({ response }: HttpContextContract) {
 
     const retainedMessage = axiosResponse.data;
 
-    // Decodificar el payload del mensaje retenido
     const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
 
-    // Intentar analizar el contenido decodificado como JSON
     let parsedPayload;
     try {
       parsedPayload = JSON.parse(decodedPayload);
     } catch (error) {
-      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
       parsedPayload = decodedPayload;
     }
 
@@ -1022,7 +1057,8 @@ public async obtenerPeso({ response }: HttpContextContract) {
       message: 'El último mensaje de peso ha sido recuperado correctamente.',
       type: 'success',
       data: {
-        retained_message: parsedPayload + ' kg'
+        retained_message: parsedPayload,
+        unit: unit
       },
     });
   } catch (error) {
