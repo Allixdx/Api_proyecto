@@ -5,6 +5,6 @@ Route.group(()=>{
     Route.get('/','SensorsController.index')
     Route.post('/','SensorsController.store')
     Route.put('/:id','SensorsController.update')
-    Route.delete(':id','SensorsController.destroy')
+    Route.delete(':id','SensorsController.destroy').middleware('auth:api')
     
 }).prefix('/api/sensor')
