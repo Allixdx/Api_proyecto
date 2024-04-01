@@ -112,13 +112,11 @@ public async store({ request, response }: HttpContextContract) {
   try {
     const name = request.input('tipoDispositivo');
 
-    // Validar el tipo de dispositivo seleccionado
     if (name !== 'pesa' && name !== 'brazalete') {
       return response.status(400).json({
         message: 'Tipo de dispositivo inválido',
       });
     }
-    // Crear el dispositivo basado en la selección
     const tipodispositivo = await TipoDispositivo.create({
       name,
     });
@@ -198,48 +196,39 @@ public async creardispositivo({ request, response, auth }: HttpContextContract) 
     const tipoDispositivo = request.input('tipoDispositivo');
     const userId = auth.user?.id;
 
-    // Validar el tipo de dispositivo seleccionado
     if (tipoDispositivo !== 'pesa' && tipoDispositivo !== 'brazalete') {
       return response.status(400).json({
         message: 'Tipo de dispositivo inválido',
       });
     }
 
-    // Verificar si ya existe un tipo de dispositivo del mismo tipo
     let tipoDispositivoExistente = await TipoDispositivo.query()
       .where('name', tipoDispositivo === 'pesa' ? 'pesa' : 'brazalete')
       .first();
 
-    // Si no existe, crear uno nuevo
     if (!tipoDispositivoExistente) {
       tipoDispositivoExistente = await TipoDispositivo.create({
         name: tipoDispositivo === 'pesa' ? 'pesa' : 'brazalete',
       });
     }
 
-    // Crear el dispositivo basado en el tipo de dispositivo existente
     const dispositivo = await Dispositivo.create({
       tipoDispositivoId: tipoDispositivoExistente.id,
       id_usuario: userId,
     });
 
-    // Obtener el tipo de sensor correspondiente al tipo de dispositivo
     const tipoDeSensor = await SensorType.query()
       .where('name', tipoDispositivo === 'pesa' ? 'Peso' : 'Distancia')
       .firstOrFail();
 
-    // Determinar el valor del sensor según el tipo de dispositivo
     let valorSensor = tipoDispositivo === 'pesa' ? 1 : 5;
 
-    // Crear el sensor asociado al tipo de sensor y asignar el valor determinado
     const sensor = await Sensor.create({
       sensor_type_id: tipoDeSensor.id,
       value: valorSensor,
       activo: 1,
     });
 
-    // Crear la relación entre el dispositivo y el sensor en la tabla intermedia
-// Crear la relación entre el dispositivo y el sensor en la tabla intermedia
 await DispositivoSensor.create({
   dispositivo_id: dispositivo.id,
   sensor_id: sensor.id,
