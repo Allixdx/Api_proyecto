@@ -9,5 +9,4 @@ Route.group(() => {
   Route.post('/', 'HabitsController.store')
   Route.put('/:habit_id', 'HabitsController.update')
   Route.delete('/:habit_id', 'HabitsController.destroy')
-  
-}).prefix('/api/habits')
+}).prefix('/api/habits').middleware('auth:api')

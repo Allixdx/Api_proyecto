@@ -109,13 +109,11 @@ public async store({ request, response }: HttpContextContract) {
   try {
     const name = request.input('tipoDispositivo');
 
-    // Validar el tipo de dispositivo seleccionado
     if (name !== 'pesa' && name !== 'brazalete') {
       return response.status(400).json({
         message: 'Tipo de dispositivo inválido',
       });
     }
-    // Crear el dispositivo basado en la selección
     const tipodispositivo = await TipoDispositivo.create({
       name,
     });
@@ -196,14 +194,12 @@ public async creardispositivo({ request, response, auth }: HttpContextContract) 
     const tipoDispositivo = request.input('tipoDispositivo');
     const userId = auth.user?.id;
 
-    // Validar el tipo de dispositivo seleccionado
     if (tipoDispositivo !== 'pesa' && tipoDispositivo !== 'brazalete') {
       return response.status(400).json({
         message: 'Tipo de dispositivo inválido',
       });
     }
 
-    // Crear el dispositivo basado en la selección
     const dispositivo = await Dispositivo.create({
       tipoDispositivoId: tipoDispositivo === 'pesa' ? 1 : 2,
       id_usuario: userId,
@@ -221,7 +217,6 @@ public async creardispositivo({ request, response, auth }: HttpContextContract) 
     });
   }
 }
-
 /**
    * @swagger
    * /api/dispositivos/{id}:

@@ -11,4 +11,4 @@ Route.group(() => {
     Route.post('/MandarAPantalla','EmqxController.MandarAPantalla')
     Route.post('/obtenerTemperatura','EmqxController.obtenerTemperatura')
     Route.post('/obtenerPeso','EmqxController.obtenerPeso')
-}).prefix('/api/emqx')
+}).prefix('/api/emqx').middleware('auth:api')

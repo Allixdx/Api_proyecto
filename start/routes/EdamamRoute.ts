@@ -4,4 +4,4 @@ Route.group(()=>{
     Route.get('/','EdamamsController.comida')
     Route.get('/obteneralimento','EdamamsController.findFood')
     Route.post('calculatenutrition','EdamamsController.calculateNutrition')
-}).prefix('/api/foods')
+}).prefix('/api/foods').middleware('auth:api')

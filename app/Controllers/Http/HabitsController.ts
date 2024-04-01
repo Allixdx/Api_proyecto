@@ -1,5 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { rules, schema } from '@ioc:Adonis/Core/Validator'
+import { schema } from '@ioc:Adonis/Core/Validator'
 import Habit from 'App/Models/Habit'
 
 export default class HabitsController {
@@ -328,7 +328,7 @@ export default class HabitsController {
         *   put:
         *     description: Actualiza el recurso de habito, se pueden actualizar los datos que se necesiten.
         *     tags:
-        *       - Habito
+        *       - Habits
         *     security:
         *       - bearerAuth: []
         *     produces:

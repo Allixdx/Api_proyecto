@@ -214,6 +214,8 @@ public async webhookRes ({ request, response }: HttpContextContract) {
  * @swagger
  * /api/emqx/obtenerRitmo:
  *   post:
+ *     security:
+ *      - bearerAuth: []
  *     tags:
  *       - EMQX
  *     summary: Obtener el último mensaje retenido de ritmo cardiaco.
@@ -342,6 +344,8 @@ public async obtenerRitmo({ response }: HttpContextContract) {
  * @swagger
  * /api/emqx/obtenerPasos:
  *   post:
+ *     security:
+ *      - bearerAuth: []
  *     tags:
  *       - EMQX
  *     summary: Obtener el último mensaje retenido de pasos.
@@ -469,6 +473,8 @@ public async obtenerPasos({  response }: HttpContextContract) {
  * @swagger
  * /api/emqx/obtenerDistancia:
  *   post:
+ *     security:
+ *      - bearerAuth: []
  *     tags:
  *       - EMQX
  *     summary: Obtener el último mensaje retenido de distancia.
@@ -595,6 +601,8 @@ public async obtenerDistancia({  response }: HttpContextContract) {
  * @swagger
  * /api/emqx/obtenerAlcohol:
  *   post:
+ *     security:
+ *      - bearerAuth: []
  *     tags:
  *       - EMQX
  *     summary: Obtener el último mensaje retenido de alcohol.
@@ -721,6 +729,8 @@ public async obtenerAlcohol({ response }: HttpContextContract) {
    * @swagger
    * /api/emqx/MandarAPantalla:
    *   post:
+   *     security:
+   *      - bearerAuth: []
    *     summary: Enviar mensaje a pantalla.
    *     tags: 
    *     - EMQX
@@ -832,6 +842,8 @@ public async obtenerAlcohol({ response }: HttpContextContract) {
  * @swagger
  * /api/emqx/obtenerTemperatura:
  *   post:
+ *     security:
+ *      - bearerAuth: []
  *     tags:
  *       - EMQX
  *     summary: Obtener el último mensaje retenido de temperatura.
@@ -958,6 +970,8 @@ public async obtenerTemperatura({ response }: HttpContextContract) {
  * @swagger
  * /api/emqx/obtenerPeso:
  *   post:
+ *    security:
+ *      - bearerAuth: []
  *     tags:
  *       - EMQX
  *     summary: Obtener el último mensaje retenido de peso.
