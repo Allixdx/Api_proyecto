@@ -237,12 +237,7 @@ public async findFood({ request, response }: HttpContextContract) {
 
     const foodNutrients: FoodNutrients = edamamResponse.parsed[0].food.nutrients;
 
-//todos alimentos
-//categorias 
-//alimentos de una categoria
-//endpoint para peso en la pesa 
     const calories = (foodNutrients.ENERC_KCAL * peso) / 100; // Suponiendo que los nutrientes están en 100 gramos
-
 
     return response.ok({
       food: nombrealimento,
@@ -257,8 +252,6 @@ public async findFood({ request, response }: HttpContextContract) {
 }
 
 }
-
-
 
   
 

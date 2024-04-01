@@ -2,7 +2,7 @@
 
 import { DateTime } from 'luxon';
 import { BaseModel, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm';
-import Habito from './Habito';
+import Habit from './Habit';
 
 export default class User extends BaseModel {
   public static table='users'
@@ -34,6 +34,6 @@ export default class User extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime;
 
-  @hasMany(() => Habito)
-  public habitos: HasMany<typeof Habito>;
+  @hasMany(() => Habit)
+  public habitos: HasMany<typeof Habit>;
 }
