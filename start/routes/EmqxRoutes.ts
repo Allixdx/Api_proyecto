@@ -10,4 +10,5 @@ Route.group(() => {
     Route.post('/obtenerAlcohol','EmqxController.obtenerAlcohol')
     Route.post('/obtenerPantalla','EmqxController.obtenerPantalla')
     Route.post('/obtenerTemperatura','EmqxController.obtenerTemperatura')
+    Route.post('/obtenerPeso','EmqxController.obtenerPeso')
 }).prefix('/api/emqx')

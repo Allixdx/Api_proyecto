@@ -925,6 +925,125 @@ public async obtenerTemperatura({ response }: HttpContextContract) {
     });
   }
 }
+/**
+ * @swagger
+ * /api/emqx/obtenerPeso:
+ *   post:
+ *     tags:
+ *       - EMQX
+ *     summary: Obtener el último mensaje retenido de peso.
+ *     description: |
+ *       Esta ruta permite obtener el último mensaje retenido de peso desde el servidor EMQX.
+ *     responses:
+ *       200:
+ *         description: Último mensaje retenido de peso obtenido correctamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                   description: Título de la respuesta.
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de éxito.
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta.
+ *                 data:
+ *                   type: object
+ *                   description: Datos de respuesta.
+ *                   properties:
+ *                     retained_message:
+ *                       type: object
+ *                       description: Último mensaje retenido de peso.
+ *       500:
+ *         description: Error interno al procesar la solicitud.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                 message:
+ *                   type: string
+ *                   description: Descripción del error.
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de error.
+ *                 data:
+ *                   type: object
+ *                   description: Datos adicionales relacionados con el error.
+ *                   properties:
+ *                     error:
+ *                       type: string
+ *                       description: Mensaje de error detallado.
+ */
+public async obtenerPeso({ response }: HttpContextContract) {
+  try {
+    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/peso';
+
+    const axiosResponse = await axios.get(url, {
+      auth: {
+        username: Env.get('MQTT_API_KEY'),
+        password: Env.get('MQTT_SECRET_KEY')
+      }
+    });
+
+    if (axiosResponse.status !== 200) {
+      return response.status(axiosResponse.status).send({
+        title: 'Error',
+        message: 'Ocurrió un error al obtener el último mensaje de peso.',
+        type: 'error',
+        data: {
+          error: axiosResponse.statusText 
+        },
+      });
+    }
+
+    const retainedMessage = axiosResponse.data;
+
+    // Decodificar el payload del mensaje retenido
+    const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
+
+    // Intentar analizar el contenido decodificado como JSON
+    let parsedPayload;
+    try {
+      parsedPayload = JSON.parse(decodedPayload);
+    } catch (error) {
+      // Si no se puede analizar como JSON, simplemente usa el contenido decodificado
+      parsedPayload = decodedPayload;
+    }
+
+    return response.status(200).send({
+      title: 'Último mensaje de peso obtenido con éxito',
+      message: 'El último mensaje de peso ha sido recuperado correctamente.',
+      type: 'success',
+      data: {
+        retained_message: parsedPayload + ' kg'
+      },
+    });
+  } catch (error) {
+    let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
+    if (error.response) {
+      errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
+    } else if (error.request) {
+      errorMessage = 'No se recibió ninguna respuesta del servidor.';
+    } else {
+      errorMessage = `Error al realizar la solicitud: ${error.message}`;
+    }
+    return response.status(500).send({
+      title: 'Error',
+      message: errorMessage,
+      type: 'error',
+      data: {
+        error: error.message
+      },
+    });
+  }
+}
 
 
 
