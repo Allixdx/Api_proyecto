@@ -4,10 +4,12 @@ import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
   Route.get('/','UsersController.index')
+
+  Route.post('/codeVerify/:id','UsersController.SendCodigo')
   
   Route.post('/logout', 'UsersController.logout').middleware('auth:api')
 
- Route.get('/:id', 'UsersController.show')
+  Route.get('/:id', 'UsersController.show')
 
   Route.post('/', 'UsersController.register')
 
@@ -27,6 +29,6 @@ Route.group(() => {
 
   Route.post('/recuperar-contra','UsersController.correorecuperacion')
 
-  Route.post('/update-password/:id','UsersController.updatePassword')
+  Route.put('/update-password/:id','UsersController.updatePassword')
 
 }).prefix('/api/users')

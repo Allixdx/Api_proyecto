@@ -39,6 +39,63 @@ export default class UsersController {
   }
   /**
    * @swagger
+   * /api/users/codeVerify/{id}:
+   *  post:
+   *    security:
+   *      - bearerAuth: []
+   *    tags:
+   *      - users
+   *    summary: Codigo de verificacion
+   *    description: Mandar codigo de verificacion 
+   *    parameters:
+   *      - name: id
+   *        in: path
+   *        required: true
+   *        description: Id
+   *        schema:
+   *          type: string
+   *    requestBody:
+   *      required: true
+   *      content:
+   *        application/json:
+   *          schema:
+   *            type: object
+   *            properties:
+   *              email:
+   *                type: string
+   *    responses:
+   *       200:
+   *        description: Datos de usuario actualizados exitosamente.
+   *        content:
+   *          application/json:
+   *            schema:
+   *              type: object
+   *              properties:
+   *                message:
+   *                  type: string
+   *                  description: Mensaje indicando el éxito de la actualización.
+   */
+  public async SendCodigo({response, params}:HttpContextContract){
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    const user = await User.findOrFail(params.id);
+    const codigo = this.generateVerificationCode()
+    const email = user.email
+
+    await Mail.send((message) => {
+      message
+        .from(Env.get('SMTP_USERNAME'), 'Healthy App')
+        .to(email)
+        .subject('Healthy App - Codigo de verifiacion')
+        .htmlView('emails/VerificationCode',{codigo});
+    });
+    user.verificationCode = codigo
+    await user.save()
+    return response.status(200).send({
+      title:'Codigo de verificacion enviado a tu correo electronico',
+    })
+  }
+  /**
+   * @swagger
    * /api/users:
    *  post:
    *      tags:
@@ -337,6 +394,7 @@ export default class UsersController {
    *                   description: Mensaje de error.
    */
   public async updatePassword({ params, request, response }: HttpContextContract) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     try {
       const userId = params.id;
       const email = request.input('email');
@@ -352,9 +410,18 @@ export default class UsersController {
       }
 
       user.password = await Hash.make(newPassword);
+
+      await Mail.send((message) => {
+        message
+          .from(Env.get('SMTP_USERNAME'), 'Healthy App')
+          .to(email)
+          .subject('Healthy App - Recuperacion de Contraseña')
+          .htmlView('emails/nuevaContrasena', {email});
+      });
+
       await user.save();
 
-      return response.status(200).json({ message: 'Contraseña de usuario actualizada' });
+      return response.status(200).json({ message: 'Contraseña de usuario actualizada'});
     } catch (error) {
       return response.status(500).json({ error: 'Error interno del servidor al actualizar la contraseña del usuario' });
     }
@@ -582,7 +649,7 @@ export default class UsersController {
         return response.status(401).json({ message: 'Contraseña incorrecta' });
       }
       // Verificar si el usuario ya está verificado con su código
-      if (user.verificationCode) {
+      if (user.verificationCode || user.verificationCode === '' || user.verificationCode === null) {
         return response.status(401).json({ message: 'El usuario aún no está verificado. Por favor, verifique su cuenta.' });
       }
 
