@@ -7,6 +7,8 @@ export default class SensorTypesController {
  * @swagger
  * /api/sensorType:
  *  get:
+ *    security:
+ *      - bearerAuth: []
  *    tags:
  *      - SensorsTypes
  *    summary: Lista de tipos de sensores
@@ -47,6 +49,8 @@ export default class SensorTypesController {
   * @swagger
   * /api/sensorType:
   *   post:
+  *     security:
+  *      - bearerAuth: []
   *     tags:
   *       - SensorsTypes
   *     summary: Crear un nuevo tipo de sensor
@@ -63,7 +67,7 @@ export default class SensorTypesController {
   *                 type: string
   *                 description: nombre
   *               unit:
-  *                 type: number
+  *                 type: string
   *                 description: unidad
   *     responses:
   *       200:
@@ -97,6 +101,8 @@ export default class SensorTypesController {
    * @swagger
    * /api/sensorType/{id}:
    *  put:
+   *    security:
+   *      - bearerAuth: []
    *    tags:
    *      - SensorsTypes
    *    summary:  Actualizar tipo de sensor
@@ -162,6 +168,8 @@ export default class SensorTypesController {
  * @swagger
  * /api/sensorType/{id}:
  *  delete:
+ *    security:
+ *      - bearerAuth: []
  *    tags:
  *      - SensorsTypes
  *    summary: Eliminar tipo de sensor

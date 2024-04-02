@@ -290,7 +290,7 @@ export default class UsersController {
    *                  type: string
    *                  description: Mensaje indicando el éxito de la actualización.
    */
-  public async update({auth, request, response, params }: HttpContextContract) {
+  public async update({ request, response, params }: HttpContextContract) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     try {
       // const user = auth.user

@@ -401,7 +401,7 @@ public async obtenerRitmo({ response }: HttpContextContract) {
 public async obtenerPasos({  response }: HttpContextContract) {
   try {
     const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePasos';
-    const sensorType = await SensorType.findBy('name', 'Ritmo');
+    const sensorType = await SensorType.findBy('name', 'Pasos');
 
     if (!sensorType) {
       return response.status(404).send({
@@ -530,7 +530,7 @@ public async obtenerPasos({  response }: HttpContextContract) {
 public async obtenerDistancia({  response }: HttpContextContract) {
   try {
     const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteDistancia';
-    const sensorType = await SensorType.findBy('name', 'Ritmo');
+    const sensorType = await SensorType.findBy('name', 'Distancia');
 
     if (!sensorType) {
       return response.status(404).send({
@@ -658,7 +658,7 @@ public async obtenerDistancia({  response }: HttpContextContract) {
 public async obtenerAlcohol({ response }: HttpContextContract) {
   try {
     const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteAlcohol';
-    const sensorType = await SensorType.findBy('name', 'Ritmo');
+    const sensorType = await SensorType.findBy('name', 'Alcohol');
 
     if (!sensorType) {
       return response.status(404).send({
@@ -899,7 +899,7 @@ public async obtenerAlcohol({ response }: HttpContextContract) {
 public async obtenerTemperatura({ response }: HttpContextContract) {
   try {
     const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteTemperatura';
-    const sensorType = await SensorType.findBy('name', 'Ritmo');
+    const sensorType = await SensorType.findBy('name', 'Temperatura');
 
     if (!sensorType) {
       return response.status(404).send({
@@ -1027,7 +1027,7 @@ public async obtenerTemperatura({ response }: HttpContextContract) {
 public async obtenerPeso({ response }: HttpContextContract) {
   try {
     const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/peso';
-    const sensorType = await SensorType.findBy('name', 'Ritmo');
+    const sensorType = await SensorType.findBy('name', 'Peso');
 
     if (!sensorType) {
       return response.status(404).send({

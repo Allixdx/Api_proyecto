@@ -6,4 +6,4 @@ Route.group(()=>{
     Route.get('/:id','ConfigurationsController.show')
     Route.put('/:id','ConfigurationsController.update')
     Route.delete('/:id','ConfigurationsController.destroy')
-}).prefix('/api/configurations')
+}).prefix('/api/configurations').middleware('auth:api')
