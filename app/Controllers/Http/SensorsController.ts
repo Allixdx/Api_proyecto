@@ -7,8 +7,6 @@ export default class SensorsController {
    * @swagger
    * /api/sensor:
    *  get:
-   *    security:
-   *      - bearerAuth: []
    *    tags:
    *      - Sensors
    *    summary: list of sensors
@@ -41,8 +39,6 @@ export default class SensorsController {
   * @swagger
   * /api/sensor:
   *   post:
-  *     security:
-  *       - bearerAuth: []
   *     tags:
   *       - Sensors
   *     summary: Create new sensor
@@ -97,8 +93,6 @@ export default class SensorsController {
    * @swagger
    * /api/sensor/{id}:
    *  put:
-   *    security:
-   *    - bearerAuth: []
    *    tags:
    *      - Sensors
    *    summary:  Activate sensor by id
@@ -153,8 +147,6 @@ export default class SensorsController {
    * @swagger
    * /api/sensor/{id}:
    *  delete:
-   *    security:
-   *      - bearerAuth: []
    *    tags:
    *      - Sensors
    *    summary:  drop sensor by id

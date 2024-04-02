@@ -234,6 +234,7 @@ export default class UsersController {
           name: newUser.name,
           lastname: newUser.lastname,
           email: newUser.email,
+        message: 'Se ha enviado un codigo de verificacion a tu correo electromico'
         },
       });
     } catch (error) {

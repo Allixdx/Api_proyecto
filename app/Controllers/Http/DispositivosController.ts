@@ -2,6 +2,9 @@ import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Dispositivo from 'App/Models/Dispositivo';
 import Mail from '@ioc:Adonis/Addons/Mail'
 import Env from '@ioc:Adonis/Core/Env'
+import DispositivoSensor from 'App/Models/DispositivoSensor';
+import Sensor from 'App/Models/Sensor';
+import SensorType from 'App/Models/SensorType';
 import TipoDispositivo from 'App/Models/TipoDispositivo';
 
 export default class DispositivosController {
