@@ -236,7 +236,7 @@ export default class UsersController {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     try {
       // const user = auth.user
-      const user = await User.findOrFail(params.id)
+      const user = await User.findOrFail(params.id) // pic agregue este findOrFail porque no me dejaba con el auth.user  atte: Miller :D
       const email = user.email
       const name = user.name
       const lastname =user.lastname
@@ -390,7 +390,7 @@ export default class UsersController {
    */
   public async destroy({ auth, response, params }: HttpContextContract) {
     // const user = auth.user!
-    const usuario = await User.findOrFail(params.id)
+    const usuario = await User.findOrFail(params.id)// pic agregue este findOrFail porque no me dejaba con el auth.user  atte: Miller :D
     await usuario.delete()
 
     return response.json({ message: 'Cuenta de usuario eliminada' })
