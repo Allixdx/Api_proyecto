@@ -456,7 +456,7 @@ export default class UsersController {
    *                  type: string
    *                  description: Mensaje indicando el éxito de la eliminación.
    */
-  public async destroy({ auth, response, params }: HttpContextContract) {
+  public async destroy({ response, params }: HttpContextContract) {
     // const user = auth.user!
     const usuario = await User.findOrFail(params.id)// pic agregue este findOrFail porque no me dejaba con el auth.user  atte: Miller :D
     await usuario.delete()

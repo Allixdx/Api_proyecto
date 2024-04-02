@@ -1,6 +1,8 @@
 import EdamamResource from "App/Resources/EdamamResource";
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import SensorType from "App/Models/SensorType";
+import axios from 'axios';
+import Env from '@ioc:Adonis/Core/Env';
 
 export default class EdamamsController {
   /**
@@ -138,20 +140,11 @@ public async findFood({ request, response }: HttpContextContract) {
  *           schema:
  *             type: object
  *             properties:
- *               alimentos:
+ *               ingr:
  *                 type: array
  *                 items:
- *                   type: object
- *                   properties:
- *                     nombre:
- *                       type: string
- *                       description: Nombre del alimento.
- *                     peso:
- *                       type: number
- *                       description: Peso del alimento en gramos.
- *               peso:
- *                 type: number
- *                 description: Peso total de la porción en gramos para la cual se desea calcular la información nutricional.
+ *                   type: string
+ *                 description: Lista de ingredientes en el formato "cantidad unidad nombre".
  *     responses:
  *       200:
  *         description: Información nutricional calculada correctamente.
@@ -160,18 +153,40 @@ public async findFood({ request, response }: HttpContextContract) {
  *             schema:
  *               type: object
  *               properties:
- *                 food:
+ *                 uri:
  *                   type: string
- *                   description: Nombre del alimento.
- *                 weight:
+ *                   description: URI única para la receta.
+ *                 yield:
  *                   type: number
- *                   description: Peso total del alimento en gramos.
+ *                   description: Rendimiento de la receta.
  *                 calories:
  *                   type: number
- *                   description: Calorías calculadas para el alimento.
- *                 nutrients:
+ *                   description: Calorías totales de la receta.
+ *                 totalCO2Emissions:
+ *                   type: number
+ *                   description: Emisiones totales de CO2 de la receta.
+ *                 co2EmissionsClass:
+ *                   type: string
+ *                   description: Clasificación de las emisiones de CO2 de la receta.
+ *                 totalWeight:
+ *                   type: number
+ *                   description: Peso total de la receta en gramos.
+ *                 dietLabels:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: Etiquetas de dieta para la receta.
+ *                 healthLabels:
+ *                   type: array
+ *                   items:
+ *                     type: string
+ *                   description: Etiquetas de salud para la receta.
+ *                 totalNutrients:
  *                   type: object
- *                   description: Datos nutricionales del alimento.
+ *                   description: Datos nutricionales totales de la receta.
+ *                 totalDaily:
+ *                   type: object
+ *                   description: Porcentaje diario de los nutrientes totales de la receta.
  *       400:
  *         description: Error al procesar la solicitud debido a datos faltantes o incorrectos.
  *         content:
@@ -203,34 +218,41 @@ public async findFood({ request, response }: HttpContextContract) {
  *                   type: string
  *                   description: Descripción del error.
  */
-public async calculateNutrition({ request, response }: HttpContextContract) {
+
+public async calculateNutrition({ request, response }) {
   try {
-    const { alimentos, peso } = request.only(['alimentos', 'peso']);
-    const unidad = await SensorType.findBy('name', 'Peso');
-    if (!unidad) {
-      return response.status(404).send({
-        title: 'Error',
-        message: 'No se encontró el tipo de sensor especificado.',
-        type: 'error',
-      });
-    }
-    const unidadString = JSON.stringify(unidad);
+    const sensorType = await SensorType.findBy('name', 'Peso');
 
-    if (!alimentos || alimentos.length === 0) {
-      return response.badRequest({ error: 'Por favor, proporciona la lista de alimentos.' });
+    if (!sensorType) {
+      console.error('La unidad "gr" no se encontró en la base de datos.');
+      return response.status(400).json({ error: 'La unidad "peso" no se encontró en la base de datos.' });
     }
-    const edamamResponse = await EdamamResource.getNutritionDetails(alimentos, peso, unidadString);
+    const unit = sensorType.unit;
+    const body = request.all();
 
-    if (!edamamResponse || edamamResponse.error) {
-      return response.notFound({ error: 'No se pudieron obtener los detalles nutricionales.' });
-    }
-    return response.ok(edamamResponse);
+    console.log('Title:', body.title);
+    console.log('Ingredients:', body.ingr);
+    console.log ('unidad',{unit});
+   
+    const requestData = {
+      title:'x', 
+      ingr: body.ingr.map(ingredient => `${ingredient} ${unit}`)
+    };
+
+    const params = {
+      app_id: '0ca38ce0',
+      app_key: '6d1af65e035c952a1ab92ee42668d728'
+    };
+
+    const edamamResponse = await axios.post('https://api.edamam.com/api/nutrition-details', requestData, { params });
+
+    return response.json(edamamResponse.data);
   } catch (error) {
-    console.error('Error al calcular la nutrición:', error.message);
-    return response.status(500).json({ error: 'Ocurrió un error al calcular la nutrición.', errormensaje: error.message });
+    console.error('Error al calcular la información nutricional:', error);
+    return response.status(500).json({ error: 'Ocurrió un error al calcular la información nutricional.', errorMessage: error.message });
   }
 }
-}
+
 
   
-
+}
