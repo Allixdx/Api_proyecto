@@ -31,4 +31,25 @@ export default class EdamamResource {
       throw new Error('Error al obtener información sobre los alimentos');
     }
   }
+
+  public static async getNutritionDetails(alimentos: any, peso: number, unidad: string) {
+    try {
+        const baseURL = 'https://api.edamam.com/api/nutrition-details';
+        const params = {
+            app_id: Env.get('app_id_an'),
+            app_key: Env.get('app_key_an'),
+        };
+        const requestData = {
+            title: 'Recipe', // Título genérico para la receta
+            ingr: alimentos.map((alimento: { nombre: string; peso: number }) => `${alimento.peso} ${unidad} ${alimento.nombre}`),
+        };
+        const response = await axios.post(baseURL, requestData, { params });
+        return response.data;
+    } catch (error) {
+        console.error('Error al obtener detalles nutricionales:', error);
+        throw new Error('Error al obtener detalles nutricionales');
+    }
 }
+
+}
+
