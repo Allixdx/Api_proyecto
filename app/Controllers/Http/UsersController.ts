@@ -649,7 +649,7 @@ export default class UsersController {
         return response.status(401).json({ message: 'Contraseña incorrecta' });
       }
       // Verificar si el usuario ya está verificado con su código
-      if (user.verificationCode || user.verificationCode === '' || user.verificationCode === null) {
+      if (user.verificationCode !== null) {
         return response.status(401).json({ message: 'El usuario aún no está verificado. Por favor, verifique su cuenta.' });
       }
 
