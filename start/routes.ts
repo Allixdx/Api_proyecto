@@ -19,6 +19,7 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
+import './routes/ConfigurationRoutes.ts'
 import './routes/UserRoutes.ts'
 import './routes/DispositivoRoutes.ts'
 import './routes/SensorRoutes.ts'

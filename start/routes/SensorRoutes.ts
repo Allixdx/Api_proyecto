@@ -2,9 +2,9 @@ import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(()=>{
 
-    Route.get('/','SensorsController.index').middleware('auth:api')
+    Route.get('/','SensorsController.index')
     Route.post('/','SensorsController.store')
-    Route.put('/:id','SensorsController.update').middleware('auth:api')
-    Route.delete(':id','SensorsController.destroy').middleware('auth:api')
+    Route.put('/:id','SensorsController.update')
+    Route.delete(':id','SensorsController.destroy')
     
-}).prefix('/api/sensor')
+}).prefix('/api/sensor').middleware('auth:api')
