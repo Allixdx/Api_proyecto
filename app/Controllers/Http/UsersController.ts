@@ -3,6 +3,8 @@ import Hash from '@ioc:Adonis/Core/Hash'
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import User from 'App/Models/User'
 import Env from '@ioc:Adonis/Core/Env'
+import Database from '@ioc:Adonis/Lucid/Database';
+
 
 export default class UsersController {
   /**
@@ -248,185 +250,212 @@ export default class UsersController {
     const randomNumber = Math.floor(1000 + Math.random() * 9000);
     return randomNumber.toString();
   }
-  /**
-   * @swagger
-   * /api/users/{id}:
-   *  put:
-   *    security:
-   *      - bearerAuth: []
-   *    tags:
-   *      - users
-   *    summary: Actualización de datos de usuario
-   *    description: Actualiza los datos de un usuario existente.
-   *    parameters:
-   *      - name: id
-   *        in: path
-   *        required: true
-   *        description: ID del usuario a actualizar.
-   *        schema:
-   *          type: integer
-   *    requestBody:
-   *      required: true
-   *      content:
-   *        application/json:
-   *          schema:
-   *            type: object
-   *            properties:
-   *              name:
-   *                type: string
-   *              lastname:
-   *                type: string
-   *              email:
-   *                type: string
-   *    responses:
-   *       200:
-   *        description: Datos de usuario actualizados exitosamente.
-   *        content:
-   *          application/json:
-   *            schema:
-   *              type: object
-   *              properties:
-   *                message:
-   *                  type: string
-   *                  description: Mensaje indicando el éxito de la actualización.
-   */
-  public async update({ request, response, params }: HttpContextContract) {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    try {
-      // const user = auth.user
-      const user = await User.findOrFail(params.id) // pic agregue este findOrFail porque no me dejaba con el auth.user  atte: Miller :D
-      const email = user.email
-      const name = user.name
-      const lastname =user.lastname
+/**
+ * @swagger
+ * /api/users:
+ *  put:
+ *    security:
+ *      - bearerAuth: []
+ *    tags:
+ *      - users
+ *    summary: Actualización de datos de usuario
+ *    description: Actualiza los datos de un usuario existente. Cada campo es opcional y se actualizará solo si está presente en la solicitud.
+ *    requestBody:
+ *      required: true
+ *      content:
+ *        application/json:
+ *          schema:
+ *            type: object
+ *            properties:
+ *              name:
+ *                type: string
+ *              lastname:
+ *                type: string
+ *              email:
+ *                type: string
+ *    responses:
+ *       200:
+ *        description: Datos de usuario actualizados exitosamente.
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: Mensaje indicando el éxito de la actualización.
+ *       401:
+ *        description: Usuario no autenticado.
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                error:
+ *                  type: string
+ *                  description: Mensaje indicando el error de autenticación.
+ *       500:
+ *        description: Error interno del servidor al actualizar los datos del usuario.
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                message:
+ *                  type: string
+ *                  description: Mensaje indicando el error interno del servidor.
+ */
+public async update({ auth, request, response }: HttpContextContract) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  try {
+    const user = auth.user!;
+    
+    const { name, lastname, email } = request.only(['name', 'lastname', 'email']);
 
-      console.log(user)
-      if (!user) {
-        return response.status(401).json({ error: 'Usuario no autenticado' })
-      }
-
-      user.merge(request.only(['name', 'lastname', 'email',]))
-
-      await user.save()
-   
-      await Mail.send((message) => {
-        message
-          .from(Env.get('SMTP_USERNAME'), 'Healthy App')
-          .to(email)
-          .subject('Healthy App - Personalizacion de cuenta')
-          .htmlView('emails/actualizarUser', {name,lastname,email});
-      });
-
-      return response.status(200).json({ message: 'Datos de usuario actualizados'})
-    } catch (error) {
-      return response.status(500).json({ error: 'Error interno del servidor al actualizar los datos del usuario'})
+    // Construye un objeto con los campos que se van a actualizar
+    const updates: { [key: string]: any } = {};
+    if (name !== undefined) {
+      updates.name = name;
     }
-  }
-  /**
-   * @swagger
-   * /api/users/update-password/{id}:
-   *   put:
-   *     security:
-   *       - bearerAuth: []
-   *     tags:
-   *       - users
-   *     summary: Actualización de contraseña de usuario
-   *     description: Actualiza la contraseña de un usuario existente.
-   *     parameters:
-   *       - name: id
-   *         in: path
-   *         required: true
-   *         description: ID del usuario cuya contraseña se va a actualizar.
-   *         schema:
-   *           type: integer
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               email:
-   *                 type: string
-   *                 format: email
-   *                 description: Correo electrónico del usuario.
-   *               password:
-   *                 type: string
-   *                 description: Nueva contraseña del usuario.
-   *     responses:
-   *       '200':
-   *         description: Contraseña de usuario actualizada exitosamente.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   description: Mensaje indicando el éxito de la actualización de contraseña.
-   *       '400':
-   *         description: La contraseña debe tener al menos 8 caracteres.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 error:
-   *                   type: string
-   *                   description: Mensaje de error.
-   *       '404':
-   *         description: Usuario no encontrado.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 error:
-   *                   type: string
-   *                   description: Mensaje de error.
-   *       '500':
-   *         description: Error interno del servidor al actualizar la contraseña del usuario.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 error:
-   *                   type: string
-   *                   description: Mensaje de error.
-   */
-  public async updatePassword({ params, request, response }: HttpContextContract) {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    try {
-      const userId = params.id;
-      const email = request.input('email');
-      const newPassword = request.input('password');
-      if (newPassword.length < 8) {
-        return response.status(400).json({ error: 'La contraseña debe tener al menos 8 caracteres' });
-      }
 
-      const user = userId ? await User.find(userId) : await User.findBy('email', email);
-
-      if (!user) {
-        return response.status(404).json({ error: 'Usuario no encontrado' });
-      }
-
-      user.password = await Hash.make(newPassword);
-
-      await Mail.send((message) => {
-        message
-          .from(Env.get('SMTP_USERNAME'), 'Healthy App')
-          .to(email)
-          .subject('Healthy App - Recuperacion de Contraseña')
-          .htmlView('emails/nuevaContrasena', {email});
-      });
-
-      await user.save();
-
-      return response.status(200).json({ message: 'Contraseña de usuario actualizada'});
-    } catch (error) {
-      return response.status(500).json({ error: 'Error interno del servidor al actualizar la contraseña del usuario' });
+    if (lastname !== undefined) {
+      updates.lastname = lastname;
     }
+
+    if (email !== undefined) {
+      updates.email = email;
+    }
+
+    // Actualiza los datos del usuario en la base de datos directamente
+    await Database.from('users').where('id', user.id).update(updates);
+
+    // Obtiene los datos actualizados del usuario
+    const updatedUser = await Database.from('users').where('id', user.id).first();
+
+    // Envía el correo electrónico
+    await Mail.send((message) => {
+      message
+        .from(Env.get('SMTP_USERNAME'), 'Healthy App')
+        .to(user.email)
+        .subject('Healthy App - Personalizacion de cuenta')
+        .htmlView('emails/actualizarUser', { name: updates.name || user.name, lastname: updates.lastname || user.lastname, email: updates.email || user.email });
+    });
+
+    return response.status(200).json({ message: 'Datos de usuario actualizados', data: updatedUser });
+  } catch (error) {
+    return response.status(500).json({ message: 'Error interno del servidor al actualizar los datos del usuario', error: error.message });
   }
+}
+ /**
+ * @swagger
+ * /api/users/update-password:
+ *   put:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - users
+ *     summary: Actualización de contraseña de usuario
+ *     description: Actualiza la contraseña de un usuario autenticado.
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               oldPassword:
+ *                 type: string
+ *               newPassword:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Contraseña de usuario actualizada exitosamente.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje indicando el éxito de la actualización de contraseña.
+ *       400:
+ *         description: Error de solicitud debido a datos faltantes o inválidos.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error indicando el problema con la solicitud.
+ *       401:
+ *         description: No autorizado, token de acceso inválido o no proporcionado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error indicando la falta de autorización.
+ *       500:
+ *         description: Error interno del servidor al actualizar la contraseña del usuario.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *                   description: Mensaje de error indicando el problema interno del servidor.
+ */
+ public async updatePassword({ auth, request, response }: HttpContextContract) {
+  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+  try {
+    // Obtener el ID de usuario desde la información de autenticación
+    const userId = auth.user?.id;
+
+    // Verifica si el usuario está autenticado
+    if (!userId) {
+      return response.status(401).json({ error: 'Usuario no autenticado' });
+    }
+
+    // Buscar el modelo de usuario en la base de datos
+    const user = await User.findOrFail(userId);
+
+    // Obtener la contraseña anterior y la nueva contraseña del cuerpo de la solicitud
+    const oldPassword: string = request.input('oldPassword');
+    const newPassword: string = request.input('newPassword');
+
+    // Verificar si la contraseña anterior es correcta
+    const isPasswordValid = await Hash.verify(user.password, oldPassword);
+    if (!isPasswordValid) {
+      return response.status(401).json({ error: 'La contraseña anterior es incorrecta' });
+    }
+
+    // Verifica que la nueva contraseña tenga al menos 8 caracteres
+    if (newPassword.length < 8) {
+      return response.status(400).json({ error: 'La nueva contraseña debe tener al menos 8 caracteres' });
+    }
+
+    // Actualiza la contraseña del usuario
+    user.password = await Hash.make(newPassword);
+    await user.save();
+
+    // Envía el correo electrónico
+    await Mail.send((message) => {
+      message
+        .from(Env.get('SMTP_USERNAME'), 'Healthy App')
+        .to(user.email)
+        .subject('Healthy App - Recuperacion de Contraseña')
+        .htmlView('emails/nuevaContrasena', { email: user.email });
+    });
+
+    return response.status(200).json({ message: 'Contraseña de usuario actualizada' });
+  } catch (error) {
+    return response.status(500).json({ message: 'Error interno del servidor al actualizar la contraseña del usuario', error: error.message});
+  }
+}
   /**
    * @swagger
    * /api/users/{id}:

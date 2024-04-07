@@ -13,7 +13,7 @@ Route.group(() => {
 
   Route.post('/', 'UsersController.register')
 
-  Route.put('/:id', 'UsersController.update').middleware('auth:api')
+  Route.put('/', 'UsersController.update').middleware('auth:api')
 
   Route.delete('/:id', 'UsersController.destroy').middleware('auth:api')
 
@@ -29,6 +29,6 @@ Route.group(() => {
 
   Route.post('/recuperar-contra','UsersController.correorecuperacion')
 
-  Route.put('/update-password/:id','UsersController.updatePassword')
+  Route.put('/update-password','UsersController.updatePassword').middleware('auth:api')
 
 }).prefix('/api/users')
