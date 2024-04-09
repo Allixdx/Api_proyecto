@@ -68,10 +68,13 @@ public async findFood({ request, response }: HttpContextContract) {
       
       console.log('Respuesta de la API de Edamam:', alimento); // Agregar este console.log para verificar la respuesta de la API
 
+      if(alimento.hints.length==0){
+        return response.notFound({ message: 'No hubo resultados' });
+      }
       return response.ok(alimento);
   } catch (error) {
       console.error('Error al buscar el alimento:', error.message);
-      return response.status(500).json({ error: 'Ocurrió un error al buscar el alimento.' });
+      return response.status(500).json({ message: 'Ocurrió un error al buscar el alimento.' });
   }
 }
 /**

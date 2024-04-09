@@ -1,7 +1,8 @@
 import { DateTime } from 'luxon';
-import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm';
+import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:Adonis/Lucid/Orm';
 import User from './User';
 import TipoDispositivo from './TipoDispositivo';
+import Sensor from './Sensor';
 
 export default class Dispositivo extends BaseModel {
 
@@ -26,6 +27,11 @@ export default class Dispositivo extends BaseModel {
   @belongsTo(() => User)
   public usuario: BelongsTo<typeof User>;
 
+  @hasMany(() => Sensor, {
+    localKey: 'id',
+    foreignKey: 'dispositivo_id', 
+  })
+  public sensores: HasMany<typeof Sensor>
   @belongsTo(() => TipoDispositivo)
   public tipoDispositivo: BelongsTo<typeof TipoDispositivo>;
 }

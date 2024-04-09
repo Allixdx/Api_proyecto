@@ -35,7 +35,7 @@ export default class DispositivosController {
    */
   public async index({ response }: HttpContextContract) {
     try {
-      const dispositivos = await Dispositivo.all();
+      const dispositivos = await Dispositivo.query().where('sensors.activo',1).preload('sensores');
       return response.status(200).send({
         status: 'success',
         message: 'Successfully retrieved all devices',
@@ -224,6 +224,7 @@ public async creardispositivo({ request, response, auth }: HttpContextContract) 
 
     const sensor = await Sensor.create({
       sensor_type_id: tipoDeSensor.id,
+      dispositivo_id: dispositivo.id,
       value: valorSensor,
       activo: 1,
     });
@@ -231,7 +232,10 @@ public async creardispositivo({ request, response, auth }: HttpContextContract) 
     return response.status(201).json({
       status: 'success',
       message: 'Dispositivo creado exitosamente',
-      data: dispositivo,
+      data: {
+        device: dispositivo,
+        sensor: sensor
+      },
     });
   } catch (error) {
     return response.status(500).json({

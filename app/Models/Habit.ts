@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo,BelongsTo, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, column, belongsTo,BelongsTo, hasMany, HasMany, hasManyThrough } from '@ioc:Adonis/Lucid/Orm'
 import User from './User'
 import Configuration from './Configuration'
 
@@ -9,8 +9,6 @@ export default class Habit extends BaseModel {
 
   public static table = "habitos"
 
-  @column()
-  public user_id: number 
 
   @column()
   public name: String 
@@ -23,12 +21,7 @@ export default class Habit extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updatedAt: DateTime
-  
-  @belongsTo(() => User, {
-    localKey: 'user_id',  
-    foreignKey: 'id',
-  })
-  public user: BelongsTo<typeof User>
+
 
   @hasMany(() => Configuration, {
     localKey: 'id',  

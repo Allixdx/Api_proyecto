@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import { BaseModel, column, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm'
 import SensorType from 'App/Models/SensorType'
+import Dispositivo from './Dispositivo'
 
 export default class Sensor extends BaseModel {
   public static table ='sensors'
@@ -10,6 +11,10 @@ export default class Sensor extends BaseModel {
 
   @column()
   public sensor_type_id: number
+
+  
+  @column()
+  public dispositivo_id: number
 
   @column()
   public activo: number
@@ -26,4 +31,10 @@ export default class Sensor extends BaseModel {
   // Relación con el modelo SensorType (pertenece a un tipo de sensor)
   @belongsTo(() => SensorType)
   public sensorType: BelongsTo<typeof SensorType>
+
+  @belongsTo(() => Dispositivo, {
+    localKey: 'dispositivo_id',  
+    foreignKey: 'id',
+  })
+  public dispositivo: BelongsTo<typeof Dispositivo>
 }

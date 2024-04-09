@@ -32,7 +32,9 @@ export default class UsersController {
    *                  description: jajajaj
    */
   public async index({ response }: HttpContextContract) {
-    const users = await User.all()
+    const users = await User.query().preload('dispositivo',(habitUser) => {
+      habitUser.preload('sensores')
+    })
     return response.status(200).send({
       title: 'Success!!',
       messgae: 'Lista de usuarios',
@@ -659,7 +661,9 @@ public async update({ auth, request, response }: HttpContextContract) {
       const password = request.input('password');
 
       // Verificar las credenciales del usuario
-      const user = await User.query().where('email', email).first();
+      const user = await User.query().where('email', email).preload('dispositivo',(habitUser) => {
+        habitUser.preload('sensores')
+      }).first();
 
       if (!user) {
         return response.status(401).json({ message: 'Usuario no encontrado' });
