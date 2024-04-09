@@ -412,37 +412,29 @@ public async update({ auth, request, response }: HttpContextContract) {
  public async updatePassword({ auth, request, response }: HttpContextContract) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   try {
-    // Obtener el ID de usuario desde la información de autenticación
     const userId = auth.user?.id;
 
-    // Verifica si el usuario está autenticado
     if (!userId) {
       return response.status(401).json({ error: 'Usuario no autenticado' });
     }
 
-    // Buscar el modelo de usuario en la base de datos
     const user = await User.findOrFail(userId);
 
-    // Obtener la contraseña anterior y la nueva contraseña del cuerpo de la solicitud
     const oldPassword: string = request.input('oldPassword');
     const newPassword: string = request.input('newPassword');
 
-    // Verificar si la contraseña anterior es correcta
     const isPasswordValid = await Hash.verify(user.password, oldPassword);
     if (!isPasswordValid) {
       return response.status(401).json({ error: 'La contraseña anterior es incorrecta' });
     }
 
-    // Verifica que la nueva contraseña tenga al menos 8 caracteres
     if (newPassword.length < 8) {
       return response.status(400).json({ error: 'La nueva contraseña debe tener al menos 8 caracteres' });
     }
 
-    // Actualiza la contraseña del usuario
     user.password = await Hash.make(newPassword);
     await user.save();
 
-    // Envía el correo electrónico
     await Mail.send((message) => {
       message
         .from(Env.get('SMTP_USERNAME'), 'Healthy App')
