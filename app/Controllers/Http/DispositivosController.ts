@@ -1,6 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Dispositivo from 'App/Models/Dispositivo';
-import DispositivoSensor from 'App/Models/DispositivoSensor';
 import Sensor from 'App/Models/Sensor';
 import SensorType from 'App/Models/SensorType';
 import TipoDispositivo from 'App/Models/TipoDispositivo';
@@ -228,11 +227,6 @@ public async creardispositivo({ request, response, auth }: HttpContextContract) 
       value: valorSensor,
       activo: 1,
     });
-
-await DispositivoSensor.create({
-  dispositivo_id: dispositivo.id,
-  sensor_id: sensor.id,
-});
 
     return response.status(201).json({
       status: 'success',
