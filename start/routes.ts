@@ -19,14 +19,14 @@
 */
 
 import Route from '@ioc:Adonis/Core/Route'
-import './routes/UserRoutes.ts'
-import './routes/DispositivoRoutes.ts'
-import './routes/SensorRoutes.ts'
-import './routes/HabitRoutes.ts'
-import './routes/EdamamRoute.ts'
-import './routes/EmqxRoutes.ts'
-import './routes/SensorTypeRoute.ts'
-import './routes/ConfigurationRoutes.ts'
+import './routes/UserRoutes'
+import './routes/DispositivoRoutes'
+import './routes/SensorRoutes'
+import './routes/HabitRoutes'
+import './routes/EdamamRoute'
+import './routes/EmqxRoutes'
+import './routes/SensorTypeRoute'
+import './routes/ConfigurationRoutes'
 
 Route.get('/', async () => {
   return { hello: 'world' }
