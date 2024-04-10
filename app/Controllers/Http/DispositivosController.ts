@@ -35,7 +35,9 @@ export default class DispositivosController {
    */
   public async index({ response }: HttpContextContract) {
     try {
-      const dispositivos = await Dispositivo.query().where('sensors.activo',1).preload('sensores');
+      const dispositivos = await Dispositivo.query()
+      .joinRaw('inner join sensors on sensors.dispositivo_id = dispositivo.id')
+      .where('sensors.activo',1).preload('sensores');
       return response.status(200).send({
         status: 'success',
         message: 'Successfully retrieved all devices',
