@@ -252,7 +252,7 @@ export default class UsersController {
   }
 /**
  * @swagger
- * /api/users:
+ * /api/users/actualizar:
  *  put:
  *    security:
  *      - bearerAuth: []

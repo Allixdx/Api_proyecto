@@ -13,7 +13,7 @@ Route.group(() => {
 
   Route.post('/', 'UsersController.register')
 
-  Route.put('/', 'UsersController.update').middleware('auth:api')
+  Route.put('/actualizar', 'UsersController.update').middleware('auth:api')
 
   Route.delete('/:id', 'UsersController.destroy').middleware('auth:api')
 
