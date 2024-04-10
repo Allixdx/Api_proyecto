@@ -1,6 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo,BelongsTo, hasMany, HasMany, hasManyThrough } from '@ioc:Adonis/Lucid/Orm'
-import User from './User'
+import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
 import Configuration from './Configuration'
 
 export default class Habit extends BaseModel {
