@@ -3,7 +3,7 @@ import {  schema } from '@ioc:Adonis/Core/Validator'
 import Configuration from 'App/Models/Configuration'
 
 export default class ConfigurationsController {
-  public async index({ request }: HttpContextContract) {
+  public async index({  }: HttpContextContract) {
     /**
 * @swagger
 * /api/configurations:
