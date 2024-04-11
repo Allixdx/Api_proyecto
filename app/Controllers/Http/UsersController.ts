@@ -41,6 +41,49 @@ export default class UsersController {
       data: users
     })
   }
+
+    /**
+   * @swagger
+   * /api/users/{user_id}:
+   *  get:
+   *    tags:
+   *      - users
+   *    summary: Lista de usuarios
+   *    produces:
+   *      - application/json
+   *    parameters:
+   *      - name: user_id
+   *        in: path
+   *        required: true
+   *        description: ID del usuario a mostrar.
+   *        schema:
+   *          type: integer
+   *    responses:
+   *      200:
+   *        description: Success!!
+   *        content:
+   *          application/json:
+   *            schema:
+   *              type: object
+   *              properties:
+   *                title:
+   *                  type: string
+   *                  description: title 
+   *                data:
+   *                  type: string 
+   *                  description: jajajaj
+   */
+    public async show({ response,params }: HttpContextContract) {
+      const users = await User.query().where('user_id',params.user_id).preload('dispositivo',(habitUser) => {
+        habitUser.preload('sensores')
+      })
+      return response.status(200).send({
+        title: 'Success!!',
+        messgae: 'Usuario',
+        data: users
+      })
+    }
+
   /**
    * @swagger
    * /api/users/codeVerify/{id}:
