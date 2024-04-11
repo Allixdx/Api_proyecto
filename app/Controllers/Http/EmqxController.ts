@@ -899,7 +899,7 @@ public async obtenerAlcohol({ response }: HttpContextContract) {
 public async obtenerTemperatura({ response }: HttpContextContract) {
   try {
     const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteTemperatura';
-    const sensorType = await SensorType.findBy('name', 'Ritmo');
+    const sensorType = await SensorType.findBy('name', 'Temperatura');
 
     if (!sensorType) {
       return response.status(404).send({
