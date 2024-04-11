@@ -42,7 +42,7 @@ export default class SensorsController {
   * /api/sensor:
   *   post:
   *     security:
-  *       - bearerAuth: []
+  *      - bearerAuth: []
   *     tags:
   *       - Sensors
   *     summary: Create new sensor
@@ -98,7 +98,7 @@ export default class SensorsController {
    * /api/sensor/{id}:
    *  put:
    *    security:
-   *    - bearerAuth: []
+   *      - bearerAuth: []
    *    tags:
    *      - Sensors
    *    summary:  Activate sensor by id

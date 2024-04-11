@@ -1,7 +1,7 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
 import Dispositivo from 'App/Models/Dispositivo';
-import Mail from '@ioc:Adonis/Addons/Mail'
-import Env from '@ioc:Adonis/Core/Env'
+import Sensor from 'App/Models/Sensor';
+import SensorType from 'App/Models/SensorType';
 import TipoDispositivo from 'App/Models/TipoDispositivo';
 
 export default class DispositivosController {
@@ -49,43 +49,222 @@ export default class DispositivosController {
       });
     }
   }
-  /**
+/**
+ * @swagger
+ * /api/dispositivos:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Dispositivos
+ *     summary: Crear un nuevo tipo dispositivo
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tipoDispositivo:
+ *                 type: string
+ *                 description: Tipo de dispositivo ('pesa' o 'reloj')
+ *     responses:
+ *       201:
+ *         description: Dispositivo creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Device created successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/Dispositivo'
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Tipo de dispositivo inválido
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error creating device
+ *                 error:
+ *                   type: string
+ */
+public async store({ request, response }: HttpContextContract) {
+  try {
+    const name = request.input('tipoDispositivo');
+
+    if (name !== 'pesa' && name !== 'brazalete') {
+      return response.status(400).json({
+        message: 'Tipo de dispositivo inválido',
+      });
+    }
+    const tipodispositivo = await TipoDispositivo.create({
+      name,
+    });
+
+    return response.status(201).json({
+      status: 'success',
+      message: 'Dispositivo creado exitosamente',
+      data: tipodispositivo,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: 'Error al crear el dispositivo',
+      error: error.message,
+    });
+  }
+}
+/**
+ * @swagger
+ * /api/dispositivos/creardispositivo:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Dispositivos
+ *     summary: Crear un nuevo dispositivo
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tipoDispositivo:
+ *                 type: string
+ *                 description: Tipo de dispositivo ('pesa' o 'brazalete')
+ *     responses:
+ *       201:
+ *         description: Dispositivo creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Dispositivo creado exitosamente
+ *                 data:
+ *                   $ref: '#/components/schemas/TipoDispositivo'
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Tipo de dispositivo inválido
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error al crear el dispositivo
+ *                 error:
+ *                   type: string
+ */
+public async creardispositivo({ request, response, auth }: HttpContextContract) {
+  try {
+    const tipoDispositivo = request.input('tipoDispositivo');
+    const userId = auth.user?.id;
+
+    if (tipoDispositivo !== 'pesa' && tipoDispositivo !== 'brazalete') {
+      return response.status(400).json({
+        message: 'Tipo de dispositivo inválido',
+      });
+    }
+
+    let tipoDispositivoExistente = await TipoDispositivo.query()
+      .where('name', tipoDispositivo === 'pesa' ? 'pesa' : 'brazalete')
+      .first();
+
+    if (!tipoDispositivoExistente) {
+      tipoDispositivoExistente = await TipoDispositivo.create({
+        name: tipoDispositivo === 'pesa' ? 'pesa' : 'brazalete',
+      });
+    }
+
+    const dispositivo = await Dispositivo.create({
+      tipoDispositivoId: tipoDispositivoExistente.id,
+      id_usuario: userId,
+    });
+
+    const tipoDeSensor = await SensorType.query()
+      .where('name', tipoDispositivo === 'pesa' ? 'Peso' : 'Distancia')
+      .firstOrFail();
+
+    let valorSensor = tipoDispositivo === 'pesa' ? 1 : 5;
+
+    const sensor = await Sensor.create({
+      sensor_type_id: tipoDeSensor.id,
+      value: valorSensor,
+      activo: 1,
+    });
+
+    return response.status(201).json({
+      status: 'success',
+      message: 'Dispositivo creado exitosamente',
+      data: dispositivo,
+    });
+  } catch (error) {
+    return response.status(500).json({
+      message: 'Error al crear el dispositivo',
+      error: error.message,
+    });
+  }
+}
+/**
    * @swagger
-   * /api/dispositivos:
-   *   post:
+   * /api/dispositivos/{id}:
+   *   get:
    *     security:
    *       - bearerAuth: []
    *     tags:
    *       - Dispositivos
-   *     summary: Crear un nuevo tipo dispositivo
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               tipoDispositivo:
-   *                 type: string
-   *                 description: Tipo de dispositivo ('pesa' o 'reloj')
+   *     summary: Obtener un dispositivo por su ID
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         required: true
+   *         description: ID del dispositivo a obtener
+   *         schema:
+   *           type: integer
    *     responses:
-   *       201:
-   *         description: Dispositivo creado exitosamente
+   *       200:
+   *         description: Dispositivo encontrado
    *         content:
    *           application/json:
    *             schema:
-   *               type: object
-   *               properties:
-   *                 status:
-   *                   type: string
-   *                   example: success
-   *                 message:
-   *                   type: string
-   *                   example: Device created successfully
-   *                 data:
-   *                   $ref: '#/components/schemas/Dispositivo'
-   *       400:
-   *         description: Bad Request
+   *               $ref: '#/components/schemas/Dispositivo'
+   *       404:
+   *         description: Dispositivo no encontrado
    *         content:
    *           application/json:
    *             schema:
@@ -93,176 +272,9 @@ export default class DispositivosController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: Tipo de dispositivo inválido
-   *       500:
-   *         description: Error interno del servidor
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Error creating device
-   *                 error:
-   *                   type: string
+   *                   example: Device not found
    */
-  public async store({ request, response }: HttpContextContract) {
-    try {
-      const name = request.input('tipoDispositivo');
-
-      if (name !== 'pesa' && name !== 'brazalete') {
-        return response.status(400).json({
-          message: 'Tipo de dispositivo inválido',
-        });
-      }
-      const tipodispositivo = await TipoDispositivo.create({
-        name,
-      });
-
-      return response.status(201).json({
-        status: 'success',
-        message: 'Dispositivo creado exitosamente',
-        data: tipodispositivo,
-      });
-    } catch (error) {
-      return response.status(500).json({
-        message: 'Error al crear el dispositivo',
-        error: error.message,
-      });
-    }
-  }
-  /**
-   * @swagger
-   * /api/dispositivos/creardispositivo:
-   *   post:
-   *     security:
-   *       - bearerAuth: []
-   *     tags:
-   *       - Dispositivos
-   *     summary: Crear un nuevo dispositivo
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               tipoDispositivo:
-   *                 type: string
-   *                 description: Tipo de dispositivo ('pesa' o 'brazalete')
-   *     responses:
-   *       201:
-   *         description: Dispositivo creado exitosamente
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 status:
-   *                   type: string
-   *                   example: success
-   *                 message:
-   *                   type: string
-   *                   example: Dispositivo creado exitosamente
-   *                 data:
-   *                   $ref: '#/components/schemas/TipoDispositivo'
-   *       400:
-   *         description: Bad Request
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Tipo de dispositivo inválido
-   *       500:
-   *         description: Error interno del servidor
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Error al crear el dispositivo
-   *                 error:
-   *                   type: string
-   */
-  public async creardispositivo({ request, response, auth }: HttpContextContract) {
-    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-    try {
-      const tipoDispositivo = request.input('tipoDispositivo');
-      const userId = auth.user?.id;
-      const email = auth.user?.email
-
-      if (tipoDispositivo !== 'pesa' && tipoDispositivo !== 'brazalete') {
-        return response.status(400).json({
-          message: 'Tipo de dispositivo inválido',
-        });
-      }
-
-      const dispositivo = await Dispositivo.create({
-        tipoDispositivoId: tipoDispositivo === 'pesa' ? 1 : 2,
-        id_usuario: userId,
-      });
-
-      await Mail.send((message) => {
-        message
-          .from(Env.get('SMTP_USERNAME'), 'Healthy App')
-          .to(email)
-          .subject('Healthy App - Verificación de cuenta')
-          .htmlView('emails/dispositivoVinculado');
-      });
-
-      return response.status(201).json({
-        status: 'success',
-        message: 'Dispositivo creado exitosamente',
-        data: dispositivo,
-      });
-    } catch (error) {
-      return response.status(500).json({
-        message: 'Error al crear el dispositivo',
-        error: error.message,
-      });
-    }
-  }
-  /**
-     * @swagger
-     * /api/dispositivos/{id}:
-     *   get:
-     *     security:
-     *       - bearerAuth: []
-     *     tags:
-     *       - Dispositivos
-     *     summary: Obtener un dispositivo por su ID
-     *     parameters:
-     *       - name: id
-     *         in: path
-     *         required: true
-     *         description: ID del dispositivo a obtener
-     *         schema:
-     *           type: integer
-     *     responses:
-     *       200:
-     *         description: Dispositivo encontrado
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/Dispositivo'
-     *       404:
-     *         description: Dispositivo no encontrado
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 message:
-     *                   type: string
-     *                   example: Device not found
-     */
-  public async show({ params, response }: HttpContextContract) {
+public async show({ params, response }: HttpContextContract) {
     try {
       const dispositivo = await Dispositivo.findOrFail(params.id);
       return response.status(200).json(dispositivo);

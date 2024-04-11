@@ -1,7 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { rules, schema } from '@ioc:Adonis/Core/Validator'
+import {  schema } from '@ioc:Adonis/Core/Validator'
 import Configuration from 'App/Models/Configuration'
-import Habit from 'App/Models/Habit'
 
 export default class ConfigurationsController {
   public async index({ request }: HttpContextContract) {
