@@ -3,6 +3,8 @@ import { DateTime } from 'luxon';
 import { BaseModel, column, BelongsTo, belongsTo } from '@ioc:Adonis/Lucid/Orm';
 import Habito from './Habito';
 
+
+
 export default class ConfiguracionHabito extends BaseModel {
   public static table ='configuracion_habito'
 

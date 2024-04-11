@@ -3,6 +3,31 @@ import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm';
 import User from './User';
 import TipoDispositivo from './TipoDispositivo';
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    Dispositivo:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: integer
+ *          example: 10
+ *        tipoDispositivoId:
+ *          type: integer
+ *          example:  10
+ *        id_usuarios:
+ *          type: integer
+ *          example:  10
+ *        data:
+ *          type: string
+ *          example:  Datos
+ *      required:
+ *        - id
+ *        - tipoDispositivoId
+ *        - id_usuarios
+ *        - data
+ */
 export default class Dispositivo extends BaseModel {
 
   // Especificar el nombre de la tabla como una variable estática
