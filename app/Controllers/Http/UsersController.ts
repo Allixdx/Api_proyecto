@@ -37,22 +37,24 @@ export default class UsersController {
     })
     return response.status(200).send({
       title: 'Success!!',
-      messgae: 'Lista de usuarios',
+      message: 'Lista de usuarios',
       data: users
     })
   }
 
     /**
    * @swagger
-   * /api/users/{user_id}:
+   * /api/users/{id}:
    *  get:
+   *    security:
+   *      - bearerAuth: []
    *    tags:
    *      - users
    *    summary: Lista de usuarios
    *    produces:
    *      - application/json
    *    parameters:
-   *      - name: user_id
+   *      - name: id
    *        in: path
    *        required: true
    *        description: ID del usuario a mostrar.
@@ -74,12 +76,12 @@ export default class UsersController {
    *                  description: jajajaj
    */
     public async show({ response,params }: HttpContextContract) {
-      const users = await User.query().where('user_id',params.user_id).preload('dispositivo',(habitUser) => {
+      const users = await User.query().where('id',params.id).preload('dispositivo',(habitUser) => {
         habitUser.preload('sensores')
       })
       return response.status(200).send({
         title: 'Success!!',
-        messgae: 'Usuario',
+        message: 'Usuario',
         data: users
       })
     }

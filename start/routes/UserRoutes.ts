@@ -9,7 +9,7 @@ Route.group(() => {
   
   Route.post('/logout', 'UsersController.logout').middleware('auth:api')
 
-  Route.get('/:id', 'UsersController.show')
+  Route.get('/:id', 'UsersController.show').middleware('auth:api')
 
   Route.post('/', 'UsersController.register')
 
