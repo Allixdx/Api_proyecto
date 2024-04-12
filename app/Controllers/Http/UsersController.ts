@@ -537,7 +537,7 @@ public async update({ auth, request, response }: HttpContextContract) {
    *                  description: Mensaje indicando el éxito de la eliminación.
    */
   public async destroy({ response, params }: HttpContextContract) {
-    // const user = auth.user!
+    const user = auth.user!
     const usuario = await User.findOrFail(params.id)// pic agregue este findOrFail porque no me dejaba con el auth.user  atte: Miller :D
     await usuario.delete()
 
