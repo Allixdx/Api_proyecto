@@ -2,7 +2,31 @@ import { DateTime } from 'luxon'
 import { BaseModel, column, belongsTo, BelongsTo } from '@ioc:Adonis/Lucid/Orm'
 import SensorType from 'App/Models/SensorType'
 import Dispositivo from './Dispositivo'
-
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    Sensor:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: integer
+ *          example: 10
+ *        sensor_type_id:
+ *          type: integer
+ *          example:  10
+ *        activo:
+ *          type: integer
+ *          example:  1
+ *        value:
+ *          type: integer
+ *          example:  666
+ *      required:
+ *        - id
+ *        - sensor_type_id
+ *        - activo
+ *        - value
+ */
 export default class Sensor extends BaseModel {
   public static table ='sensors'
 

@@ -8,6 +8,8 @@ export default class EmqxController {
 * @swagger
 * /api/emqx/topic-retained:
 *   post:
+*     security:
+*      - bearerAuth: []
 *     tags:
 *       - EMQX
 *     produces:

@@ -4,6 +4,35 @@ import User from './User';
 import TipoDispositivo from './TipoDispositivo';
 import Sensor from './Sensor';
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    Dispositivo:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: integer
+ *          example: 10
+ *        nombre:
+ *          type: string
+ *          example: Omnitrix
+ *        tipoDispositivoId:
+ *          type: integer
+ *          example:  10
+ *        id_usuarios:
+ *          type: integer
+ *          example:  10
+ *        data:
+ *          type: string
+ *          example:  Datos
+ *      required:
+ *        - id
+ *        - nombre
+ *        - tipoDispositivoId
+ *        - id_usuarios
+ *        - data
+ */
 export default class Dispositivo extends BaseModel {
 
   // Especificar el nombre de la tabla como una variable estática
@@ -11,6 +40,9 @@ export default class Dispositivo extends BaseModel {
 
   @column({ isPrimary: true })
   public id: number;
+
+  @column()
+  public nombre: string;
 
   @column()
   public tipoDispositivoId: number;

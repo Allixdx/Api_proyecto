@@ -2,6 +2,31 @@ import { DateTime } from 'luxon'
 import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
 import Configuration from './Configuration'
 
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    Habits:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: integer
+ *          example: 10
+ *        user_id:
+ *          type: integer
+ *          example:  10
+ *        name:
+ *          type: string
+ *          example:  Arthur Morgan
+ *        description:
+ *          type: string
+ *          example:  Descripcion
+ *      required:
+ *        - id
+ *        - user_id
+ *        - name
+ *        - description
+ */
 export default class Habit extends BaseModel {
   @column({ isPrimary: true })
   public id: number

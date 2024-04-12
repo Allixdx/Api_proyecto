@@ -230,7 +230,7 @@ export default class UsersController {
    *          - email
    *          - password
    */
-  public async register({ request, response }: HttpContextContract) {
+  public async register({ request, response}: HttpContextContract) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     try {
       const name = request.input('name');
@@ -274,6 +274,18 @@ export default class UsersController {
           .subject('Healthy App - Verificación de cuenta')
           .htmlView('emails/welcome', emailData);
       });
+      
+      const accountSid = Env.get('TWILIO_ACCOUNT_SID')
+      const authToken = Env.get('TWILIO_AUTH_TOKEN')
+      const client = require('twilio')(accountSid, authToken)
+
+
+   
+      await client.messages.create({
+        body: "Gracias por registrarte en HealthyApp :D",
+        from: Env.get('TWILIO_FROM_NUMBER'),
+        to:`+528717957718`
+      })
 
       return response.status(201).json({
         title: 'Success!!',
@@ -299,7 +311,7 @@ export default class UsersController {
   }
 /**
  * @swagger
- * /api/users:
+ * /api/users/actualizar:
  *  put:
  *    security:
  *      - bearerAuth: []

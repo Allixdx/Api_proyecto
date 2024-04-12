@@ -5,6 +5,32 @@ import { BaseModel, column, HasMany, hasMany, ManyToMany, manyToMany } from '@io
 import Habit from './Habit';
 import Dispositivo from './Dispositivo';
 
+
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    User:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: integer
+ *          example: 10
+ *        name:
+ *          type: string
+ *          example:  Arthur
+ *        lastname:
+ *          type: string
+ *          example:  Morgan
+ *        email:
+ *          type: string
+ *          example:  hola@example.com
+ *      required:
+ *        - id
+ *        - name
+ *        - lastname
+ *        - email
+ */
 export default class User extends BaseModel {
   public static table='users'
   
