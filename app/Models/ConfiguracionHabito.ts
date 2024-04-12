@@ -1,7 +1,7 @@
 // app/Models/ConfiguracionHabito.ts
 import { DateTime } from 'luxon';
 import { BaseModel, column, BelongsTo, belongsTo } from '@ioc:Adonis/Lucid/Orm';
-import Habito from './Habito';
+import Habito from './Habit';
 
 
 
