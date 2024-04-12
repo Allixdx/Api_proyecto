@@ -151,11 +151,11 @@ public async store({ request, response }: HttpContextContract) {
  *             type: object
  *             properties:
  *               tipoDispositivo:
- *                 type: string
- *                 description: Tipo de dispositivo ('pesa' o 'brazalete')
+ *                 type: number
+ *                 description: Tipo de dispositivo  ( 'brazalete':1,'pesa':2)
  *               nombre:
  *                 type: string
- *                 description: Nombre del brazalate otorgado por el usuario
+ *                 description: Nombre de dispositivo
  *     responses:
  *       201:
  *         description: Dispositivo creado exitosamente
@@ -196,13 +196,9 @@ public async store({ request, response }: HttpContextContract) {
  *                   type: string
  */
 public async creardispositivo({ request, response, auth }: HttpContextContract) {
-  //agregar por el id del tipo dispositivo y el nombre = nombre especial para el brazalete que le pone el usuario
   try {
     const tipoDispositivo = request.input('tipoDispositivo');
-    const nombre = request.input('nombre')
     const userId = auth.user?.id;
-
-
 
     if (tipoDispositivo !== 'pesa' && tipoDispositivo !== 'brazalete') {
       return response.status(400).json({
@@ -222,31 +218,29 @@ public async creardispositivo({ request, response, auth }: HttpContextContract) 
 
     const dispositivo = await Dispositivo.create({
       tipoDispositivoId: tipoDispositivoExistente.id,
-      id_usuario: userId,
-      nombre: nombre
+      id_usuario: userId
     });
-
-    const ultimoDispositivo = await Dispositivo.query().orderBy('id', 'desc').firstOrFail();
 
     const tipoDeSensor = await SensorType.query()
       .where('name', tipoDispositivo === 'pesa' ? 'Peso' : 'Distancia')
       .firstOrFail();
 
-    let valorSensor = tipoDispositivo === 'brazalete' ?  1 : 5;
+    let valorSensor = tipoDispositivo === 'pesa' ? 1 : 5;
 
-    // cuando es pesa se relaciona con el sensor de peso y si es brazalete con los sensores de brazaletes
     const sensor = await Sensor.create({
       sensor_type_id: tipoDeSensor.id,
-      dispositivo_id: ultimoDispositivo.id,
+      dispositivo_id: dispositivo.id,
       value: valorSensor,
       activo: 1,
     });
 
-    return response.status(200).json({
+    return response.status(201).json({
       status: 'success',
       message: 'Dispositivo creado exitosamente',
-      data: dispositivo, 
-      sensor: sensor,
+      data: {
+        device: dispositivo,
+        sensor: sensor
+      },
     });
   } catch (error) {
     return response.status(500).json({
