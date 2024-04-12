@@ -243,7 +243,8 @@ public async creardispositivo({ request, response, auth }: HttpContextContract) 
     return response.status(200).json({
       status: 'success',
       message: 'Dispositivo creado exitosamente',
-      data: dispositivo,sensor
+      data: dispositivo, 
+      sensor: sensor,
     });
   } catch (error) {
     return response.status(500).json({
