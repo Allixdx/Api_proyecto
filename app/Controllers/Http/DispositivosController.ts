@@ -151,7 +151,7 @@ public async store({ request, response }: HttpContextContract) {
  *             type: object
  *             properties:
  *               tipoDispositivo:
- *                 type: number
+ *                 type: string
  *                 description: Tipo de dispositivo  ( 'brazalete':1,'pesa':2)
  *               nombre:
  *                 type: string
