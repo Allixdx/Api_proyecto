@@ -36,6 +36,9 @@ export default class Sensor extends BaseModel {
   public sensor_type_id: number
 
   @column()
+  public dispositivo_id: number
+
+  @column()
   public activo: number
 
   @column()
