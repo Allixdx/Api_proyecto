@@ -320,6 +320,7 @@ public async obtenerRitmo({ response }: HttpContextContract) {
       type: 'success',
       data: {
         retained_message: parsedPayload,
+        value: parsedPayload.Ritmo,
         unit: unit 
       },
     });
@@ -449,6 +450,7 @@ public async obtenerPasos({  response }: HttpContextContract) {
       type: 'success',
       data: {
         retained_message: parsedPayload,
+        value: parsedPayload.Pasos,
         unit: unit
       },
     });
@@ -577,6 +579,7 @@ public async obtenerDistancia({  response }: HttpContextContract) {
       type: 'success',
       data: {
         retained_message: parsedPayload,
+        value: parsedPayload.Distancia,
         unit: unit
       },
     });
@@ -608,7 +611,7 @@ public async obtenerDistancia({  response }: HttpContextContract) {
  *     tags:
  *       - EMQX
  *     summary: Obtener el último mensaje retenido de alcohol.
- *     description: |
+ *     description: 
  *       Esta ruta permite obtener el último mensaje retenido de alcohol desde el servidor EMQX.
  *     responses:
  *       200:
@@ -705,6 +708,7 @@ public async obtenerAlcohol({ response }: HttpContextContract) {
       type: 'success',
       data: {
         retained_message: parsedPayload,
+        value: parsedPayload.Alcohol,
         unit: unit
       },
     });
@@ -849,7 +853,7 @@ public async obtenerAlcohol({ response }: HttpContextContract) {
  *     tags:
  *       - EMQX
  *     summary: Obtener el último mensaje retenido de temperatura.
- *     description: |
+ *     description: 
  *       Esta ruta permite obtener el último mensaje retenido de temperatura desde el servidor EMQX.
  *     responses:
  *       200:
@@ -946,6 +950,7 @@ public async obtenerTemperatura({ response }: HttpContextContract) {
       type: 'success',
       data: {
         retained_message: parsedPayload,
+        value: parsedPayload.Temperatura,
         unit: unit
       },
     });
@@ -972,12 +977,12 @@ public async obtenerTemperatura({ response }: HttpContextContract) {
  * @swagger
  * /api/emqx/obtenerPeso:
  *   post:
- *    security:
+ *     security:
  *      - bearerAuth: []
  *     tags:
  *       - EMQX
  *     summary: Obtener el último mensaje retenido de peso.
- *     description: |
+ *     description: 
  *       Esta ruta permite obtener el último mensaje retenido de peso desde el servidor EMQX.
  *     responses:
  *       200:
@@ -1028,7 +1033,7 @@ public async obtenerTemperatura({ response }: HttpContextContract) {
  */
 public async obtenerPeso({ response }: HttpContextContract) {
   try {
-    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/peso';
+    const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/Peso';
     const sensorType = await SensorType.findBy('name', 'Peso');
 
     if (!sensorType) {
@@ -1074,6 +1079,7 @@ public async obtenerPeso({ response }: HttpContextContract) {
       type: 'success',
       data: {
         retained_message: parsedPayload,
+        value: parsedPayload.Peso,
         unit: unit
       },
     });

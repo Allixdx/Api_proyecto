@@ -77,7 +77,7 @@ export default class UsersController {
    */
     public async show({ response,params }: HttpContextContract) {
       const users = await User.query().where('id',params.id).preload('dispositivo',(habitUser) => {
-        habitUser.preload('sensores')
+        habitUser.preload('sensores').preload('tipoDispositivo')
       }).first()
       return response.status(200).send({
         title: 'Success!!',
