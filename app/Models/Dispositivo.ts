@@ -13,7 +13,7 @@ export default class Dispositivo extends BaseModel {
   public id: number;
 
   @column()
-  public tipoDispositivoId: number;
+  public tipo_dispositivo_id: number;
 
   @column()
   public id_usuario: number;

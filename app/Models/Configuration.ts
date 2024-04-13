@@ -28,25 +28,25 @@ import HabitUser from './HabitUser'
  *        - data
  */
 export default class Configuration extends BaseModel {
-  @column({ isPrimary: true })
-  public id: number
-
   public static table = "configuracion_habito"
 
+  @column({ isPrimary: true })
+  public id: number
+  
   @column()
-  public habit_user_id: number 
-
-  @column()
-  public name: String 
+  public user_id: number 
 
   @column()
   public data: String
 
+  @column()
+  public tipo_configuracion_id: number
+
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  public updated_at: DateTime
 
   @belongsTo(() => HabitUser, {
     localKey: 'id',  

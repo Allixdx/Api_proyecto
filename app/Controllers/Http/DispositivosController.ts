@@ -59,7 +59,7 @@ export default class DispositivosController {
    *     security:
    *       - bearerAuth: []
    *     tags:
-   *       - Dispositivos
+   *       - TiposDispositivos
    *     summary: Crear un nuevo tipo dispositivo
    *     requestBody:
    *       required: true
@@ -145,7 +145,7 @@ export default class DispositivosController {
    *     security:
    *       - bearerAuth: []
    *     tags:
-   *       - TiposDispositivos
+   *       - Dispositivos
    *     summary: Crear un nuevo dispositivo
    *     requestBody:
    *       required: true
