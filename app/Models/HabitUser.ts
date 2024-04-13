@@ -11,15 +11,17 @@ export default class HabitUser extends BaseModel {
   public static table = "habit_user"
 
   @column()
-  public habito_id: number 
-  @column()
   public user_id: number 
 
+  @column()
+  public habito_id: number 
+
+
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  public updated_at: DateTime
   
   @belongsTo(() => Habit, {
     localKey: 'id',  

@@ -591,7 +591,7 @@ export default class ConfigurationsController {
   public async userConfiguration({ params, response }: HttpContextContract) {
     /**
     * @swagger
-    * /api/configurations/userConf/{id}:
+    * /api/configurations/user-conf/{id}:
     *   get:
     *     description: Muestra una configuracion especifica identificada por el numero id que se pasa como parametro.
     *     tags:

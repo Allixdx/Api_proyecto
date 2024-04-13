@@ -39,14 +39,15 @@ export default class DispositivosController {
       .joinRaw('inner join sensors on sensors.dispositivo_id = dispositivo.id')
       .where('sensors.activo',1).preload('sensores');
       return response.status(200).send({
-        status: 'success',
-        message: 'Successfully retrieved all devices',
+        type: 'Success!!',
+        title: 'Acceso a lista de dispositivos',
+        message: 'Lista de dispositivos',
         data: dispositivos,
       });
     } catch (error) {
       return response.status(500).send({
-        status: 'error',
-        message: 'An error occurred while retrieving devices',
+        type: 'Error',
+        title: 'Error al acceder a la lista',
         error: error.message,
       });
     }
@@ -123,20 +124,23 @@ public async store({ request, response }: HttpContextContract) {
     });
 
     return response.status(201).json({
-      status: 'success',
+      type: 'Exitoso!!',
+      title: 'Dispositivo creado',
       message: 'Dispositivo creado exitosamente',
       data: tipodispositivo,
     });
   } catch (error) {
     return response.status(500).json({
-      message: 'Error al crear el dispositivo',
+      type: 'Error',
+      title: 'Error al crear',
+      message: 'Se produjo un error al crear el dispositivo',
       error: error.message,
     });
   }
 }
 /**
  * @swagger
- * /api/dispositivos/creardispositivo:
+ * /api/dispositivos/crear-dispositivo:
  *   post:
  *     security:
  *       - bearerAuth: []
@@ -286,9 +290,19 @@ public async creardispositivo({ request, response, auth }: HttpContextContract) 
 public async show({ params, response }: HttpContextContract) {
     try {
       const dispositivo = await Dispositivo.findOrFail(params.id);
-      return response.status(200).json(dispositivo);
+      return response.status(200).json({
+        type: 'Exitoso!!',
+        title: 'Recurso obtenido',
+        message: 'Exito al obtener el dispositivo por identificador',
+        data: dispositivo
+
+      });
     } catch (error) {
-      return response.status(404).json({ message: 'Device not found' });
+      return response.status(404).json({ 
+        type: 'Error',
+        title: 'Error al obtener recurso',
+        message: 'Se produjo un error al obtener el recurso' 
+      });
     }
   }
   /**
@@ -337,10 +351,17 @@ public async show({ params, response }: HttpContextContract) {
     try {
       const dispositivo = await Dispositivo.findOrFail(params.id);
       await dispositivo.delete();
-      return response.status(204).json({ message: 'Device deleted successfully' });
+      return response.status(200).json({
+        type: 'Exitoso!!',
+        title: 'Dispositivo eliminado',
+        message: 'Dispositivo eliminado exitosamente',
+        data: dispositivo 
+      });
     } catch (error) {
       return response.status(500).json({
-        message: 'Error deleting device',
+        type: 'Error',
+        title: 'Error al eliminar',
+        message: 'Se produjo un error al eliminar el dispositivo',
         error: error.message,
       });
     }

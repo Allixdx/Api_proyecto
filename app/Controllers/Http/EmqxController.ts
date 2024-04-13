@@ -110,7 +110,7 @@ public async getEMQXTopic({ request, response }: HttpContextContract) {
 
  /**
     * @swagger
-    * /api/emqx/publishEMQXTopic:
+    * /api/emqx/publish-emqx-topic:
     *   post:
     *     tags:
     *       - EMQX
@@ -214,7 +214,7 @@ public async webhookRes ({ request, response }: HttpContextContract) {
 }
 /**
  * @swagger
- * /api/emqx/obtenerRitmo:
+ * /api/emqx/obtener-ritmo:
  *   post:
  *     security:
  *      - bearerAuth: []
@@ -344,7 +344,7 @@ public async obtenerRitmo({ response }: HttpContextContract) {
 }
 /**
  * @swagger
- * /api/emqx/obtenerPasos:
+ * /api/emqx/obtener-pasos:
  *   post:
  *     security:
  *      - bearerAuth: []
@@ -473,7 +473,7 @@ public async obtenerPasos({  response }: HttpContextContract) {
 }
 /**
  * @swagger
- * /api/emqx/obtenerDistancia:
+ * /api/emqx/obtener-distancia:
  *   post:
  *     security:
  *      - bearerAuth: []
@@ -601,7 +601,7 @@ public async obtenerDistancia({  response }: HttpContextContract) {
 }
 /**
  * @swagger
- * /api/emqx/obtenerAlcohol:
+ * /api/emqx/obtener-alcohol:
  *   post:
  *     security:
  *      - bearerAuth: []
@@ -729,7 +729,7 @@ public async obtenerAlcohol({ response }: HttpContextContract) {
 }
   /**
    * @swagger
-   * /api/emqx/MandarAPantalla:
+   * /api/emqx/mandar-a-pantalla:
    *   post:
    *     security:
    *      - bearerAuth: []
@@ -842,7 +842,7 @@ public async obtenerAlcohol({ response }: HttpContextContract) {
   }
 /**
  * @swagger
- * /api/emqx/obtenerTemperatura:
+ * /api/emqx/obtener-temperatura:
  *   post:
  *     security:
  *      - bearerAuth: []
@@ -970,7 +970,7 @@ public async obtenerTemperatura({ response }: HttpContextContract) {
 }
 /**
  * @swagger
- * /api/emqx/obtenerPeso:
+ * /api/emqx/obtener-peso:
  *   post:
  *    security:
  *      - bearerAuth: []

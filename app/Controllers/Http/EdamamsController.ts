@@ -7,7 +7,7 @@ import Env from '@ioc:Adonis/Core/Env';
 export default class EdamamsController {
 /**
  * @swagger
- * /api/foods/obteneralimento:
+ * /api/foods/obtener-alimento:
  *   get:
  *     security:
  *      - bearerAuth: []
@@ -61,7 +61,11 @@ public async findFood({ request, response }: HttpContextContract) {
       const nombrealimento = request.input('nombrealimento'); // Obtener el nombre del alimento de la consulta
     
       if (!nombrealimento) {
-          return response.badRequest({ error: 'Por favor, proporciona el nombre del alimento.' });
+          return response.badRequest({ 
+            type: 'Error',
+            titlte: 'Error al obtener alimento',
+            error: 'Por favor, proporciona el nombre del alimento.' 
+          });
       }
 
       const alimento = await EdamamResource.getfood(nombrealimento);
@@ -69,9 +73,17 @@ public async findFood({ request, response }: HttpContextContract) {
       console.log('Respuesta de la API de Edamam:', alimento); // Agregar este console.log para verificar la respuesta de la API
 
       if(alimento.hints.length==0){
-        return response.notFound({ message: 'No hubo resultados' });
+        return response.notFound({ 
+          type: 'Error',
+          title: 'Error al obtener alimento',
+          message: 'No hubo resultados' });
       }
-      return response.ok(alimento);
+      return response.ok({
+        type: 'Exitoso',
+        title: 'Alimento obtenido',
+        message: 'Alimento obtenido exitosamente',
+        data: alimento
+      });
   } catch (error) {
       console.error('Error al buscar el alimento:', error.message);
       return response.status(500).json({ message: 'Ocurrió un error al buscar el alimento.' });
@@ -79,7 +91,7 @@ public async findFood({ request, response }: HttpContextContract) {
 }
 /**
  * @swagger
- * /api/foods/calculatenutrition:
+ * /api/foods/calcular-nutricion:
  *   post:
  *     security:
  *      - bearerAuth: []

@@ -5,7 +5,7 @@ export default class SensorTypesController {
   /**
  * 
  * @swagger
- * /api/sensorType:
+ * /api/sensor-type:
  *  get:
  *    security:
  *      - bearerAuth: []
@@ -33,21 +33,23 @@ export default class SensorTypesController {
    try{
     const SensorTypes = await SensorType.all()
     return response.status(200).send({
-      title: 'Success!!',
-      message: 'Lista de tipos de sensores',
+      type: 'Exitoso!!',
+      title: 'Tipos de sensores obtenidos',
+      message: 'Tipos de sensores obtenidos exitosamente',
       data: SensorTypes
     });
   }catch(error){
     return response.status(500).send({
-      status: 'error',
-      message: 'Error al obtener los tipo de sensores',
+      type: 'Error',
+      titlte: 'Error al obtener tipos de sensores',
+      message: 'Se produjo un error al obtener los tipo de sensores',
       error: error.message,
     });
   }
 }
   /**
   * @swagger
-  * /api/sensorType:
+  * /api/sensor-type:
   *   post:
   *     security:
   *      - bearerAuth: []
@@ -91,15 +93,16 @@ export default class SensorTypesController {
     newSensorType.unit = unit
     await newSensorType.save()
     return response.status(200).send({
-      title:'Success!!',
-      message:'Nuevo tipo de sensor creado',
+      type: 'Exitoso!!',
+      title:'Exito al crear un tipo de sensor',
+      message:'Exito al crear un tipo de sensor',
       data:newSensorType
     })
   }
   /**
    * 
    * @swagger
-   * /api/sensorType/{id}:
+   * /api/sensor-type/{id}:
    *  put:
    *    security:
    *      - bearerAuth: []
@@ -151,14 +154,16 @@ export default class SensorTypesController {
       upSensorType.unit = unit
       await upSensorType.save()
       return response.status(200).send({
-        title:'Success!!',
+        type: 'Exitoso!!',
+        title:'Exito al actualizar tipo de sensor',
         message:'Tipo de sensor actualizado',
         data:upSensorType 
       })
     } catch (error) {
       if(error.code === 'E_ROW_NOT_FOUND'){
         return response.status(404).send({
-          title:'ERROR!!',
+          type: 'Error',
+          title: 'Error al obtener tipo de sensor',
           message:'Tipo de sensor no encontrado, intenta otro identificador :/'
         })
       }
@@ -166,7 +171,7 @@ export default class SensorTypesController {
   }
  /**
  * @swagger
- * /api/sensorType/{id}:
+ * /api/sensor-type/{id}:
  *  delete:
  *    security:
  *      - bearerAuth: []
@@ -202,14 +207,16 @@ export default class SensorTypesController {
       const delSensorType = await SensorType.findOrFail(params.id)
       await delSensorType.delete()
       return response.status(200).send({
-        title:'Success!!',
-        message:'Tipo de sensor eliminado D:',
+        type: 'Exitoso!!',
+        title:'Se elimino el tipo de sensor',
+        message:'Tipo de sensor eliminado exitosamente D:',
         data:delSensorType
       })
     } catch (error) {
       if(error.code === 'E_ROW_NOT_FOUND'){
         return response.status(404).send({
-          title:'ERROR!!',
+          type: 'Error',
+          title:'Error al eliminar tipo de sensor',
           message:'Tipo de sensor no encontrado, intenta con otro identificador :/'
         })
       }
