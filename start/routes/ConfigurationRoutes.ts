@@ -7,4 +7,5 @@ Route.group(()=>{
     Route.put('/:id','ConfigurationsController.update')
     Route.delete('/:id','ConfigurationsController.destroy')
     Route.get('/user-conf/:id','ConfigurationsController.userConfiguration')
+    Route.post('meta-distancia','ConfigurationsController.metaDistancia')
 }).prefix('/api/configurations').middleware('auth:api')

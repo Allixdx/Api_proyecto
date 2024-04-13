@@ -27,6 +27,7 @@ import './routes/EdamamRoute'
 import './routes/EmqxRoutes'
 import './routes/SensorTypeRoute'
 import './routes/ConfigurationRoutes'
+import './routes/DeviceTypesRoutes'
 
 Route.get('/', async () => {
   return { hello: 'world' }

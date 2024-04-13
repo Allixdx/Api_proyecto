@@ -145,7 +145,7 @@ export default class DispositivosController {
    *     security:
    *       - bearerAuth: []
    *     tags:
-   *       - Dispositivos
+   *       - TiposDispositivos
    *     summary: Crear un nuevo dispositivo
    *     requestBody:
    *       required: true
@@ -259,6 +259,8 @@ export default class DispositivosController {
         await Sensor.create(sensor)
       }
 
+      // tuve que quitar este para poder hacer el ciclo e insertar los sensores dependiendo del tipo de dispositivo
+      
       // const sensor = await Sensor.create({
       //   sensor_type_id: tipoDeSensor.id,
       //   dispositivo_id: ultimoDispositivo.id,

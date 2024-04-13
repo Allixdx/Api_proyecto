@@ -652,26 +652,32 @@ public async update({ auth, request, response }: HttpContextContract) {
       if (!user || user.verificationCode !== verificationCode) {
         // Devolver error de datos inválidos
         return response.status(401).send({
+          type: 'warning',
           title: 'Datos inválidos',
           message: 'Usuario no verificado o datos incorrectos',
-          type: 'warning',
         });
       }
 
       if (!(await Hash.verify(user.password, password))) {
         return response.status(401).send({
+          type: 'warning',
           title: 'Datos inválidos',
           message: 'Contraseña incorrecta',
-          type: 'warning',
         });
       }
 
       user.verificationCode = null;
       await user.save();
 
-      return response.status(200).json({ message: 'Cuenta Verificada Correctamente' });
+      return response.status(200).json({ 
+        type: 'Exitoso!!',
+        title: 'Verificado',
+        message: 'Cuenta Verificada Correctamente'
+       });
     } catch (error) {
       return response.status(400).json({
+        type: 'Error',
+        title: 'Error de inicio',
         message: 'Error al iniciar sesión',
         error: error.message,
       });
