@@ -78,11 +78,18 @@ export default class UsersController {
    *                  description: jajajaj
    */
     public async show({ response,params }: HttpContextContract) {
-      const users = await User.query().where('id',params.id).preload('dispositivo',(habitUser) => {
-        habitUser.preload('sensores',(sensor)=>{
+      const users = await User.query().where('id',params.id).preload('dispositivo',(dispositivo) => {
+        dispositivo.preload('sensores',(sensor)=>{
           sensor.preload('sensorType')
         }).preload('tipoDispositivo')
       }).first()
+      if(!users){
+        return response.status(404).send({
+          type: 'Error',
+          title: 'Error al obtener usuario por identificador',
+          message: 'No se encontro usuario con este identificador'
+        })
+      }
       try{
       return response.status(200).send({
         type: 'Success!!',
@@ -95,7 +102,8 @@ export default class UsersController {
         return response.status(404).send({
           type: 'Error',
           title: 'Error al obtener usuario por identificador',
-          message: 'No se encontro usuario con este identificador'
+          message: 'No se encontro usuario con este identificador',
+          error:error
         })
       }
     }
