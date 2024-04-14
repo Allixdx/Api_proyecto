@@ -791,7 +791,7 @@ public async update({ auth, request, response }: HttpContextContract) {
       const password = request.input('password');
 
       // Verificar las credenciales del usuario
-      const user = await User.query().where('email', email).preload('dispositivo',(habitUser) => {
+      const user = await User.query().where('email', email).preload('configurations').preload('dispositivo',(habitUser) => {
         habitUser.preload('sensores')
       }).first();
 

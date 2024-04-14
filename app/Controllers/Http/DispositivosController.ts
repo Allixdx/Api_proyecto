@@ -36,8 +36,7 @@ export default class DispositivosController {
   public async index({ response }: HttpContextContract) {
     try {
       const dispositivos = await Dispositivo.query()
-        .joinRaw('inner join sensors on sensors.dispositivo_id = dispositivo.id')
-        .where('sensors.activo', 1).preload('sensores');
+        .preload('sensores');
       return response.status(200).send({
         type: 'Success!!',
         title: 'Acceso a lista de dispositivos',
@@ -335,6 +334,140 @@ export default class DispositivosController {
         title: 'Error al obtener recurso',
         message: 'Se produjo un error al obtener el recurso'
       });
+    }
+  }
+   /**
+   * @swagger
+   * /api/dispositivos/{id}:
+   *   put:
+   *     description: Actualiza el recurso de dispositivo
+   *     tags:
+   *       - Dispositivos
+   *     security:
+   *       - bearerAuth: []
+   *     produces:
+   *       - application/json
+   *     requestBody:
+   *       description: Se pueden cambiar los datos que sean necesarios
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               name:
+   *                 type: string
+   *                 description: Nombre del dispositivo
+   *                 required: true
+   *     parameters:
+   *       - in: path
+   *         name: id
+   *         schema:
+   *           type: number
+   *         required: true
+   *         description: Id de dispositivo que se va a actualizar
+   *     responses:
+   *       200:
+   *         description: La actualización del recurso fue exitosa
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                   description: Título de la respuesta
+   *                 message:
+   *                   type: string
+   *                   description: Mensaje de la respuesta
+   *                 data: 
+   *                   type: object
+   *                   description: Datos de la respuesta
+   *       422:
+   *         description: Los datos en el cuerpo de la solicitud no son procesables 
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                   description: Título del error
+   *                 message:
+   *                   type: string
+   *                   description: Mensaje del error
+   *                 errors: 
+   *                   type: object
+   *                   description: Datos del error  
+   *       404:
+   *         description: No se pudo encontrar el recurso de dispositivo para su actualización
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                   description: Título del error
+   *                 message:
+   *                   type: string
+   *                   description: Mensaje del error
+   *                 errors: 
+   *                   type: object
+   *                   description: Datos del error   
+   *       500:
+   *         description: Hubo un fallo en el servidor durante la solicitud 
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                   description: Título del error
+   *                 message:
+   *                   type: string
+   *                   description: Mensaje del error
+   *                 errors: 
+   *                   type: object
+   *                   description: Datos del error 
+   */
+   public async update({params, request, response}: HttpContextContract) {
+    try {
+
+      const device = await Dispositivo.findOrFail(params.id)
+
+      const body = request.all()
+      device.nombre=body.name
+      await device.save()
+
+      return response.status(200).send({
+        title: 'Recurso actualizado',
+        message: 'El recurso hábito ha sido actualizado exitosamente',
+        data: device
+      })
+    } catch (error) {
+      if (error.messages) {
+        return response.status(422).send({
+          title: 'Error de validación',
+          message: 'Los datos en el cuerpo de la solicitud no son procesables',
+          errors: error.messages
+        })
+      }
+
+      if (error.code === 'E_ROW_NOT_FOUND') {
+        return response.status(404).send({
+          title: 'Recurso no encontrado',
+          message: 'El recurso de hábito no pudo encontrarse',
+          errors: []
+        })
+      }
+
+      return response.status(500).send({
+        title: 'Error de servidor',
+        message: 'Hubo un fallo en el servidor durante la solicitud',
+        errors: error
+      })
     }
   }
   /**
