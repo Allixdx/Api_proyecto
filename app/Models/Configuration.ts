@@ -1,6 +1,7 @@
 import { DateTime } from 'luxon'
 import { BaseModel, BelongsTo, belongsTo, column } from '@ioc:Adonis/Lucid/Orm'
-import HabitUser from './HabitUser'
+import User from './User'
+import TipoConfiguracion from './TipoConfiguracion'
 
 /**
  * @swagger
@@ -48,9 +49,16 @@ export default class Configuration extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime
 
-  @belongsTo(() => HabitUser, {
+  @belongsTo(() => User, {
     localKey: 'id',  
     foreignKey: 'user_id',
   })
-  public habit_user: BelongsTo<typeof HabitUser>
+  public user: BelongsTo<typeof User>
+
+  
+  @belongsTo(() => TipoConfiguracion, {
+    localKey: 'id',  
+    foreignKey: 'tipo_configuracion_id',
+  })
+  public tipo_configuracion: BelongsTo<typeof TipoConfiguracion>
 }

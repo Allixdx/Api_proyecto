@@ -30,7 +30,7 @@ export default class SensorsController {
    *                  description: jajajaj
    */
   public async index({response}: HttpContextContract) {
-    const sensores = await Sensor.all()
+    const sensores = await Sensor.query().preload('sensorType')
     return response.status(200).send({
       title:'Success!!',
       message:'List of sensors',

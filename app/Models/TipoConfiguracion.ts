@@ -1,13 +1,12 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
-import Sensor from 'App/Models/Sensor'
-
+import { BaseModel, HasMany, column, hasMany } from '@ioc:Adonis/Lucid/Orm'
+import Configuration from './Configuration'
 
 /**
  * @swagger
  * components:
  *  schemas:
- *    SensorType:
+ *    TipoConfiguracion:
  *      type: object
  *      properties:
  *        id:
@@ -15,25 +14,19 @@ import Sensor from 'App/Models/Sensor'
  *          example: 10
  *        name:
  *          type: string
- *          example:  Arthur Morgan
- *        unit:
- *          type: string
- *          example:  km
+ *          example:  meta_calorica
  *      required:
  *        - id
  *        - name
- *        - unit
  */
-export default class SensorType extends BaseModel {
-  public static table='sensor_types'
+export default class TipoConfiguracion extends BaseModel {
+  public static table = "tipo_configuracion"
+
   @column({ isPrimary: true })
   public id: number
-
+  
   @column()
   public name: string
-
-  @column()
-  public unit: string
 
   @column.dateTime({ autoCreate: true })
   public created_at: DateTime
@@ -41,9 +34,9 @@ export default class SensorType extends BaseModel {
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   public updated_at: DateTime
 
-  @hasMany(() => Sensor, {
-    localKey: 'id',
-    foreignKey: 'sensor_type_id', 
+  @hasMany(() => Configuration, {
+    localKey: 'id',  
+    foreignKey: 'user_id',
   })
-  public sensors: HasMany<typeof Sensor>
+  public configuration: HasMany<typeof Configuration>
 }

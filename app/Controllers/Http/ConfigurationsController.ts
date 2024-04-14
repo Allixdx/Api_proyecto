@@ -59,9 +59,7 @@ export default class ConfigurationsController {
     */
 
     const configuration = await Configuration.query()
-      .preload('habit_user', (habitUser) => {
-        habitUser.preload('user').preload('habit')
-      })
+      .preload('user').preload('tipo_configuracion')
 
 
     return response.status(200).send({
@@ -280,9 +278,7 @@ export default class ConfigurationsController {
     */
     const configuration = await Configuration.query()
       .where('id', params.id)
-      .preload('habit_user', (habitUser) => {
-        habitUser.preload('user').preload('habit')
-      })
+      .preload('user').preload('tipo_configuracion')
       .first()
     if (configuration) {
       response.send({
