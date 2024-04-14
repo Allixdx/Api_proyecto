@@ -1,9 +1,9 @@
 // app/Models/User.ts
 
 import { DateTime } from 'luxon';
-import { BaseModel, column, HasMany, hasMany, ManyToMany, manyToMany } from '@ioc:Adonis/Lucid/Orm';
-import Habit from './Habit';
+import { BaseModel, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm';
 import Dispositivo from './Dispositivo';
+import Configuration from './Configuration';
 
 
 /**
@@ -68,13 +68,11 @@ export default class User extends BaseModel {
   @hasMany(() => Dispositivo,{
     localKey: 'id',  
     foreignKey: 'id_usuario'})
-  public dispositivo: HasMany<typeof Dispositivo>;
+  public dispositivo: HasMany<typeof Dispositivo>
+  
+  @hasMany(() => Configuration,{
+    localKey: 'id',  
+    foreignKey: 'user_id'})
+  public configurations: HasMany<typeof Configuration>
 
-  @manyToMany(() => Habit, {
-    localKey: 'id',
-    pivotForeignKey: 'user_id',
-    relatedKey: 'id',
-    pivotRelatedForeignKey: 'habito_id',
-  })
-  public Habit: ManyToMany<typeof Habit>
 }

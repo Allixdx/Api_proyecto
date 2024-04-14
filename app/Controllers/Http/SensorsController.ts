@@ -30,7 +30,7 @@ export default class SensorsController {
    *                  description: jajajaj
    */
   public async index({response}: HttpContextContract) {
-    const sensores = await Sensor.all()
+    const sensores = await Sensor.query().preload('sensorType')
     return response.status(200).send({
       title:'Success!!',
       message:'List of sensors',
@@ -131,15 +131,29 @@ export default class SensorsController {
     try {
       const {} = request.body()
       const updateSensor = await Sensor.findOrFail(params.id)
-      updateSensor.activo = 0
-      await updateSensor.save()
-  
-      return response.status(200).send({
-        type: 'Exito!!',
-        title: 'Sensor desactivado',
-        message:'Sensor desactivado exitosamente',
-        data:updateSensor
-      })  
+      if(updateSensor.activo==1){
+        updateSensor.activo = 0
+        await updateSensor.save()
+    
+        return response.status(200).send({
+          type: 'Exito!!',
+          title: 'Sensor desactivado',
+          message:'Sensor desactivado exitosamente',
+          data:updateSensor
+        })  
+
+        }else if(updateSensor.activo==0){
+          updateSensor.activo = 1
+          await updateSensor.save()
+      
+          return response.status(200).send({
+            type: 'Exito!!',
+            title: 'Sensor activado',
+            message:'Sensor activado exitosamente',
+            data:updateSensor
+          })  
+        
+      }
     } catch (error) {
       if(error.code === 'E_ROW_NOT_FOUND'){
         return response.status(200).send({
@@ -148,7 +162,9 @@ export default class SensorsController {
           message:'Sensor no encontrado'
         })
       }
+    
     }
+  
      
   }
   /**

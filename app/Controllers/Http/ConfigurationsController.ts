@@ -59,9 +59,7 @@ export default class ConfigurationsController {
     */
 
     const configuration = await Configuration.query()
-      .preload('habit_user', (habitUser) => {
-        habitUser.preload('user').preload('habit')
-      })
+      .preload('user').preload('tipo_configuracion')
 
 
     return response.status(200).send({
@@ -92,9 +90,9 @@ export default class ConfigurationsController {
     *           schema:
     *             type: object
     *             properties:
-    *               name:
-    *                 type: string
-    *                 descripcion: Nombre de la configuracion
+    *               tipo_configuracion_id:
+    *                 type: number
+    *                 descripcion: id de tipo de configuraciones
     *                 required: true
     *               data: 
     *                 type: string
@@ -102,7 +100,7 @@ export default class ConfigurationsController {
     *                 required: true
     *               user_id:
     *                 type: number
-    *                 descripcion: Id de habito
+    *                 descripcion: Id de usuario
     *                 required: true
     *     responses:
     *       201:
@@ -162,15 +160,15 @@ export default class ConfigurationsController {
 
     await request.validate({
       schema: schema.create({
-        name: schema.string(),
+        tipo_configuracion_id: schema.number(),
         data: schema.string(),
         user_id: schema.number()
       }),
       messages: {
-        'name.required': 'El nombre de la configuracion es obligatorio para crear un recurso de configuracion',
+        'tipo_configuracion_id.required': 'El tipo de configuracion es obligatorio para crear un recurso de configuracion',
         'data.required': 'La descripcion de la configuracion es obligatoria para crear un recurso de configuracion',
-        'user_id.required': 'El id de habito es obligatorio para crear un recurso de configuracion',
-        'user_id.number': 'El id de habito debe ser un numero entero'
+        'user_id.required': 'El id de usuario es obligatorio para crear un recurso de configuracion',
+        'user_id.number': 'El id de usuario debe ser un numero entero'
       }
     })
 
@@ -178,6 +176,7 @@ export default class ConfigurationsController {
     try {
 
       configuration.data = body.data
+      configuration.tipo_configuracion_id = body.tipo_configuracion_id
       configuration.user_id = body.user_id
       await configuration.save()
     } catch (error) {
@@ -280,9 +279,7 @@ export default class ConfigurationsController {
     */
     const configuration = await Configuration.query()
       .where('id', params.id)
-      .preload('habit_user', (habitUser) => {
-        habitUser.preload('user').preload('habit')
-      })
+      .preload('user').preload('tipo_configuracion')
       .first()
     if (configuration) {
       response.send({
@@ -322,17 +319,9 @@ export default class ConfigurationsController {
     *           schema:
     *             type: object
     *             properties:
-    *               name:
-    *                 type: string
-    *                 descripcion: Nombre de la configuracion
-    *                 required: false
     *               data: 
     *                 type: string
     *                 descripcion: dato de la configuracion
-    *                 required: false
-    *               user_id:
-    *                 type: number
-    *                 descripcion: Id de habito
     *                 required: false
     *     parameters:
     *       - in: path
@@ -437,13 +426,8 @@ export default class ConfigurationsController {
 
     await request.validate({
       schema: schema.create({
-        name: schema.string.nullableAndOptional(),
-        data: schema.string.nullableAndOptional(),
-        user_id: schema.number.nullableAndOptional()
-      }),
-      messages: {
-        'user_id.number': 'El id de habito debe ser un numero entero'
-      }
+        data: schema.string.nullableAndOptional()
+      })
     })
 
     var configuration = await Configuration.find(params.id)
@@ -461,9 +445,7 @@ export default class ConfigurationsController {
       if (body.data) {
         configuration.data = body.data
       }
-      if (body.habit_id) {
-        configuration.user_id = body.user_id
-      }
+      configuration.save()
     } catch (error) {
       response.internalServerError({
         "type": "Error",

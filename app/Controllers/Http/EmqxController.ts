@@ -970,66 +970,66 @@ export default class EmqxController {
     }
   }
   /**
-   * @swagger
-   * /api/emqx/obtener-peso:
-   *   post:
-   *    security:
-   *      - bearerAuth: []
-   *     tags:
-   *       - EMQX
-   *     summary: Obtener el último mensaje retenido de peso.
-   *     description: |
-   *       Esta ruta permite obtener el último mensaje retenido de peso desde el servidor EMQX.
-   *     responses:
-   *       200:
-   *         description: Último mensaje retenido de peso obtenido correctamente.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 title:
-   *                   type: string
-   *                   description: Título de la respuesta.
-   *                 message:
-   *                   type: string
-   *                   description: Mensaje de éxito.
-   *                 type:
-   *                   type: string
-   *                   description: Tipo de respuesta.
-   *                 data:
-   *                   type: object
-   *                   description: Datos de respuesta.
-   *                   properties:
-   *                     retained_message:
-   *                       type: object
-   *                       description: Último mensaje retenido de peso.
-   *       500:
-   *         description: Error interno al procesar la solicitud.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 title:
-   *                   type: string
-   *                 message:
-   *                   type: string
-   *                   description: Descripción del error.
-   *                 type:
-   *                   type: string
-   *                   description: Tipo de error.
-   *                 data:
-   *                   type: object
-   *                   description: Datos adicionales relacionados con el error.
-   *                   properties:
-   *                     error:
-   *                       type: string
-   *                       description: Mensaje de error detallado.
-   */
-  public async obtenerPeso({ response }: HttpContextContract) {
+  * @swagger
+  * /api/emqx/obtener-peso:
+  *   post:
+  *    security:
+  *      - bearerAuth: []
+  *     tags:
+  *       - EMQX
+  *     summary: Obtener el último mensaje retenido de peso.
+  *     description: 
+  *       Esta ruta permite obtener el último mensaje retenido de peso desde el servidor EMQX.
+  *     responses:
+  *       200:
+  *         description: Último mensaje retenido de peso obtenido correctamente.
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: object
+  *               properties:
+  *                 title:
+  *                   type: string
+  *                   description: Título de la respuesta.
+  *                 message:
+  *                   type: string
+  *                   description: Mensaje de éxito.
+  *                 type:
+  *                   type: string
+  *                   description: Tipo de respuesta.
+  *                 data:
+  *                   type: object
+  *                   description: Datos de respuesta.
+  *                   properties:
+  *                     retained_message:
+  *                       type: object
+  *                       description: Último mensaje retenido de peso.
+  *       500:
+  *         description: Error interno al procesar la solicitud.
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: object
+  *               properties:
+  *                 title:
+  *                   type: string
+  *                 message:
+  *                   type: string
+  *                   description: Descripción del error.
+  *                 type:
+  *                   type: string
+  *                   description: Tipo de error.
+  *                 data:
+  *                   type: object
+  *                   description: Datos adicionales relacionados con el error.
+  *                   properties:
+  *                     error:
+  *                       type: string
+  *                       description: Mensaje de error detallado.
+  */
+public async obtenerPeso({ response }: HttpContextContract) {
     try {
-      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/peso';
+      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/Peso';
       const sensorType = await SensorType.findBy('name', 'Peso');
 
       if (!sensorType) {

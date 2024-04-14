@@ -77,13 +77,20 @@ export default class UsersController {
    *                  type: string 
    *                  description: jajajaj
    */
-  public async show({ response, params }: HttpContextContract) {
-
-    try {
-
-      const users = await User.query().where('id', params.id).preload('dispositivo', (habitUser) => {
-        habitUser.preload('sensores')  
+    public async show({ response,params }: HttpContextContract) {
+      const users = await User.query().where('id',params.id).preload('dispositivo',(dispositivo) => {
+        dispositivo.preload('sensores',(sensor)=>{
+          sensor.preload('sensorType')
+        }).preload('tipoDispositivo')
       }).first()
+      if(!users){
+        return response.status(404).send({
+          type: 'Error',
+          title: 'Error al obtener usuario por identificador',
+          message: 'No se encontro usuario con este identificador'
+        })
+      }
+      try{
       return response.status(200).send({
         type: 'Success!!',
         title: 'Mostrar usuario y dispositivo',
@@ -95,7 +102,8 @@ export default class UsersController {
         return response.status(404).send({
           type: 'Error',
           title: 'Error al obtener usuario por identificador',
-          message: 'No se encontro usuario con este identificador'
+          message: 'No se encontro usuario con este identificador',
+          error:error
         })
       }
     }
@@ -783,7 +791,7 @@ public async update({ auth, request, response }: HttpContextContract) {
       const password = request.input('password');
 
       // Verificar las credenciales del usuario
-      const user = await User.query().where('email', email).preload('dispositivo',(habitUser) => {
+      const user = await User.query().where('email', email).preload('configurations').preload('dispositivo',(habitUser) => {
         habitUser.preload('sensores')
       }).first();
 
