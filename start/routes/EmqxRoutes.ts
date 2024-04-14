@@ -12,4 +12,5 @@ Route.group(() => {
     Route.post('/obtener-temperatura','EmqxController.obtenerTemperatura')
     Route.post('/obtener-peso','EmqxController.obtenerPeso')
     Route.post('/meta-pasos','EmqxController.metaPasos')
+    Route.post('/meta-distancia','EmqxController.metaDistancia')
 }).prefix('/api/emqx').middleware('auth:api')
