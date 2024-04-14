@@ -10,7 +10,7 @@ import Dispositivo from './Dispositivo';
  * @swagger
  * components:
  *  schemas:
- *    User:
+ *    Users:
  *      type: object
  *      properties:
  *        id:
@@ -18,18 +18,22 @@ import Dispositivo from './Dispositivo';
  *          example: 10
  *        name:
  *          type: string
- *          example:  Arthur
+ *          example:  Naruto
  *        lastname:
  *          type: string
- *          example:  Morgan
+ *          example:  Uzumaki
  *        email:
  *          type: string
- *          example:  hola@example.com
+ *          example: bolillo@gmail.com
+ *        password:
+ *          type: string
+ *          example: passwd1234
  *      required:
  *        - id
  *        - name
  *        - lastname
  *        - email
+ *        - password
  */
 export default class User extends BaseModel {
   public static table='users'
@@ -56,10 +60,10 @@ export default class User extends BaseModel {
   public password: string;
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime;
+  public created_at: DateTime;
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime;
+  public updated_at: DateTime;
 
   @hasMany(() => Dispositivo,{
     localKey: 'id',  

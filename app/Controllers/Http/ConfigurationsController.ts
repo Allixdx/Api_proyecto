@@ -1,63 +1,62 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
-import { schema } from '@ioc:Adonis/Core/Validator'
+import {  schema } from '@ioc:Adonis/Core/Validator'
 import Configuration from 'App/Models/Configuration'
 
 
 export default class ConfigurationsController {
-  public async index({ }: HttpContextContract) {
+  public async index({ response }: HttpContextContract) {
     /**
-* @swagger
-* /api/configurations:
-*   get:
-*     description: Lista de todas las configuraciones de los habitos en el sistema
-*     tags:
-*       - Configurations
-*     security:
-*       - bearerAuth: []
-*     produces:
-*       - application/json
-*     responses:
-*       200:
-*         description: La busqueda fue exitosa
-*         content:
-*           application/json:
-*             schema:
-*               type: object
-*               properties:
-*                 type:
-*                   type: string
-*                   descripcion: tipo de respuesta
-*                 title:
-*                   type: string
-*                   descripcion: titulo de la respuesta
-*                 message:
-*                   type: string
-*                   descripcion: mensaje de la respuesta
-*                 data: 
-*                   type: object
-*                   descripcion: Datos de la respuesta
-*       500:
-*         description: Hubo un fallo en el servidor durante la solicitud 
-*         content:
-*           application/json:
-*             schema:
-*               type: object
-*               properties:
-*                 type:
-*                   type: string
-*                   descripcion: tipo de error
-*                 title:
-*                   type: string
-*                   descripcion: titulo del error
-*                 message:
-*                   type: string
-*                   descripcion: mensaje del error
-*                 errors: 
-*                   type: object
-*                   descripcion: Datos del error 
-* 
-*/
-
+    * @swagger
+    * /api/configurations:
+    *   get:
+    *     description: Lista de todas las configuraciones de los habitos en el sistema
+    *     tags:
+    *       - Configurations
+    *     security:
+    *       - bearerAuth: []
+    *     produces:
+    *       - application/json
+    *     responses:
+    *       200:
+    *         description: La busqueda fue exitosa
+    *         content:
+    *           application/json:
+    *             schema:
+    *               type: object
+    *               properties:
+    *                 type:
+    *                   type: string
+    *                   descripcion: tipo de respuesta
+    *                 title:
+    *                   type: string
+    *                   descripcion: titulo de la respuesta
+    *                 message:
+    *                   type: string
+    *                   descripcion: mensaje de la respuesta
+    *                 data: 
+    *                   type: object
+    *                   descripcion: Datos de la respuesta
+    *       500:
+    *         description: Hubo un fallo en el servidor durante la solicitud 
+    *         content:
+    *           application/json:
+    *             schema:
+    *               type: object
+    *               properties:
+    *                 type:
+    *                   type: string
+    *                   descripcion: tipo de error
+    *                 title:
+    *                   type: string
+    *                   descripcion: titulo del error
+    *                 message:
+    *                   type: string
+    *                   descripcion: mensaje del error
+    *                 errors: 
+    *                   type: object
+    *                   descripcion: Datos del error 
+    * 
+    */
 
     const configuration = await Configuration.query()
       .preload('habit_user', (habitUser) => {
@@ -65,12 +64,12 @@ export default class ConfigurationsController {
       })
 
 
-    return {
+    return response.status(200).send({
       "type": "Exitoso",
       "title": "Recursos encontrados",
       "message": "La lista de recursos de configuraciones ha sido encontrada con exito",
       "data": configuration,
-    }
+    })
   }
 
   public async store({ request, response }: HttpContextContract) {
@@ -585,6 +584,4 @@ export default class ConfigurationsController {
     }
 
   }
-
-  // endopoint de pasos y distancias para que al cumplirse la meta de distancia o pasos recorridos se active el buzzer en la app //
 }

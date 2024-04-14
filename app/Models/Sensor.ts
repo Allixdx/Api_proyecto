@@ -15,15 +15,18 @@ import Dispositivo from './Dispositivo'
  *        sensor_type_id:
  *          type: integer
  *          example:  10
- *        activo:
+ *        dispositivo_id:
  *          type: integer
  *          example:  1
- *        value:
+ *        activo:
  *          type: integer
- *          example:  666
+ *          example:  1 
+ *        value: 
+ *          type: 
  *      required:
  *        - id
  *        - sensor_type_id
+ *        - dispositivo_id
  *        - activo
  *        - value
  */

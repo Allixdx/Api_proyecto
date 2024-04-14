@@ -1097,5 +1097,13 @@ export default class EmqxController {
     }
   }
 
+  public async metaPasos({}:HttpContextContract){
+
+  }
+
+  public async metaDistancia({}:HttpContextContract){
+    
+  }
+
 }    
 

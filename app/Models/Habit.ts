@@ -12,9 +12,6 @@ import Configuration from './Configuration'
  *        id:
  *          type: integer
  *          example: 10
- *        user_id:
- *          type: integer
- *          example:  10
  *        name:
  *          type: string
  *          example:  Arthur Morgan
@@ -23,7 +20,6 @@ import Configuration from './Configuration'
  *          example:  Descripcion
  *      required:
  *        - id
- *        - user_id
  *        - name
  *        - description
  */
@@ -32,7 +28,6 @@ export default class Habit extends BaseModel {
   public id: number
 
   public static table = "habitos"
-
 
   @column()
   public name: String 

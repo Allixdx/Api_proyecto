@@ -3,7 +3,27 @@ import { BaseModel, BelongsTo, HasMany, belongsTo, column, hasMany } from '@ioc:
 import Habit from './Habit'
 import User from './User'
 import Configuration from './Configuration'
-
+/**
+ * @swagger
+ * components:
+ *  schemas:
+ *    HabitUser:
+ *      type: object
+ *      properties:
+ *        id:
+ *          type: integer
+ *          example: 10
+ *        user_id:
+ *          type: integer
+ *          example:  10
+ *        habito_id:
+ *          type: number
+ *          example: 3
+ *      required:
+ *        - id
+ *        - user_id
+ *        - habito_id
+ */
 export default class HabitUser extends BaseModel {
   @column({ isPrimary: true })
   public id: number
