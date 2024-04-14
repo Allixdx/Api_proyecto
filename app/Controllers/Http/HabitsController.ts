@@ -91,9 +91,6 @@ public async index({response}: HttpContextContract) {
    *               description: 
    *                 type: string
    *                 description: Descripción del hábito
-   *               user_id:
-   *                 type: number
-   *                 description: Id de usuario
    *     responses:
    *       201:
    *         description: La creación del recurso fue exitosa
@@ -146,6 +143,12 @@ public async index({response}: HttpContextContract) {
    */
   public async store({request, response}: HttpContextContract) {
     try {
+
+      // const {name, descripcion, user_id} = request.body()
+      // const newHabit = new Habit()
+      // newHabit.name = name
+      // newHabit.description = descripcion
+
       const validatedData = await request.validate({
         schema: schema.create({
           name: schema.string(),

@@ -12,45 +12,45 @@ import HabitUser from './HabitUser'
  *        id:
  *          type: integer
  *          example: 10
- *        habit_id:
+ *        user_id:
  *          type: integer
  *          example:  10
- *        name:
- *          type: string
- *          example:  Arthur Morgan
  *        data:
  *          type: string
- *          example:  Datos
+ *          example:  43
+ *        tipo_configuracion_id:
+ *          type: integer
+ *          example: 1
  *      required:
  *        - id
- *        - habit_od
- *        - name
+ *        - user_id
  *        - data
+ *        - tipo_configuracion_id
  */
 export default class Configuration extends BaseModel {
-  @column({ isPrimary: true })
-  public id: number
-
   public static table = "configuracion_habito"
 
+  @column({ isPrimary: true })
+  public id: number
+  
   @column()
-  public habit_user_id: number 
+  public user_id: number 
 
   @column()
-  public name: String 
+  public data: string
 
   @column()
-  public data: String
+  public tipo_configuracion_id: number
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  public updated_at: DateTime
 
   @belongsTo(() => HabitUser, {
     localKey: 'id',  
-    foreignKey: 'habit_user_id',
+    foreignKey: 'user_id',
   })
   public habit_user: BelongsTo<typeof HabitUser>
 }

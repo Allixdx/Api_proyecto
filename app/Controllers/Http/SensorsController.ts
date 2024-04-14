@@ -87,8 +87,9 @@ export default class SensorsController {
     await newSensor.save()
 
     return response.status(200).send({
-      title:'Success',
-      message:'Created new sensor',
+      type: 'Success!!',
+      title:'Sensor obtenido',
+      message:'Sensor creado con exito',
       data: newSensor
     })
   }
@@ -134,15 +135,17 @@ export default class SensorsController {
       await updateSensor.save()
   
       return response.status(200).send({
-        title:'Success!!',
-        message:'Sensor disable',
+        type: 'Exito!!',
+        title: 'Sensor desactivado',
+        message:'Sensor desactivado exitosamente',
         data:updateSensor
       })  
     } catch (error) {
       if(error.code === 'E_ROW_NOT_FOUND'){
         return response.status(200).send({
-          title:'ERROR',
-          message:'Sensor no found :C'
+          type: 'Error',
+          title: 'Error al obtener sensor',
+          message:'Sensor no encontrado'
         })
       }
     }
@@ -186,11 +189,18 @@ export default class SensorsController {
     try {
       const delSensor = await Sensor.findOrFail(params.id)
       await delSensor.delete()
+      return response.status(204).send({
+        type: 'Exitoso!!',
+        title: 'Sensor eliminado',
+        message: 'Sensor eliminado exitosamente',
+        data: delSensor
+      })
     } catch (error) {
       if(error.code === 'E_ROW_NOT_FOUND'){
         return response.status(200).send({
-          title:'ERROR',
-          message:'Sensor no found for delete D:'
+          type: 'Error',
+          title:'Error al eliminar sensor',
+          message:'Se produjo un error al eliminar sensor D:'
         })
       }
     }

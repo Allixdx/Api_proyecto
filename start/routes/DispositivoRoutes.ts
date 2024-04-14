@@ -7,7 +7,7 @@ Route.group(()=> {
   Route.post('/', 'DispositivosController.store');
   Route.get('/:id', 'DispositivosController.show');
   Route.delete('/:id', 'DispositivosController.destroy');
-  Route.post('/creardispositivo','DispositivosController.creardispositivo');
+  Route.post('/crear-dispositivo','DispositivosController.creardispositivo');
 
 }).prefix('/api/dispositivos').middleware('auth:api')
 

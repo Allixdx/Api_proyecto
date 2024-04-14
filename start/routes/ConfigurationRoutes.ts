@@ -6,5 +6,8 @@ Route.group(()=>{
     Route.get('/:id','ConfigurationsController.show')
     Route.put('/:id','ConfigurationsController.update')
     Route.delete('/:id','ConfigurationsController.destroy')
-    Route.get('/userConf/:id','ConfigurationsController.userConfiguration')
+    Route.get('/user-conf/:id','ConfigurationsController.userConfiguration')
+    Route.post('/meta-distancia','ConfigurationsController.metaDistancia')
+    Route.post('/meta-pasos','ConfigurationsController.metaPasos')
 }).prefix('/api/configurations').middleware('auth:api')
+//

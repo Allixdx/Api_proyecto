@@ -2,13 +2,13 @@ import Route from '@ioc:Adonis/Core/Route'
 
 Route.group(() => {
     
-    Route.post('/publishEMQXTopic','EmqxController.publishEMQXTopic')
+    Route.post('/publish-emqx-topic','EmqxController.publishEMQXTopic')
     Route.post('/topic-retained','EmqxController.getEMQXTopic')
-    Route.post('/obtenerDistancia','EmqxController.obtenerDistancia')
-    Route.post('/obtenerPasos','EmqxController.obtenerPasos')
-    Route.post('/obtenerRitmo','EmqxController.obtenerRitmo')
-    Route.post('/obtenerAlcohol','EmqxController.obtenerAlcohol')
-    Route.post('/MandarAPantalla','EmqxController.MandarAPantalla')
-    Route.post('/obtenerTemperatura','EmqxController.obtenerTemperatura')
-    Route.post('/obtenerPeso','EmqxController.obtenerPeso')
+    Route.post('/obtener-distancia','EmqxController.obtenerDistancia')
+    Route.post('/obtene-pasos','EmqxController.obtenerPasos')
+    Route.post('/obtener-ritmo','EmqxController.obtenerRitmo')
+    Route.post('/obtener-alcohol','EmqxController.obtenerAlcohol')
+    Route.post('/mandar-a-pantalla','EmqxController.MandarAPantalla')
+    Route.post('/obtener-temperatura','EmqxController.obtenerTemperatura')
+    Route.post('/obtener-peso','EmqxController.obtenerPeso')
 }).prefix('/api/emqx').middleware('auth:api')

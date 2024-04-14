@@ -5,4 +5,4 @@ Route.group(()=>{
     Route.post('/','SensorTypesController.store')
     Route.put('/:id','SensorTypesController.update')
     Route.delete('/:id','SensorTypesController.destroy')
-}).prefix('/api/sensorType').middleware('auth:api')
+}).prefix('/api/sensor-type').middleware('auth:api')

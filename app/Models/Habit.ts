@@ -12,9 +12,6 @@ import Configuration from './Configuration'
  *        id:
  *          type: integer
  *          example: 10
- *        user_id:
- *          type: integer
- *          example:  10
  *        name:
  *          type: string
  *          example:  Arthur Morgan
@@ -23,7 +20,6 @@ import Configuration from './Configuration'
  *          example:  Descripcion
  *      required:
  *        - id
- *        - user_id
  *        - name
  *        - description
  */
@@ -33,7 +29,6 @@ export default class Habit extends BaseModel {
 
   public static table = "habitos"
 
-
   @column()
   public name: String 
 
@@ -41,10 +36,10 @@ export default class Habit extends BaseModel {
   public description: String 
 
   @column.dateTime({ autoCreate: true })
-  public createdAt: DateTime
+  public created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  public updatedAt: DateTime
+  public updated_at: DateTime
 
 
   @hasMany(() => Configuration, {

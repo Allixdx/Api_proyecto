@@ -5,7 +5,7 @@ import Route from '@ioc:Adonis/Core/Route'
 Route.group(() => {
   Route.get('/','UsersController.index')
 
-  Route.post('/codeVerify/:id','UsersController.SendCodigo')
+  Route.post('/code-verify/:id','UsersController.SendCodigo')
   
   Route.post('/logout', 'UsersController.logout').middleware('auth:api')
 
@@ -17,7 +17,7 @@ Route.group(() => {
 
   Route.delete('/:id', 'UsersController.destroy').middleware('auth:api')
 
-  Route.post('/authlogin', 'UsersController.authLogin')
+  Route.post('/auth-login', 'UsersController.authLogin')
 
   Route.get('/foods','EdamamsController.obtenerAlimentos')
 

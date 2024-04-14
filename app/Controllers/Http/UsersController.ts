@@ -32,11 +32,13 @@ export default class UsersController {
    *                  description: jajajaj
    */
   public async index({ response }: HttpContextContract) {
+  
     const users = await User.query().preload('dispositivo',(habitUser) => {
       habitUser.preload('sensores')
     })
     return response.status(200).send({
-      title: 'Success!!',
+      type: 'Success!!',
+      title: 'Acceso a lista de usuarios',
       message: 'Lista de usuarios',
       data: users
     })
@@ -81,16 +83,28 @@ export default class UsersController {
           sensor.preload('sensorType')
         }).preload('tipoDispositivo')
       }).first()
+      try{
       return response.status(200).send({
-        title: 'Success!!',
+        type: 'Success!!',
+        title: 'Mostrar usuario y dispositivo',
         message: 'Usuario',
         data: users
       })
+    } catch (error) {
+      if (error.code === 'E_ROW_NOT_FOUND') {
+        return response.status(404).send({
+          type: 'Error',
+          title: 'Error al obtener usuario por identificador',
+          message: 'No se encontro usuario con este identificador'
+        })
+      }
     }
+
+  }
 
   /**
    * @swagger
-   * /api/users/codeVerify/{id}:
+   * /api/users/code-verify/{id}:
    *  post:
    *    security:
    *      - bearerAuth: []
@@ -142,6 +156,7 @@ export default class UsersController {
     user.verificationCode = codigo
     await user.save()
     return response.status(200).send({
+      type: 'Success!!',
       title:'Codigo de verificacion enviado a tu correo electronico',
     })
   }
@@ -237,13 +252,14 @@ export default class UsersController {
     try {
       const name = request.input('name');
       const lastname = request.input('lastname');
-      const email = request.input('email');
+      const email = request.input('email')
       const password = request.input('password');
 
       // Verificar si el correo electrónico ya existe
       const existingUser = await User.findBy('email', email);
       if (existingUser) {
         return response.status(400).json({
+          type: 'Error',
           message: 'Error al crear usuario',
           error: 'Correo electrónico ya registrado',
         });
@@ -251,6 +267,7 @@ export default class UsersController {
 
       if (password.length < 8) {
         return response.status(400).json({
+          type: 'Error',
           message: 'Error al crear usuario',
           error: 'La contraseña debe tener al menos 8 caracteres',
         });
@@ -290,7 +307,8 @@ export default class UsersController {
       })
 
       return response.status(201).json({
-        title: 'Success!!',
+        type: 'Success!!',
+        title: 'Registro correctamente',
         message:'Usuario registrado correctamente',
         data: {
           user_id: newUser.id,
@@ -302,6 +320,8 @@ export default class UsersController {
       });
     } catch (error) {
       return response.status(400).json({
+        type: 'Error',
+        title: 'Error registrar usuario',
         message: 'Error al crear usuario',
         error: error.message,
       });
@@ -402,9 +422,19 @@ public async update({ auth, request, response }: HttpContextContract) {
         .htmlView('emails/actualizarUser', { name: updates.name || user.name, lastname: updates.lastname || user.lastname, email: updates.email || user.email });
     });
 
-    return response.status(200).json({ message: 'Datos de usuario actualizados', data: updatedUser });
+    return response.status(200).json({
+      type: 'Success!!',
+      title: 'Datos actualizados',
+      message: 'Datos de usuario actualizados', 
+      data: updatedUser 
+    });
   } catch (error) {
-    return response.status(500).json({ message: 'Error interno del servidor al actualizar los datos del usuario', error: error.message });
+    return response.status(500).json({ 
+      type: 'Error',
+      title: 'Error de servidor',
+      message: 'Error interno del servidor al actualizar los datos del usuario', 
+      error: error.message 
+    });
   }
 }
  /**
@@ -504,9 +534,17 @@ public async update({ auth, request, response }: HttpContextContract) {
         .htmlView('emails/nuevaContrasena', { email: user.email });
     });
 
-    return response.status(200).json({ message: 'Contraseña de usuario actualizada' });
+    return response.status(200).json({ 
+      type: 'Exitoso!!',
+      title: 'Contraseña actualizada',
+      message: 'Contraseña de usuario actualizada' 
+    });
   } catch (error) {
-    return response.status(500).json({ message: 'Error interno del servidor al actualizar la contraseña del usuario', error: error.message});
+    return response.status(500).json({ 
+      type: 'Error',
+      title: 'Error al actualizar contraseña',
+      message: 'Error interno del servidor al actualizar la contraseña del usuario', 
+      error: error.message});
   }
 }
   /**
@@ -532,14 +570,27 @@ public async update({ auth, request, response }: HttpContextContract) {
    *                  description: Mensaje indicando el éxito de la eliminación.
    */
   public async destroy({ response, auth }: HttpContextContract) {
-    const usuario = auth.user!
-    await usuario.delete()
-
-    return response.json({ message: 'Cuenta de usuario eliminada' })
+    try {
+      const usuario = auth.user!
+      await usuario.delete()
+      return response.status(204).send({
+        type: 'Exitoso!!',
+        title: 'Exito al eliminar usuario',
+        message: 'Usuario eliminado exitosamente',
+        data: usuario
+      })
+      
+    } catch (error) {
+      return response.status(400).send({
+        type: 'Error',
+        title: 'Error al aliminar usuario',
+        message: 'Se produjo un error al eliminar usuario'
+      })
+    }
   }
   /**
    * @swagger
-   * /api/users/authlogin:
+   * /api/users/auth-login:
    *  post:
    *    tags:
    *      - users
@@ -601,26 +652,32 @@ public async update({ auth, request, response }: HttpContextContract) {
       if (!user || user.verificationCode !== verificationCode) {
         // Devolver error de datos inválidos
         return response.status(401).send({
+          type: 'warning',
           title: 'Datos inválidos',
           message: 'Usuario no verificado o datos incorrectos',
-          type: 'warning',
         });
       }
 
       if (!(await Hash.verify(user.password, password))) {
         return response.status(401).send({
+          type: 'warning',
           title: 'Datos inválidos',
           message: 'Contraseña incorrecta',
-          type: 'warning',
         });
       }
 
       user.verificationCode = null;
       await user.save();
 
-      return response.status(200).json({ message: 'Cuenta Verificada Correctamente' });
+      return response.status(200).json({ 
+        type: 'Exitoso!!',
+        title: 'Verificado',
+        message: 'Cuenta Verificada Correctamente'
+       });
     } catch (error) {
       return response.status(400).json({
+        type: 'Error',
+        title: 'Error de inicio',
         message: 'Error al iniciar sesión',
         error: error.message,
       });
@@ -649,8 +706,22 @@ public async update({ auth, request, response }: HttpContextContract) {
    *                  description: Mensaje indicando el éxito del cierre de sesión.
    */
   public async logout({ auth, response }: HttpContextContract) {
-    await auth.logout()
-    return response.json({ message: 'Cierre de sesión exitoso' })
+    try {
+      await auth.logout()
+      return response.status(200).send({
+        type: 'Exitoso!!',
+        title: 'Logout exitoso',
+        message: 'Logout exitosamente '
+      })
+      
+    } catch (error) {
+      return response.status(200).send({
+        type: 'Error',
+        title: 'Error al cerrar sesion',
+        message: 'Se produjo un error al cerrar sesion'
+      })
+      
+    }
   }
   /**
    * @swagger
@@ -733,13 +804,19 @@ public async update({ auth, request, response }: HttpContextContract) {
       const token = await auth.use('api').generate(user, { expiresIn: '3 days' });
 
       return response.status(200).json({
+        type: 'Exitoso!!',
+        title: 'Login exitoso',
+        message: 'Login exitosamente',
         data: {
           token,
           user,
         },
       });
     } catch (error) {
-      return response.status(500).json({ message: 'Error al iniciar sesión', error: error.message });
+      return response.status(500).json({
+        type: 'Error',
+        title: 'Error al iniciar sesion',
+        message: 'Error al iniciar sesión', error: error.message });
     }
   }
   /**
