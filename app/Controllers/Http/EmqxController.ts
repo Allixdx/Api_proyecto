@@ -2,6 +2,7 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import axios from 'axios';
 import Env from '@ioc:Adonis/Core/Env'
 import SensorType from 'App/Models/SensorType';
+import Configuration from 'App/Models/Configuration';
 
 export default class EmqxController {
   /**
@@ -1097,13 +1098,155 @@ export default class EmqxController {
     }
   }
 
-  public async metaPasos({}:HttpContextContract){
-
-  }
-
   public async metaDistancia({}:HttpContextContract){
-    
+
   }
+
+  /**
+   * @swagger
+   * /api/emqx/meta-pasos:
+   *   post:
+   *     security:
+   *      - bearerAuth: []
+   *     tags:
+   *       - EMQX
+   *     summary: Obtener el último mensaje retenido de pasos.
+   *     description: |
+   *       Esta ruta permite obtener el último mensaje retenido de pasos desde el servidor EMQX.
+   *     responses:
+   *       200:
+   *         description: Último mensaje retenido de pasos obtenido correctamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                   description: Título de la respuesta.
+   *                 message:
+   *                   type: string
+   *                   description: Mensaje de éxito.
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de respuesta.
+   *                 data:
+   *                   type: object
+   *                   description: Datos de respuesta.
+   *                   properties:
+   *                     retained_message:
+   *                       type: object
+   *                       description: Último mensaje retenido del ritmo cardíaco.
+   *       500:
+   *         description: Error interno al procesar la solicitud.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 title:
+   *                   type: string
+   *                 message:
+   *                   type: string
+   *                   description: Descripción del error.
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de error.
+   *                 data:
+   *                   type: object
+   *                   description: Datos adicionales relacionados con el error.
+   *                   properties:
+   *                     error:
+   *                       type: string
+   *                       description: Mensaje de error detallado.
+   */
+  public async metaPasos({ response }: HttpContextContract) {
+    try {
+      const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePasos';
+      const sensorType = await SensorType.findBy('name', 'Pasos');
+  
+      if (!sensorType) {
+        return response.status(404).send({
+          title: 'Error',
+          message: 'No se encontró el tipo de sensor especificado.',
+          type: 'error',
+        });
+      }
+  
+      const unit = sensorType.unit;
+  
+      const axiosResponse = await axios.get(url, {
+        auth: {
+          username: Env.get('MQTT_API_KEY'),
+          password: Env.get('MQTT_SECRET_KEY')
+        }
+      });
+  
+      if (axiosResponse.status !== 200) {
+        return response.status(axiosResponse.status).send({
+          title: 'Error',
+          message: 'Ocurrió un error al obtener los pasos más reciente.',
+          type: 'error',
+          data: {
+            error: axiosResponse.statusText
+          },
+        });
+      }
+  
+      const retainedMessage = axiosResponse.data;
+      const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
+      let parsedPayload;
+
+      const tablaConfig = await Configuration.query().firstOrFail()
+      const metaPasos = tablaConfig.data
+
+      try {
+        parsedPayload = JSON.parse(decodedPayload);
+      } catch (error) {
+        parsedPayload = decodedPayload.toString;
+      }
+      
+      // aca se hace la comparacion de los ultimos datos del sensor con los que el usuario puso como meta de pasos //
+      if (parsedPayload == metaPasos) {
+        return response.status(200).send({
+          title: 'Datos coinciden',
+          message: 'Los datos obtenidos coinciden con lo registrado.',
+          type: 'success',
+          data: {
+            retained_message: parsedPayload,
+            unit: unit,
+            meta: metaPasos
+          },
+        });
+      } else {
+        return response.status(400).send({
+          title: 'Error',
+          message: 'Los datos obtenidos no coinciden con lo registrado.',
+          type: 'error',
+          data: metaPasos,
+        });
+      }
+  
+    } catch (error) {
+      let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
+      if (error.response) {
+        errorMessage = `Se recibió una respuesta con el estado ${error.response.status}: ${error.response.statusText}`;
+      } else if (error.request) {
+        errorMessage = 'No se recibió ninguna respuesta del servidor.';
+      } else {
+        errorMessage = `Error al realizar la solicitud: ${error.message}`;
+      }
+      return response.status(500).send({
+        title: 'Error',
+        message: errorMessage,
+        type: 'error',
+        data: {
+          error: error.message
+        },
+      });
+    }
+  }
+  
 
 }    
 

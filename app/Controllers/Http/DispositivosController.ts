@@ -4,6 +4,7 @@ import Sensor from 'App/Models/Sensor';
 import SensorType from 'App/Models/SensorType'; 
 import TipoDispositivo from 'App/Models/TipoDispositivo';
 
+
 export default class DispositivosController {
   /**
    * @swagger
@@ -211,6 +212,26 @@ export default class DispositivosController {
           message: 'Tipo de dispositivo inválido',
         });
       }
+      const dispositivoExistente = await Dispositivo.query()
+      .where('id_usuario', userId)
+      .whereHas('tipoDispositivo', (query) => {
+        query.where('name', tipoDispositivo);
+      })
+      .first();
+      
+      if (dispositivoExistente) {
+        return response.status(400).json({
+          message: 'Ya tienes 2 dispositivos registrados, no puedes agregar más',
+        });
+      }
+
+      // if(dispositivoExist){
+      //   return response.status(400).send({
+      //     type: 'Error',
+      //     title: 'Maximo de dispositivos',
+      //     message: 'Has excedido el limite de dispositivos posibles por usuario'
+      //   })
+      // }
 
       let tipoDispositivoExistente = await TipoDispositivo.query()
         .where('name', tipoDispositivo === 'pesa' ? 'pesa' : 'brazalete')
@@ -229,10 +250,6 @@ export default class DispositivosController {
       });
 
       const ultimoDispositivo = await Dispositivo.query().orderBy('id', 'desc').firstOrFail();
-
-      // const tipoDeSensor = await SensorType.query()
-      //   .where('name', tipoDispositivo === 'pesa' ? 'Peso' : 'Distancia')
-      //   .firstOrFail();
 
       let valorSensor = tipoDispositivo === 'pesa' ? 1 : 5;
 
@@ -258,15 +275,6 @@ export default class DispositivosController {
         });
         await Sensor.create(sensor)
       }
-
-      // tuve que quitar este para poder hacer el ciclo e insertar los sensores dependiendo del tipo de dispositivo
-      
-      // const sensor = await Sensor.create({
-      //   sensor_type_id: tipoDeSensor.id,
-      //   dispositivo_id: ultimoDispositivo.id,
-      //   value: valorSensor,
-      //   activo: 1,
-      // });
 
       return response.status(201).json({
         type: 'Exitoso!!',
