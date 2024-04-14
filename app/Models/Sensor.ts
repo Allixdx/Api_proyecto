@@ -53,7 +53,10 @@ export default class Sensor extends BaseModel {
   public updated_at: DateTime
 
   // Relación con el modelo SensorType (pertenece a un tipo de sensor)
-  @belongsTo(() => SensorType)
+  @belongsTo(() => SensorType,{
+    localKey: 'sensor_type_id',  
+    foreignKey: 'id',
+  })
   public sensorType: BelongsTo<typeof SensorType>
 
   @belongsTo(() => Dispositivo, {
