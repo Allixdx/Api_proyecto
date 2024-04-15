@@ -12,13 +12,13 @@ export default class UsersController {
    * /api/users:
    *  get:
    *    tags:
-   *      - users
+   *      - Usuarios
    *    summary: Lista de usuarios
    *    produces:
    *      - application/json
    *    responses:
    *      200:
-   *        description: Success!!
+   *        description: La lista de usuarios fue obtenida correctamente
    *        content:
    *          application/json:
    *            schema:
@@ -26,14 +26,14 @@ export default class UsersController {
    *              properties:
    *                title:
    *                  type: string
-   *                  description: title 
+   *                  description: titulo de la respuesta
    *                data:
    *                  type: string 
-   *                  description: jajajaj
+   *                  description: datos de la respuesta
    */
   public async index({ response }: HttpContextContract) {
-  
-    const users = await User.query().preload('dispositivo',(habitUser) => {
+
+    const users = await User.query().preload('dispositivo', (habitUser) => {
       habitUser.preload('sensores')
     })
     return response.status(200).send({
@@ -43,54 +43,53 @@ export default class UsersController {
       data: users
     })
   }
-
-    /**
-   * @swagger
-   * /api/users/{id}:
-   *  get:
-   *    security:
-   *      - bearerAuth: []
-   *    tags:
-   *      - users
-   *    summary: Lista de usuarios
-   *    produces:
-   *      - application/json
-   *    parameters:
-   *      - name: id
-   *        in: path
-   *        required: true
-   *        description: ID del usuario a mostrar.
-   *        schema:
-   *          type: integer
-   *    responses:
-   *      200:
-   *        description: Success!!
-   *        content:
-   *          application/json:
-   *            schema:
-   *              type: object
-   *              properties:
-   *                title:
-   *                  type: string
-   *                  description: title 
-   *                data:
-   *                  type: string 
-   *                  description: jajajaj
-   */
-    public async show({ response,params }: HttpContextContract) {
-      const users = await User.query().where('id',params.id).preload('dispositivo',(dispositivo) => {
-        dispositivo.preload('sensores',(sensor)=>{
-          sensor.preload('sensorType')
-        }).preload('tipoDispositivo')
-      }).first()
-      if(!users){
-        return response.status(404).send({
-          type: 'Error',
-          title: 'Error al obtener usuario por identificador',
-          message: 'No se encontro usuario con este identificador'
-        })
-      }
-      try{
+  /**
+ * @swagger
+ * /api/users/{id}:
+ *  get:
+ *    security:
+ *      - bearerAuth: []
+ *    tags:
+ *      - Usuarios
+ *    summary: Mostrar usuario especifico por identificador
+ *    produces:
+ *      - application/json
+ *    parameters:
+ *      - name: id
+ *        in: path
+ *        required: true
+ *        description: ID del usuario a mostrar.
+ *        schema:
+ *          type: integer
+ *    responses:
+ *      200:
+ *        description: Usuario obetenido correctamente
+ *        content:
+ *          application/json:
+ *            schema:
+ *              type: object
+ *              properties:
+ *                title:
+ *                  type: string
+ *                  description: titulo de la respuesta
+ *                data:
+ *                  type: string 
+ *                  description: datos de la respuesta
+ */
+  public async show({ response, params }: HttpContextContract) {
+    const users = await User.query().where('id', params.id).preload('dispositivo', (dispositivo) => {
+      dispositivo.preload('sensores', (sensor) => {
+        sensor.preload('sensorType')
+      }).preload('tipoDispositivo')
+    }).first()
+    if (!users) {
+      return response.status(404).send({
+        type: 'Error',
+        title: 'Error al obtener usuario por identificador',
+        message: 'No se encontro usuario con este identificador'
+      })
+    }
+    try {
       return response.status(200).send({
         type: 'Success!!',
         title: 'Mostrar usuario y dispositivo',
@@ -103,13 +102,12 @@ export default class UsersController {
           type: 'Error',
           title: 'Error al obtener usuario por identificador',
           message: 'No se encontro usuario con este identificador',
-          error:error
+          error: error
         })
       }
     }
 
   }
-
   /**
    * @swagger
    * /api/users/code-verify/{id}:
@@ -117,8 +115,8 @@ export default class UsersController {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - users
-   *    summary: Codigo de verificacion
+   *      - Usuarios
+   *    summary: Reenviar codigo de verificacion
    *    description: Mandar codigo de verificacion 
    *    parameters:
    *      - name: id
@@ -138,7 +136,7 @@ export default class UsersController {
    *                type: string
    *    responses:
    *       200:
-   *        description: Datos de usuario actualizados exitosamente.
+   *        description: Codigo de verificacion enviado exitosamente
    *        content:
    *          application/json:
    *            schema:
@@ -148,7 +146,7 @@ export default class UsersController {
    *                  type: string
    *                  description: Mensaje indicando el éxito de la actualización.
    */
-  public async SendCodigo({response, params}:HttpContextContract){
+  public async SendCodigo({ response, params }: HttpContextContract) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     const user = await User.findOrFail(params.id);
     const codigo = this.generateVerificationCode()
@@ -159,13 +157,13 @@ export default class UsersController {
         .from(Env.get('SMTP_USERNAME'), 'Healthy App')
         .to(email)
         .subject('Healthy App - Codigo de verifiacion')
-        .htmlView('emails/VerificationCode',{codigo});
+        .htmlView('emails/VerificationCode', { codigo });
     });
     user.verificationCode = codigo
     await user.save()
     return response.status(200).send({
       type: 'Success!!',
-      title:'Codigo de verificacion enviado a tu correo electronico',
+      title: 'Codigo de verificacion enviado a tu correo electronico',
     })
   }
   /**
@@ -173,7 +171,7 @@ export default class UsersController {
    * /api/users:
    *  post:
    *      tags:
-   *        - users
+   *        - Usuarios
    *      summary: Crear un nuevo usuario
    *      description: Crea un nuevo usuario con los datos proporcionados y envía un correo electrónico de verificación.
    *      requestBody:
@@ -255,7 +253,7 @@ export default class UsersController {
    *          - email
    *          - password
    */
-  public async register({ request, response}: HttpContextContract) {
+  public async register({ request, response }: HttpContextContract) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     try {
       const name = request.input('name');
@@ -301,29 +299,29 @@ export default class UsersController {
           .subject('Healthy App - Verificación de cuenta')
           .htmlView('emails/welcome', emailData);
       });
-      
+
       const accountSid = Env.get('TWILIO_ACCOUNT_SID')
       const authToken = Env.get('TWILIO_AUTH_TOKEN')
       const client = require('twilio')(accountSid, authToken)
 
 
-   
+
       await client.messages.create({
         body: "Gracias por registrarte en HealthyApp :D",
         from: Env.get('TWILIO_FROM_NUMBER'),
-        to:`+528717957718`
+        to: `+528717957718`
       })
 
       return response.status(201).json({
         type: 'Success!!',
         title: 'Registro correctamente',
-        message:'Usuario registrado correctamente',
+        message: 'Usuario registrado correctamente',
         data: {
           user_id: newUser.id,
           name: newUser.name,
           lastname: newUser.lastname,
           email: newUser.email,
-        message: 'Se ha enviado un codigo de verificacion a tu correo electromico'
+          message: 'Se ha enviado un codigo de verificacion a tu correo electromico'
         },
       });
     } catch (error) {
@@ -339,222 +337,223 @@ export default class UsersController {
     const randomNumber = Math.floor(1000 + Math.random() * 9000);
     return randomNumber.toString();
   }
-/**
- * @swagger
- * /api/users/actualizar:
- *  put:
- *    security:
- *      - bearerAuth: []
- *    tags:
- *      - users
- *    summary: Actualización de datos de usuario
- *    description: Actualiza los datos de un usuario existente. Cada campo es opcional y se actualizará solo si está presente en la solicitud.
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              name:
- *                type: string
- *              lastname:
- *                type: string
- *              email:
- *                type: string
- *    responses:
- *       200:
- *        description: Datos de usuario actualizados exitosamente.
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  description: Mensaje indicando el éxito de la actualización.
- *       401:
- *        description: Usuario no autenticado.
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                error:
- *                  type: string
- *                  description: Mensaje indicando el error de autenticación.
- *       500:
- *        description: Error interno del servidor al actualizar los datos del usuario.
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                message:
- *                  type: string
- *                  description: Mensaje indicando el error interno del servidor.
- */
-public async update({ auth, request, response }: HttpContextContract) {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-  try {
-    const user = auth.user!;
-    
-    const { name, lastname, email } = request.only(['name', 'lastname', 'email']);
+  /**
+   * @swagger
+   * /api/users/actualizar:
+   *  put:
+   *    security:
+   *      - bearerAuth: []
+   *    tags:
+   *      - Usuarios
+   *    summary: Actualización de datos de usuario
+   *    description: Actualiza los datos de un usuario existente. Cada campo es opcional y se actualizará solo si está presente en la solicitud.
+   *    requestBody:
+   *      required: true
+   *      content:
+   *        application/json:
+   *          schema:
+   *            type: object
+   *            properties:
+   *              name:
+   *                type: string
+   *              lastname:
+   *                type: string
+   *              email:
+   *                type: string
+   *    responses:
+   *       200:
+   *        description: Datos de usuario actualizados exitosamente.
+   *        content:
+   *          application/json:
+   *            schema:
+   *              type: object
+   *              properties:
+   *                message:
+   *                  type: string
+   *                  description: Mensaje indicando el éxito de la actualización.
+   *       401:
+   *        description: Usuario no autenticado.
+   *        content:
+   *          application/json:
+   *            schema:
+   *              type: object
+   *              properties:
+   *                error:
+   *                  type: string
+   *                  description: Mensaje indicando el error de autenticación.
+   *       500:
+   *        description: Error interno del servidor al actualizar los datos del usuario.
+   *        content:
+   *          application/json:
+   *            schema:
+   *              type: object
+   *              properties:
+   *                message:
+   *                  type: string
+   *                  description: Mensaje indicando el error interno del servidor.
+   */
+  public async update({ auth, request, response }: HttpContextContract) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    try {
+      const user = auth.user!;
 
-    // Construye un objeto con los campos que se van a actualizar
-    const updates: { [key: string]: any } = {};
-    if (name !== undefined) {
-      updates.name = name;
+      const { name, lastname, email } = request.only(['name', 'lastname', 'email']);
+
+      // Construye un objeto con los campos que se van a actualizar
+      const updates: { [key: string]: any } = {};
+      if (name !== undefined) {
+        updates.name = name;
+      }
+
+      if (lastname !== undefined) {
+        updates.lastname = lastname;
+      }
+
+      if (email !== undefined) {
+        updates.email = email;
+      }
+
+      // Actualiza los datos del usuario en la base de datos directamente
+      await Database.from('users').where('id', user.id).update(updates);
+
+      // Obtiene los datos actualizados del usuario
+      const updatedUser = await Database.from('users').where('id', user.id).first();
+
+      // Envía el correo electrónico
+      await Mail.send((message) => {
+        message
+          .from(Env.get('SMTP_USERNAME'), 'Healthy App')
+          .to(user.email)
+          .subject('Healthy App - Personalizacion de cuenta')
+          .htmlView('emails/actualizarUser', { name: updates.name || user.name, lastname: updates.lastname || user.lastname, email: updates.email || user.email });
+      });
+
+      return response.status(200).json({
+        type: 'Success!!',
+        title: 'Datos actualizados',
+        message: 'Datos de usuario actualizados',
+        data: updatedUser
+      });
+    } catch (error) {
+      return response.status(500).json({
+        type: 'Error',
+        title: 'Error de servidor',
+        message: 'Error interno del servidor al actualizar los datos del usuario',
+        error: error.message
+      });
     }
-
-    if (lastname !== undefined) {
-      updates.lastname = lastname;
-    }
-
-    if (email !== undefined) {
-      updates.email = email;
-    }
-
-    // Actualiza los datos del usuario en la base de datos directamente
-    await Database.from('users').where('id', user.id).update(updates);
-
-    // Obtiene los datos actualizados del usuario
-    const updatedUser = await Database.from('users').where('id', user.id).first();
-
-    // Envía el correo electrónico
-    await Mail.send((message) => {
-      message
-        .from(Env.get('SMTP_USERNAME'), 'Healthy App')
-        .to(user.email)
-        .subject('Healthy App - Personalizacion de cuenta')
-        .htmlView('emails/actualizarUser', { name: updates.name || user.name, lastname: updates.lastname || user.lastname, email: updates.email || user.email });
-    });
-
-    return response.status(200).json({
-      type: 'Success!!',
-      title: 'Datos actualizados',
-      message: 'Datos de usuario actualizados', 
-      data: updatedUser 
-    });
-  } catch (error) {
-    return response.status(500).json({ 
-      type: 'Error',
-      title: 'Error de servidor',
-      message: 'Error interno del servidor al actualizar los datos del usuario', 
-      error: error.message 
-    });
   }
-}
- /**
- * @swagger
- * /api/users/update-password:
- *   put:
- *     security:
- *       - bearerAuth: []
- *     tags:
- *       - users
- *     summary: Actualización de contraseña de usuario
- *     description: Actualiza la contraseña de un usuario autenticado.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               oldPassword:
- *                 type: string
- *               newPassword:
- *                 type: string
- *     responses:
- *       200:
- *         description: Contraseña de usuario actualizada exitosamente.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Mensaje indicando el éxito de la actualización de contraseña.
- *       400:
- *         description: Error de solicitud debido a datos faltantes o inválidos.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Mensaje de error indicando el problema con la solicitud.
- *       401:
- *         description: No autorizado, token de acceso inválido o no proporcionado.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Mensaje de error indicando la falta de autorización.
- *       500:
- *         description: Error interno del servidor al actualizar la contraseña del usuario.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 error:
- *                   type: string
- *                   description: Mensaje de error indicando el problema interno del servidor.
- */
- public async updatePassword({ auth, request, response }: HttpContextContract) {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-  try {
-    const userId = auth.user?.id;
+  /**
+  * @swagger
+  * /api/users/update-password:
+  *   put:
+  *     security:
+  *       - bearerAuth: []
+  *     tags:
+  *       - Usuarios
+  *     summary: Actualización de contraseña de usuario
+  *     description: Actualiza la contraseña de un usuario autenticado.
+  *     requestBody:
+  *       required: true
+  *       content:
+  *         application/json:
+  *           schema:
+  *             type: object
+  *             properties:
+  *               oldPassword:
+  *                 type: string
+  *               newPassword:
+  *                 type: string
+  *     responses:
+  *       200:
+  *         description: Contraseña de usuario actualizada exitosamente.
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: object
+  *               properties:
+  *                 message:
+  *                   type: string
+  *                   description: Mensaje indicando el éxito de la actualización de contraseña.
+  *       400:
+  *         description: Error de solicitud debido a datos faltantes o inválidos.
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: object
+  *               properties:
+  *                 error:
+  *                   type: string
+  *                   description: Mensaje de error indicando el problema con la solicitud.
+  *       401:
+  *         description: No autorizado, token de acceso inválido o no proporcionado.
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: object
+  *               properties:
+  *                 error:
+  *                   type: string
+  *                   description: Mensaje de error indicando la falta de autorización.
+  *       500:
+  *         description: Error interno del servidor al actualizar la contraseña del usuario.
+  *         content:
+  *           application/json:
+  *             schema:
+  *               type: object
+  *               properties:
+  *                 error:
+  *                   type: string
+  *                   description: Mensaje de error indicando el problema interno del servidor.
+  */
+  public async updatePassword({ auth, request, response }: HttpContextContract) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    try {
+      const userId = auth.user?.id;
 
-    if (!userId) {
-      return response.status(401).json({ error: 'Usuario no autenticado' });
+      if (!userId) {
+        return response.status(401).json({ error: 'Usuario no autenticado' });
+      }
+
+      const user = await User.findOrFail(userId);
+
+      const oldPassword: string = request.input('oldPassword');
+      const newPassword: string = request.input('newPassword');
+
+      const isPasswordValid = await Hash.verify(user.password, oldPassword);
+      if (!isPasswordValid) {
+        return response.status(401).json({ error: 'La contraseña anterior es incorrecta' });
+      }
+
+      if (newPassword.length < 8) {
+        return response.status(400).json({ error: 'La nueva contraseña debe tener al menos 8 caracteres' });
+      }
+
+      user.password = await Hash.make(newPassword);
+      await user.save();
+
+      await Mail.send((message) => {
+        message
+          .from(Env.get('SMTP_USERNAME'), 'Healthy App')
+          .to(user.email)
+          .subject('Healthy App - Recuperacion de Contraseña')
+          .htmlView('emails/nuevaContrasena', { email: user.email });
+      });
+
+      return response.status(200).json({
+        type: 'Exitoso!!',
+        title: 'Contraseña actualizada',
+        message: 'Contraseña de usuario actualizada'
+      });
+    } catch (error) {
+      return response.status(500).json({
+        type: 'Error',
+        title: 'Error al actualizar contraseña',
+        message: 'Error interno del servidor al actualizar la contraseña del usuario',
+        error: error.message
+      });
     }
-
-    const user = await User.findOrFail(userId);
-
-    const oldPassword: string = request.input('oldPassword');
-    const newPassword: string = request.input('newPassword');
-
-    const isPasswordValid = await Hash.verify(user.password, oldPassword);
-    if (!isPasswordValid) {
-      return response.status(401).json({ error: 'La contraseña anterior es incorrecta' });
-    }
-
-    if (newPassword.length < 8) {
-      return response.status(400).json({ error: 'La nueva contraseña debe tener al menos 8 caracteres' });
-    }
-
-    user.password = await Hash.make(newPassword);
-    await user.save();
-
-    await Mail.send((message) => {
-      message
-        .from(Env.get('SMTP_USERNAME'), 'Healthy App')
-        .to(user.email)
-        .subject('Healthy App - Recuperacion de Contraseña')
-        .htmlView('emails/nuevaContrasena', { email: user.email });
-    });
-
-    return response.status(200).json({ 
-      type: 'Exitoso!!',
-      title: 'Contraseña actualizada',
-      message: 'Contraseña de usuario actualizada' 
-    });
-  } catch (error) {
-    return response.status(500).json({ 
-      type: 'Error',
-      title: 'Error al actualizar contraseña',
-      message: 'Error interno del servidor al actualizar la contraseña del usuario', 
-      error: error.message});
   }
-}
   /**
    * @swagger
    * /api/users/{id}:
@@ -562,7 +561,7 @@ public async update({ auth, request, response }: HttpContextContract) {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - users
+   *      - Usuarios
    *    summary: Eliminación de cuenta de usuario
    *    description: Elimina la cuenta de usuario actual.
    *    responses:
@@ -587,7 +586,7 @@ public async update({ auth, request, response }: HttpContextContract) {
         message: 'Usuario eliminado exitosamente',
         data: usuario
       })
-      
+
     } catch (error) {
       return response.status(400).send({
         type: 'Error',
@@ -601,7 +600,7 @@ public async update({ auth, request, response }: HttpContextContract) {
    * /api/users/auth-login:
    *  post:
    *    tags:
-   *      - users
+   *      - Usuarios
    *    summary: Verificar sesión de usuario.
    *    description: Inicia sesión de usuario verificando el correo electrónico y el código de verificación.
    *    requestBody:
@@ -677,11 +676,11 @@ public async update({ auth, request, response }: HttpContextContract) {
       user.verificationCode = null;
       await user.save();
 
-      return response.status(200).json({ 
+      return response.status(200).json({
         type: 'Exitoso!!',
         title: 'Verificado',
         message: 'Cuenta Verificada Correctamente'
-       });
+      });
     } catch (error) {
       return response.status(400).json({
         type: 'Error',
@@ -698,7 +697,7 @@ public async update({ auth, request, response }: HttpContextContract) {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - users
+   *      - Usuarios
    *    summary: Cierre de sesión de usuario
    *    description: Cierra la sesión actual del usuario.
    *    responses:
@@ -721,14 +720,14 @@ public async update({ auth, request, response }: HttpContextContract) {
         title: 'Logout exitoso',
         message: 'Logout exitosamente '
       })
-      
+
     } catch (error) {
       return response.status(200).send({
         type: 'Error',
         title: 'Error al cerrar sesion',
         message: 'Se produjo un error al cerrar sesion'
       })
-      
+
     }
   }
   /**
@@ -736,7 +735,7 @@ public async update({ auth, request, response }: HttpContextContract) {
    * /api/users/login:
    *  post:
    *    tags:
-   *      - users
+   *      - Usuarios
    *    summary: Iniciar sesión de usuario
    *    requestBody:
    *      required: true
@@ -791,7 +790,7 @@ public async update({ auth, request, response }: HttpContextContract) {
       const password = request.input('password');
 
       // Verificar las credenciales del usuario
-      const user = await User.query().where('email', email).preload('configurations').preload('dispositivo',(habitUser) => {
+      const user = await User.query().where('email', email).preload('configurations').preload('dispositivo', (habitUser) => {
         habitUser.preload('sensores')
       }).first();
 
@@ -824,7 +823,8 @@ public async update({ auth, request, response }: HttpContextContract) {
       return response.status(500).json({
         type: 'Error',
         title: 'Error al iniciar sesion',
-        message: 'Error al iniciar sesión', error: error.message });
+        message: 'Error al iniciar sesión', error: error.message
+      });
     }
   }
   /**
@@ -832,7 +832,7 @@ public async update({ auth, request, response }: HttpContextContract) {
    * /api/users/recuperar-contra:
    *   post:
    *     tags:
-   *       - users
+   *       - Usuarios
    *     summary: Solicitar recuperación de contraseña
    *     requestBody:
    *       required: true

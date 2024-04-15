@@ -10,13 +10,13 @@ export default class SensorTypesController {
  *    security:
  *      - bearerAuth: []
  *    tags:
- *      - SensorsTypes
+ *      - TiposSensores
  *    summary: Lista de tipos de sensores
  *    produces:
  *      - application/json
  *    responses:
  *      200:
- *        description: Success!!
+ *        description: Lista de los tipos de sensores obtenida correctamente
  *        content:
  *          application/json:
  *            schema:
@@ -24,10 +24,10 @@ export default class SensorTypesController {
  *              properties:
  *                title:
  *                  type: string
- *                  description: titulo
+ *                  description: titulo de la respuesta
  *                data:
  *                  type: string 
- *                  description: descripcion
+ *                  description: datos de la respuesta
  */
   public async index({ response }: HttpContextContract) {
    try{
@@ -54,7 +54,7 @@ export default class SensorTypesController {
   *     security:
   *      - bearerAuth: []
   *     tags:
-  *       - SensorsTypes
+  *       - TiposSensores
   *     summary: Crear un nuevo tipo de sensor
   *     produces:
   *       - application/json 
@@ -73,7 +73,7 @@ export default class SensorTypesController {
   *                 description: unidad
   *     responses:
   *       200:
-  *         description: Success! Tout va bien :)
+  *         description: Se creo el tipo de sensor correctamente
   *         content:
   *           application/json:
   *             schema:
@@ -81,10 +81,10 @@ export default class SensorTypesController {
   *               properties:
   *                 name:
   *                   type: string
-  *                   description: titulo
+  *                   description: titulo de la respuesta
   *                 unit:
   *                   type: string
-  *                   description: unidad
+  *                   description: unidad del sensor
   */ 
   public async store({response, request}: HttpContextContract) {
     const {name, unit} = request.body()
@@ -107,8 +107,8 @@ export default class SensorTypesController {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - SensorsTypes
-   *    summary:  Actualizar tipo de sensor
+   *      - TiposSensores
+   *    summary:  Actualizar tipo de sensor por identificador
    *    parameters:
    *      - name: id
    *        in: path
@@ -133,7 +133,7 @@ export default class SensorTypesController {
    *                description: Unidad
    *    responses:
    *      200:
-   *        description: Success! Tout va bien :)
+   *        description: Se activo el sensor correctamente
    *        content:
    *          application/json:
    *            schema:
@@ -141,7 +141,7 @@ export default class SensorTypesController {
    *              properties:
    *                title:
    *                  type: string
-   *                  description: Titulo de la respuestinha sinha sinha
+   *                  description: titulo de la respuesta
    *                data:
    *                  type: string
    *                  description: datos de respuesta
@@ -176,8 +176,8 @@ export default class SensorTypesController {
  *    security:
  *      - bearerAuth: []
  *    tags:
- *      - SensorsTypes
- *    summary: Eliminar tipo de sensor
+ *      - TiposSensores
+ *    summary: Eliminar tipo de sensor por identificador
  *    parameters:
  *      - name: id
  *        in: path
@@ -189,7 +189,7 @@ export default class SensorTypesController {
  *      - application/json
  *    responses:
  *      200:
- *        description: Success! Tout va bien :)
+ *        description: Se elimino el tipo de sensor correctamente
  *        content:
  *          application/json:
  *            schema:
@@ -197,7 +197,7 @@ export default class SensorTypesController {
  *              properties:
  *                title:
  *                  type: string
- *                  description: Titulo de la respuestinha sinha sinha
+ *                  description: titulo de la respuesta
  *                data:
  *                  type: string
  *                  description: datos de respuesta

@@ -9,12 +9,12 @@ export default class DeviceTypesController {
   *  get:
   *    tags:
   *      - TiposDispositivos
-  *    summary: Lista de usuarios
+  *    summary: Lista de todos los tipos de dispositivos de nuestra aplicacion
   *    produces:
   *      - application/json
   *    responses:
   *      200:
-  *        description: Success!!
+  *        description: La respuesta de los tipos de dispositivos fue exitosa
   *        content:
   *          application/json:
   *            schema:
@@ -22,10 +22,10 @@ export default class DeviceTypesController {
   *              properties:
   *                title:
   *                  type: string
-  *                  description: title 
+  *                  description: titulo de la respuesta
   *                data:
   *                  type: string 
-  *                  description: jajajaj
+  *                  description: datos de la respuesta
   */
   public async index({ response }: HttpContextContract) {
     const tiposDis = await TipoDispositivo.all()

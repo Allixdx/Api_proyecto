@@ -10,13 +10,13 @@ export default class SensorsController {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - Sensors
-   *    summary: list of sensors
+   *      - Sensores
+   *    summary: Lista de todos los sensores de nuestra aplicacion
    *    produces:
    *      - application/json
    *    responses:
    *      200:
-   *        description: Success!!
+   *        description: La solicitud de la lista de todos los sensores fue exitosa
    *        content:
    *          application/json:
    *            schema:
@@ -24,10 +24,10 @@ export default class SensorsController {
    *              properties:
    *                title:
    *                  type: string
-   *                  description: title 
+   *                  description: titulo de la respuesta
    *                data:
    *                  type: string 
-   *                  description: jajajaj
+   *                  description: datos de la respuesta
    */
   public async index({response}: HttpContextContract) {
     const sensores = await Sensor.query().preload('sensorType')
@@ -44,8 +44,8 @@ export default class SensorsController {
   *     security:
   *      - bearerAuth: []
   *     tags:
-  *       - Sensors
-  *     summary: Create new sensor
+  *       - Sensores
+  *     summary: Crear un nuevo sensor 
   *     produces:
   *       - application/json 
   *     requestBody:
@@ -57,13 +57,13 @@ export default class SensorsController {
   *             properties:
   *               sensor_type_id:
   *                 type: number
-  *                 description: Type sensor
+  *                 description: tipo sensor
   *               value:
   *                 type: number
-  *                 description: value
+  *                 description: valores
   *     responses:
   *       200:
-  *         description: Success! Tout va bien :)
+  *         description: Se creo el sensor de forma exitosa
   *         content:
   *           application/json:
   *             schema:
@@ -71,7 +71,7 @@ export default class SensorsController {
   *               properties:
   *                 name:
   *                   type: string
-  *                   description: Titulo de la respuestinha sinha sinha
+  *                   description: titulo de la respuesta
   *                 last_name:
   *                   type: string
   *                   description: datos de respuesta
@@ -101,8 +101,8 @@ export default class SensorsController {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - Sensors
-   *    summary:  Activate sensor by id
+   *      - Sensores
+   *    summary:  Activar sensor por identificador
    *    parameters:
    *      - name: id
    *        in: path
@@ -114,7 +114,7 @@ export default class SensorsController {
    *      - application/json
    *    responses:
    *      200:
-   *        description: Success! Tout va bien :)
+   *        description: Se activo el sensor correctamente
    *        content:
    *          application/json:
    *            schema:
@@ -122,7 +122,7 @@ export default class SensorsController {
    *              properties:
    *                title:
    *                  type: string
-   *                  description: Titulo de la respuestinha sinha sinha
+   *                  description: titulo de la respuesta
    *                data:
    *                  type: string
    *                  description: datos de respuesta
@@ -175,8 +175,8 @@ export default class SensorsController {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - Sensors
-   *    summary:  drop sensor by id
+   *      - Sensores
+   *    summary:  Eliminar sensor por identificador
    *    parameters:
    *      - name: id
    *        in: path
@@ -188,7 +188,7 @@ export default class SensorsController {
    *      - application/json
    *    responses:
    *      200:
-   *        description: Success! Tout va bien :)
+   *        description: Se elimino el sensor correctamente
    *        content:
    *          application/json:
    *            schema:
@@ -196,7 +196,7 @@ export default class SensorsController {
    *              properties:
    *                title:
    *                  type: string
-   *                  description: Titulo de la respuestinha sinha sinha
+   *                  description: titulo de la respuesta
    *                data:
    *                  type: string
    *                  description: datos de respuesta

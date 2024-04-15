@@ -28,7 +28,7 @@ export default class DispositivosController {
    *                   example: success
    *                 message:
    *                   type: string
-   *                   example: Successfully retrieved all devices
+   *                   example: mensaje de la respuesta
    *                 data:
    *                   type: array
    *                   items:
@@ -88,7 +88,7 @@ export default class DispositivosController {
    *                 data:
    *                   $ref: '#/components/schemas/Dispositivo'
    *       400:
-   *         description: Bad Request
+   *         description: Error al capturar datos, verifica tus identificadores
    *         content:
    *           application/json:
    *             schema:
@@ -106,9 +106,10 @@ export default class DispositivosController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: Error creating device
+   *                   example: mensaje de la respuesta
    *                 error:
    *                   type: string
+   *                   example: datos de error 
    */
   public async store({ request, response }: HttpContextContract) {
     try {
@@ -177,7 +178,7 @@ export default class DispositivosController {
    *                 data:
    *                   $ref: '#/components/schemas/TipoDispositivo'
    *       400:
-   *         description: Bad Request
+   *         description: Error al crear un dispositivo verifica tus datos
    *         content:
    *           application/json:
    *             schema:
@@ -300,7 +301,7 @@ export default class DispositivosController {
      *       - bearerAuth: []
      *     tags:
      *       - Dispositivos
-     *     summary: Obtener un dispositivo por su ID
+     *     summary: Obtener un dispositivo por su identificador
      *     parameters:
      *       - name: id
      *         in: path
@@ -324,7 +325,7 @@ export default class DispositivosController {
      *               properties:
      *                 message:
      *                   type: string
-     *                   example: Device not found
+     *                   example: mensaje de error
      */
   public async show({ params, response }: HttpContextContract) {
     try {
@@ -348,9 +349,10 @@ export default class DispositivosController {
    * @swagger
    * /api/dispositivos/{id}:
    *   put:
-   *     description: Actualiza el recurso de dispositivo
+   *     description: Actualiza el recurso de dispositivo por identificador
    *     tags:
    *       - Dispositivos
+   *     summary: Actualizar dispositivo por identificador
    *     security:
    *       - bearerAuth: []
    *     produces:
@@ -384,13 +386,13 @@ export default class DispositivosController {
    *               properties:
    *                 title:
    *                   type: string
-   *                   description: Título de la respuesta
+   *                   description: título de la respuesta
    *                 message:
    *                   type: string
-   *                   description: Mensaje de la respuesta
+   *                   description: mensaje de la respuesta
    *                 data: 
    *                   type: object
-   *                   description: Datos de la respuesta
+   *                   description: datos de la respuesta
    *       422:
    *         description: Los datos en el cuerpo de la solicitud no son procesables 
    *         content:
@@ -400,13 +402,13 @@ export default class DispositivosController {
    *               properties:
    *                 title:
    *                   type: string
-   *                   description: Título del error
+   *                   description: título del error
    *                 message:
    *                   type: string
-   *                   description: Mensaje del error
+   *                   description: mensaje del error
    *                 errors: 
    *                   type: object
-   *                   description: Datos del error  
+   *                   description: datos del error  
    *       404:
    *         description: No se pudo encontrar el recurso de dispositivo para su actualización
    *         content:
@@ -416,13 +418,13 @@ export default class DispositivosController {
    *               properties:
    *                 title:
    *                   type: string
-   *                   description: Título del error
+   *                   description: título del error
    *                 message:
    *                   type: string
-   *                   description: Mensaje del error
+   *                   description: mensaje del error
    *                 errors: 
    *                   type: object
-   *                   description: Datos del error   
+   *                   description: datos del error   
    *       500:
    *         description: Hubo un fallo en el servidor durante la solicitud 
    *         content:
@@ -432,13 +434,13 @@ export default class DispositivosController {
    *               properties:
    *                 title:
    *                   type: string
-   *                   description: Título del error
+   *                   description: título del error
    *                 message:
    *                   type: string
-   *                   description: Mensaje del error
+   *                   description: mensaje del error
    *                 errors: 
    *                   type: object
-   *                   description: Datos del error 
+   *                   description: datos del error 
    */
    public async update({params, request, response}: HttpContextContract) {
     try {
@@ -486,7 +488,7 @@ export default class DispositivosController {
      *       - bearerAuth: []
    *     tags:
    *       - Dispositivos
-   *     summary: Eliminar un dispositivo por su ID
+   *     summary: Eliminar un dispositivo por su identificador
    *     parameters:
    *       - name: id
    *         in: path
@@ -506,7 +508,7 @@ export default class DispositivosController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: Device not found
+   *                   example: mensaje de la respusta
    *       500:
    *         description: Error interno del servidor
    *         content:
@@ -516,7 +518,7 @@ export default class DispositivosController {
    *               properties:
    *                 message:
    *                   type: string
-   *                   example: Error deleting device
+   *                   example: mensaje del error
    *                 error:
    *                   type: string
    */

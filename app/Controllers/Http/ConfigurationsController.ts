@@ -11,14 +11,15 @@ export default class ConfigurationsController {
     *   get:
     *     description: Lista de todas las configuraciones de los habitos en el sistema
     *     tags:
-    *       - Configurations
+    *       - Configuracion
+    *     summary: Lista de todas las configuraciones de los habitos en el sistema
     *     security:
     *       - bearerAuth: []
     *     produces:
     *       - application/json
     *     responses:
     *       200:
-    *         description: La busqueda fue exitosa
+    *         description: Resultado de la busqueda fue exitosa
     *         content:
     *           application/json:
     *             schema:
@@ -26,13 +27,13 @@ export default class ConfigurationsController {
     *               properties:
     *                 type:
     *                   type: string
-    *                   descripcion: tipo de respuesta
+    *                   descripcion: Tipo de respuesta
     *                 title:
     *                   type: string
-    *                   descripcion: titulo de la respuesta
+    *                   descripcion: Mitulo de la respuesta
     *                 message:
     *                   type: string
-    *                   descripcion: mensaje de la respuesta
+    *                   descripcion: Mensaje de la respuesta
     *                 data: 
     *                   type: object
     *                   descripcion: Datos de la respuesta
@@ -45,13 +46,13 @@ export default class ConfigurationsController {
     *               properties:
     *                 type:
     *                   type: string
-    *                   descripcion: tipo de error
+    *                   descripcion: Tipo de error
     *                 title:
     *                   type: string
-    *                   descripcion: titulo del error
+    *                   descripcion: Titulo del error
     *                 message:
     *                   type: string
-    *                   descripcion: mensaje del error
+    *                   descripcion: Mensaje del error
     *                 errors: 
     *                   type: object
     *                   descripcion: Datos del error 
@@ -77,7 +78,8 @@ export default class ConfigurationsController {
     *   post:
     *     description: Crea un nuevo recurso de configuracion de habito en la base de datos. 
     *     tags:
-    *       - Configurations
+    *       - Configuracion
+    *     summary: Crear un nuevo recuerso de configuracion de habito.
     *     security:
     *       - bearerAuth: []
     *     produces:
@@ -92,11 +94,11 @@ export default class ConfigurationsController {
     *             properties:
     *               tipo_configuracion_id:
     *                 type: number
-    *                 descripcion: id de tipo de configuraciones
+    *                 descripcion: Id de tipo de configuraciones
     *                 required: true
     *               data: 
     *                 type: string
-    *                 descripcion: dato de la configuracion
+    *                 descripcion: Dato de la configuracion
     *                 required: true
     *               user_id:
     *                 type: number
@@ -121,7 +123,7 @@ export default class ConfigurationsController {
     *                   descripcion: mensaje de la respuesta
     *                 data: 
     *                   type: object
-    *                   descripcion: Datos de la respuesta
+    *                   descripcion: datos de la respuesta
     *       422:
     *         description: Los datos en el cuerpo de la solicitud no son procesables porque el formato es incorrecto o falta un elemento en el cuerpo de la solicitud 
     *         content:
@@ -133,7 +135,7 @@ export default class ConfigurationsController {
     *                   type: array
     *                   items:
     *                     type: object
-    *                   descripcion: errores en la solicitud   
+    *                   descripcion: Errores en la solicitud   
     *       500:
     *         description: Hubo un fallo en el servidor durante la solicitud 
     *         content:
@@ -152,7 +154,7 @@ export default class ConfigurationsController {
     *                   descripcion: mensaje del error
     *                 errors: 
     *                   type: object
-    *                   descripcion: Datos del error 
+    *                   descripcion: datos del error 
     * 
     */
 
@@ -205,7 +207,8 @@ export default class ConfigurationsController {
     *   get:
     *     description: Muestra una configuracion especifica identificada por el numero id que se pasa como parametro.
     *     tags:
-    *       - Configurations
+    *       - Configuracion
+    *     summary: Mostrar configuracion de habito especifica por identificador.
     *     security:
     *       - bearerAuth: []
     *     produces:
@@ -233,12 +236,12 @@ export default class ConfigurationsController {
     *                   descripcion: titulo de la respuesta
     *                 message:
     *                   type: string
-    *                   descripcion: mensaje de la respuesta
+    *                   descripcion: tensaje de la respuesta
     *                 data: 
     *                   type: object
-    *                   descripcion: Datos de la respuesta
+    *                   descripcion: tatos de la respuesta
     *       404:
-    *         description: No se pudo encontrar el recurso 
+    *         description: No se pudo encontrar el recurso o el identificador no coinicen en nuestro sistmas 
     *         content:
     *           application/json:
     *             schema:
@@ -274,7 +277,7 @@ export default class ConfigurationsController {
     *                   descripcion: mensaje del error
     *                 errors: 
     *                   type: object
-    *                   descripcion: Datos del error 
+    *                   descripcion: datos del error 
     * 
     */
     const configuration = await Configuration.query()
@@ -306,7 +309,8 @@ export default class ConfigurationsController {
     *   put:
     *     description: Actualiza el recurso de configuracion, se pueden actualizar los datos que se necesiten.
     *     tags:
-    *       - Configurations
+    *       - Configuracion
+    *     summary: Actualizar configuracion de habito por identificador.
     *     security:
     *       - bearerAuth: []
     *     produces:
@@ -321,7 +325,7 @@ export default class ConfigurationsController {
     *             properties:
     *               data: 
     *                 type: string
-    *                 descripcion: dato de la configuracion
+    *                 descripcion: Dato de la configuracion
     *                 required: false
     *     parameters:
     *       - in: path
@@ -349,7 +353,7 @@ export default class ConfigurationsController {
     *                   descripcion: mensaje de la respuesta
     *                 data: 
     *                   type: object
-    *                   descripcion: Datos de la respuesta
+    *                   descripcion: datos de la respuesta
     *       422:
     *         description: Los datos en el cuerpo de la solicitud no son procesables porque el formato es incorrecto o falta un elemento en el cuerpo de la solicitud 
     *         content:
@@ -472,7 +476,8 @@ export default class ConfigurationsController {
     *   delete:
     *     description: Elimina de la base de datos la configuracion identificada por el numero id indicado.
     *     tags:
-    *       - Configurations
+    *       - Configuracion
+    *     summary: Eliminar configuracion de habito por identificador.
     *     security:
     *       - bearerAuth: []
     *     produces:
@@ -503,7 +508,7 @@ export default class ConfigurationsController {
     *                   descripcion: mensaje de la respuesta
     *                 data: 
     *                   type: object
-    *                   descripcion: Datos de la respuesta
+    *                   descripcion: datos de la respuesta
     *       404:
     *         description: No se pudo encontrar el recurso de habito para su eliminacion
     *         content:
@@ -522,7 +527,7 @@ export default class ConfigurationsController {
     *                   descripcion: mensaje del error
     *                 errors: 
     *                   type: object
-    *                   descripcion: Datos del error   
+    *                   descripcion: datos del error   
     *       500:
     *         description: Hubo un fallo en el servidor durante la solicitud 
     *         content:
@@ -541,7 +546,7 @@ export default class ConfigurationsController {
     *                   descripcion: mensaje del error
     *                 errors: 
     *                   type: object
-    *                   descripcion: Datos del error 
+    *                   descripcion: datos del error 
     * 
     */
     const configuration = await Configuration.query().where('id', params.id).first()

@@ -12,7 +12,7 @@ export default class EdamamsController {
  *     security:
  *      - bearerAuth: []
  *     tags:
- *       - Foods
+ *       - Comida
  *     summary: Obtener información sobre un alimento específico.
  *     description: Obtiene información sobre un alimento específico basado en el nombre proporcionado.
  *     parameters:
@@ -89,6 +89,7 @@ public async findFood({ request, response }: HttpContextContract) {
       return response.status(500).json({ message: 'Ocurrió un error al buscar el alimento.' });
   }
 }
+
 /**
  * @swagger
  * /api/foods/calcular-nutricion:
@@ -96,7 +97,7 @@ public async findFood({ request, response }: HttpContextContract) {
  *     security:
  *      - bearerAuth: []
  *     tags:
- *       - Foods
+ *       - Comida
  *     summary: Calcular información nutricional basada en uno o más alimentos y el peso total.
  *     description: Calcula información nutricional basada en uno o más alimentos específicos y el peso total proporcionado en gramos.
  *     requestBody:
@@ -184,7 +185,6 @@ public async findFood({ request, response }: HttpContextContract) {
  *                   type: string
  *                   description: Descripción del error.
  */
-
 public async calculateNutrition({ request, response }) {
   try {
     const sensorType = await SensorType.findBy('name', 'Peso');
