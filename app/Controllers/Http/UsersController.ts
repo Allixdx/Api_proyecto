@@ -82,7 +82,7 @@ export default class UsersController {
         dispositivo.preload('sensores',(sensor)=>{
           sensor.preload('sensorType')
         }).preload('tipoDispositivo')
-      }).first()
+      }).preload('configurations').first()
       if(!users){
         return response.status(404).send({
           type: 'Error',
@@ -401,7 +401,7 @@ public async update({ auth, request, response }: HttpContextContract) {
       dispositivo.preload('sensores',(sensor)=>{
         sensor.preload('sensorType')
       }).preload('tipoDispositivo')
-    }).first();
+    }).preload('configurations').first();
 
     if(!user){
       return response.status(404).json({ 
@@ -536,7 +536,7 @@ public async update({ auth, request, response }: HttpContextContract) {
       dispositivo.preload('sensores',(sensor)=>{
         sensor.preload('sensorType')
       }).preload('tipoDispositivo')
-    }).first();
+    }).preload('configurations').first();
 
     if(!user){
       return response.status(404).json({ 
@@ -920,7 +920,7 @@ public async update({ auth, request, response }: HttpContextContract) {
         dispositivo.preload('sensores',(sensor)=>{
           sensor.preload('sensorType')
         }).preload('tipoDispositivo')
-      }).first()
+      }).preload('configurations').first()
 
       if (!user) {
         return response.status(400).json({
