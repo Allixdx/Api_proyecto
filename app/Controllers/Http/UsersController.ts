@@ -538,7 +538,7 @@ public async update({ auth, request, response }: HttpContextContract) {
       message
         .from(Env.get('SMTP_USERNAME'), 'Healthy App')
         .to(user.email)
-        .subject('Healthy App - Recuperacion de Contraseña')
+        .subject('Healthy App -Se ha Actualizado Tu Contrasena')
         .htmlView('emails/nuevaContrasena', { email: user.email });
     });
 
