@@ -253,16 +253,71 @@ export default class DispositivosController {
       let valorSensor = tipoDispositivo === 'pesa' ? 1 : 5;
 
       if(tipoDispositivo == 'brazalete'){
-        for(let i = 1; i<=5; i++){
-          const sensor = await Sensor.create({
-            sensor_type_id: i,
+        var tipoDeSensor = await SensorType.query()
+        .where('name', 'Pantalla')
+        .firstOrFail();
+        var sensor = await Sensor.create({
+          sensor_type_id: tipoDeSensor.id,
+          dispositivo_id: ultimoDispositivo.id,
+          value: valorSensor,
+          activo: 1
+        });
+          await Sensor.create(sensor)
+
+          tipoDeSensor = await SensorType.query()
+        .where('name', 'Ritmo')
+        .firstOrFail();
+         sensor = await Sensor.create({
+          sensor_type_id: tipoDeSensor.id,
+          dispositivo_id: ultimoDispositivo.id,
+          value: valorSensor,
+          activo: 1
+        });
+          await Sensor.create(sensor)
+          tipoDeSensor = await SensorType.query()
+          .where('name', 'Temperatura')
+          .firstOrFail();
+           sensor = await Sensor.create({
+            sensor_type_id: tipoDeSensor.id,
             dispositivo_id: ultimoDispositivo.id,
             value: valorSensor,
             activo: 1
           });
-          await Sensor.create(sensor)
+            await Sensor.create(sensor)
+            tipoDeSensor = await SensorType.query()
+            .where('name', 'Alcohol')
+            .firstOrFail();
+             sensor = await Sensor.create({
+              sensor_type_id: tipoDeSensor.id,
+              dispositivo_id: ultimoDispositivo.id,
+              value: valorSensor,
+              activo: 1
+            });
+            
+              await Sensor.create(sensor)
+              tipoDeSensor = await SensorType.query()
+              .where('name', 'Distancia')
+              .firstOrFail();
+               sensor = await Sensor.create({
+                sensor_type_id: tipoDeSensor.id,
+                dispositivo_id: ultimoDispositivo.id,
+                value: valorSensor,
+                activo: 1
+              });
+                await Sensor.create(sensor)
+                tipoDeSensor = await SensorType.query()
+                .where('name', 'Pasos')
+                .firstOrFail();
+                 sensor = await Sensor.create({
+                  sensor_type_id: tipoDeSensor.id,
+                  dispositivo_id: ultimoDispositivo.id,
+                  value: valorSensor,
+                  activo: 1
+                });
+                  await Sensor.create(sensor)
         }
-      }else if(tipoDispositivo == 'pesa'){
+    
+      else if(tipoDispositivo == 'pesa'){
         const tipoDeSensor = await SensorType.query()
         .where('name', 'Peso')
         .firstOrFail();
