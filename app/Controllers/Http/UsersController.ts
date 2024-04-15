@@ -567,7 +567,7 @@ public async update({ auth, request, response }: HttpContextContract) {
       message
         .from(Env.get('SMTP_USERNAME'), 'Healthy App')
         .to(user.email)
-        .subject('Healthy App -Se ha Actualizado Tu Contrasena')
+        .subject('Healthy App - Recuperacion de Contraseña')
         .htmlView('emails/nuevaContrasena', { email: user.email });
     });
 
@@ -825,7 +825,7 @@ public async update({ auth, request, response }: HttpContextContract) {
         dispositivo.preload('sensores',(sensor)=>{
           sensor.preload('sensorType')
         }).preload('tipoDispositivo')
-      }).first()
+      }).preload('configurations').first()
 
       if (!user) {
         return response.status(401).json({ message: 'Usuario no encontrado' });
