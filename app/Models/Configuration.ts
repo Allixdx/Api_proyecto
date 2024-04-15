@@ -54,7 +54,7 @@ export default class Configuration extends BaseModel {
     foreignKey: 'user_id',
   })
   public user: BelongsTo<typeof User>
-
+  
   
   @belongsTo(() => TipoConfiguracion, {
     localKey: 'id',  

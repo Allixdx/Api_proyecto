@@ -1027,7 +1027,7 @@ export default class EmqxController {
   *                       type: string
   *                       description: Mensaje de error detallado.
   */
-public async obtenerPeso({ response }: HttpContextContract) {
+  public async obtenerPeso({ response }: HttpContextContract) {
     try {
       const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/Peso';
       const sensorType = await SensorType.findBy('name', 'Peso');
@@ -1097,7 +1097,6 @@ public async obtenerPeso({ response }: HttpContextContract) {
       });
     }
   }
-
   /**
    * @swagger
    * /api/emqx/meta-pasos:
@@ -1168,18 +1167,16 @@ public async obtenerPeso({ response }: HttpContextContract) {
           type: 'error',
         });
       }
-  
+
       const unit = sensorType.unit;
-    
-      const tipoDispositivoName = 'alarma_pasos';
-  
+
       const axiosResponse = await axios.get(url, {
         auth: {
           username: Env.get('MQTT_API_KEY'),
           password: Env.get('MQTT_SECRET_KEY')
         }
       });
-      
+
       if (axiosResponse.status !== 200) {
         return response.status(axiosResponse.status).send({
           title: 'Error',
@@ -1190,14 +1187,20 @@ public async obtenerPeso({ response }: HttpContextContract) {
           },
         });
       }
-  
+
       const retainedMessage = axiosResponse.data;
       const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
       let parsedPayload;
 
       const tablaConfig = await Configuration.query().firstOrFail()
       const metaPasos = tablaConfig.data
-      
+
+      const meta = await Configuration.query()
+      .whereHas('tipo_configuracion', (query)=>{
+        query.where('name','alarma_pasos')
+      })
+      .first()
+
       try {
         parsedPayload = JSON.parse(decodedPayload);
       } catch (error) {
@@ -1205,7 +1208,7 @@ public async obtenerPeso({ response }: HttpContextContract) {
       }
 
       // aca se hace la comparacion de los ultimos datos del sensor con los que el usuario puso como meta de pasos //
-      if (parsedPayload == metaPasos) {
+      if (parsedPayload == meta?.data) {
         return response.status(200).send({
           title: 'Datos coinciden',
           message: 'Los datos obtenidos coinciden con lo registrado.',
@@ -1213,7 +1216,8 @@ public async obtenerPeso({ response }: HttpContextContract) {
           data: {
             retained_message: parsedPayload,
             unit: unit,
-            meta: metaPasos
+            metaPasos: metaPasos,
+            meta:meta
           },
         });
       } else {
@@ -1221,10 +1225,11 @@ public async obtenerPeso({ response }: HttpContextContract) {
           title: 'Error',
           message: 'Los datos obtenidos no coinciden con lo registrado.',
           type: 'error',
-          data: metaPasos,
+          metaPasos: metaPasos,
+          meta:meta
         });
       }
-  
+
     } catch (error) {
       let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
       if (error.response) {
@@ -1244,7 +1249,6 @@ public async obtenerPeso({ response }: HttpContextContract) {
       });
     }
   }
-
   /**
    * @swagger
    * /api/emqx/meta-distancia:
@@ -1343,12 +1347,19 @@ public async obtenerPeso({ response }: HttpContextContract) {
       const tablaConfig = await Configuration.query().firstOrFail()
       const metaDistancia = tablaConfig.data
 
+      const meta = await Configuration.query()
+      .whereHas('tipo_configuracion', (query)=>{
+        query.where('name','alarma_distancia')
+      })
+      .first()
+
+
       try {
         parsedPayload = JSON.parse(decodedPayload);
       } catch (error) {
         parsedPayload = decodedPayload.toString;
       }
-      if (parsedPayload == metaDistancia) {
+      if (parsedPayload == meta?.data) {
         return response.status(200).send({
           title: 'Datos coinciden',
           message: 'Los datos obtenidos coinciden con lo registrado.',
@@ -1356,7 +1367,8 @@ public async obtenerPeso({ response }: HttpContextContract) {
           data: {
             retained_message: parsedPayload,
             unit: unit,
-            meta: metaDistancia
+            metaDistancia: metaDistancia,
+            meta: meta
           },
         });
       } else {
@@ -1364,7 +1376,12 @@ public async obtenerPeso({ response }: HttpContextContract) {
           title: 'Error',
           message: 'Los datos obtenidos no coinciden con lo registrado.',
           type: 'error',
-          data: metaDistancia,
+          data:{
+            retainde_message: parsedPayload,
+            unit: unit,
+            metaDistancia: metaDistancia,
+            meta:meta
+          }
         });
       }
     } catch (error) {
