@@ -574,7 +574,8 @@ public async update({ auth, request, response }: HttpContextContract) {
     return response.status(200).json({ 
       type: 'Exitoso!!',
       title: 'Contraseña actualizada',
-      message: 'Contraseña de usuario actualizada' 
+      message: 'Contraseña de usuario actualizada' ,
+      data: user
     });
   } catch (error) {
     return response.status(500).json({ 
