@@ -311,7 +311,7 @@ export default class UsersController {
       await client.messages.create({
         body: "Gracias por registrarte en HealthyApp :D",
         from: Env.get('TWILIO_FROM_NUMBER'),
-        to:`+528717957718`
+        to:`+528714446301`
       })
 
       return response.status(201).json({
@@ -397,7 +397,20 @@ export default class UsersController {
 public async update({ auth, request, response }: HttpContextContract) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
   try {
-    const user = auth.user!;
+    const user = await User.query().where('id',auth.user?.id).preload('dispositivo',(dispositivo) => {
+      dispositivo.preload('sensores',(sensor)=>{
+        sensor.preload('sensorType')
+      }).preload('tipoDispositivo')
+    }).first();
+
+    if(!user){
+      return response.status(404).json({ 
+        type: 'Error',
+        title: 'Usuario no encontrado',
+        message: 'Error al encontrar los datos del usuario', 
+        error: [] 
+      })
+    }
     
     const { name, lastname, email } = request.only(['name', 'lastname', 'email']);
 
@@ -517,7 +530,23 @@ public async update({ auth, request, response }: HttpContextContract) {
       return response.status(401).json({ error: 'Usuario no autenticado' });
     }
 
-    const user = await User.findOrFail(userId);
+    const user = await User.query()
+    .where('id', userId)
+    .preload('dispositivo',(dispositivo) => {
+      dispositivo.preload('sensores',(sensor)=>{
+        sensor.preload('sensorType')
+      }).preload('tipoDispositivo')
+    }).first();
+
+    if(!user){
+      return response.status(404).json({ 
+        type: 'Error',
+        title: 'Usuario no encontrado',
+        message: 'Error al encontrar los datos del usuario', 
+        error: [] 
+      })
+    }
+
 
     const oldPassword: string = request.input('oldPassword');
     const newPassword: string = request.input('newPassword');
@@ -545,7 +574,8 @@ public async update({ auth, request, response }: HttpContextContract) {
     return response.status(200).json({ 
       type: 'Exitoso!!',
       title: 'Contraseña actualizada',
-      message: 'Contraseña de usuario actualizada' 
+      message: 'Contraseña de usuario actualizada' ,
+      data: user
     });
   } catch (error) {
     return response.status(500).json({ 
@@ -791,9 +821,11 @@ public async update({ auth, request, response }: HttpContextContract) {
       const password = request.input('password');
 
       // Verificar las credenciales del usuario
-      const user = await User.query().where('email', email).preload('dispositivo',(habitUser) => {
-        habitUser.preload('sensores')
-      }).first();
+      const user = await User.query().where('email', email).preload('dispositivo',(dispositivo) => {
+        dispositivo.preload('sensores',(sensor)=>{
+          sensor.preload('sensorType')
+        }).preload('tipoDispositivo')
+      }).first()
 
       if (!user) {
         return response.status(401).json({ message: 'Usuario no encontrado' });
@@ -884,7 +916,11 @@ public async update({ auth, request, response }: HttpContextContract) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     try {
       const email = request.input('email')
-      const user = await User.findBy('email', email)
+      const user = await User.query().where('email', email).preload('dispositivo',(dispositivo) => {
+        dispositivo.preload('sensores',(sensor)=>{
+          sensor.preload('sensorType')
+        }).preload('tipoDispositivo')
+      }).first()
 
       if (!user) {
         return response.status(400).json({
