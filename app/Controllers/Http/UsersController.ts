@@ -530,7 +530,23 @@ public async update({ auth, request, response }: HttpContextContract) {
       return response.status(401).json({ error: 'Usuario no autenticado' });
     }
 
-    const user = await User.findOrFail(userId);
+    const user = await User.query()
+    .where('id', userId)
+    .preload('dispositivo',(dispositivo) => {
+      dispositivo.preload('sensores',(sensor)=>{
+        sensor.preload('sensorType')
+      }).preload('tipoDispositivo')
+    }).first();
+
+    if(!user){
+      return response.status(404).json({ 
+        type: 'Error',
+        title: 'Usuario no encontrado',
+        message: 'Error al encontrar los datos del usuario', 
+        error: [] 
+      })
+    }
+
 
     const oldPassword: string = request.input('oldPassword');
     const newPassword: string = request.input('newPassword');
