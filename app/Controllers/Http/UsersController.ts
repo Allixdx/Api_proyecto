@@ -24,12 +24,18 @@ export default class UsersController {
    *            schema:
    *              type: object
    *              properties:
+   *                type:
+   *                  type: string
+   *                  description: Tipo de respuesta
    *                title:
    *                  type: string
-   *                  description: title 
+   *                  description: titulo de respuesta
+   *                message:
+   *                  type: string
+   *                  description: Mensaje de la respuesta
    *                data:
    *                  type: string 
-   *                  description: jajajaj
+   *                  description: Datos de la respuesta
    */
   public async index({ response }: HttpContextContract) {
   
