@@ -444,7 +444,10 @@ public async update({ auth, request, response }: HttpContextContract) {
     
     const { name, lastname, email } = request.only(['name', 'lastname', 'email']);
  
-    const nameRegex = /^[A-Za-z\s]+$/;
+    // Construye un objeto con los campos que se van a actualizar
+    const updates: { [key: string]: any } = {};
+    if (name !== undefined) {
+      const nameRegex = /^[A-Za-z\s]+$/;
     if (!nameRegex.test(name)) {
         return response.status(400).json({
             type: 'Error',
@@ -453,8 +456,11 @@ public async update({ auth, request, response }: HttpContextContract) {
             error: 'El nombre solo puede contener letras y espacios',
         });
     }
+      updates.name = name;
+    }
 
-    const lastnameRegex = /^[A-Za-z\s]+$/;
+    if (lastname !== undefined) {
+      const lastnameRegex = /^[A-Za-z\s]+$/;
     if (!lastnameRegex.test(lastname)) {
         return response.status(400).json({
             type: 'Error',
@@ -463,7 +469,11 @@ public async update({ auth, request, response }: HttpContextContract) {
             error: 'El apellido solo puede contener letras y espacios',
         });
     }
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      updates.lastname = lastname;
+    }
+
+    if (email !== undefined) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
     return response.status(400).json({
       type: 'Error',
@@ -472,26 +482,6 @@ public async update({ auth, request, response }: HttpContextContract) {
       error: 'Formato de correo electrónico inválido',
     });
   }
-
-  const existingUser = await User.findBy('email', email);
-  if (existingUser) {
-    return response.status(400).json({
-      type: 'Error',
-      message: 'Error al crear usuario',
-      error: 'Correo electrónico ya registrado',
-    });
-  }
-    // Construye un objeto con los campos que se van a actualizar
-    const updates: { [key: string]: any } = {};
-    if (name !== undefined) {
-      updates.name = name;
-    }
-
-    if (lastname !== undefined) {
-      updates.lastname = lastname;
-    }
-
-    if (email !== undefined) {
       updates.email = email;
     }
 
