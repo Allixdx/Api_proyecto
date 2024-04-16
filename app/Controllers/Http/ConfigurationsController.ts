@@ -1,6 +1,9 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import {  schema } from '@ioc:Adonis/Core/Validator'
 import Configuration from 'App/Models/Configuration'
+import Env from '@ioc:Adonis/Core/Env'
+import axios from 'axios';
+
 
 
 export default class ConfigurationsController {
@@ -301,174 +304,197 @@ export default class ConfigurationsController {
       })
     }
   }
-
+/**
+* @swagger
+* /api/configurations/{id}:
+*   put:
+*     description: Actualiza el recurso de configuracion y publica el dato en un tema MQTT específico según el tipo de configuración.
+*     tags:
+*       - Configuracion
+*     summary: Actualiza la configuración por identificador y publica en MQTT
+*     security:
+*       - bearerAuth: []
+*     produces:
+*       - application/json
+*     requestBody:
+*       description: Se pueden cambiar los datos que sean necesarios
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             properties:
+*               data: 
+*                 type: string
+*                 descripcion: dato de la configuracion
+*                 required: false
+*     parameters:
+*       - in: path
+*         name: id
+*         schema:
+*           type: number
+*         required: true
+*         description: Id de configuracion que se va a actualizar
+*     responses:
+*       200:
+*         description: La actualizacion del recurso fue exitosa
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 type:
+*                   type: string
+*                   descripcion: tipo de respuesta
+*                 title:
+*                   type: string
+*                   descripcion: titulo de la respuesta
+*                 message:
+*                   type: string
+*                   descripcion: mensaje de la respuesta
+*                 data: 
+*                   type: object
+*                   descripcion: Datos de la respuesta
+*       422:
+*         description: Los datos en el cuerpo de la solicitud no son procesables porque el formato es incorrecto o falta un elemento en el cuerpo de la solicitud 
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 errors:
+*                   type: array
+*                   items:
+*                     type: object
+*                   descripcion: errores en la solicitud  
+*       400:
+*         description: Los datos en el cuerpo de la solicitud no estan bien formulados, por un tipo de dato incorrecto 
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 type:
+*                   type: string
+*                   descripcion: tipo de error
+*                 title:
+*                   type: string
+*                   descripcion: titulo del error
+*                 message:
+*                   type: string
+*                   descripcion: mensaje del error
+*                 errors: 
+*                   type: object
+*                   descripcion: Datos del error  
+*       404:
+*         description: No se pudo encontrar el recurso de configuración para su actualización
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 type:
+*                   type: string
+*                   descripcion: tipo de error
+*                 title:
+*                   type: string
+*                   descripcion: titulo del error
+*                 message:
+*                   type: string
+*                   descripcion: mensaje del error
+*                 errors: 
+*                   type: object
+*                   descripcion: Datos del error   
+*       500:
+*         description: Hubo un fallo en el servidor durante la solicitud 
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 type:
+*                   type: string
+*                   descripcion: tipo de error
+*                 title:
+*                   type: string
+*                   descripcion: titulo del error
+*                 message:
+*                   type: string
+*                   descripcion: mensaje del error
+*                 errors: 
+*                   type: object
+*                   descripcion: Datos del error 
+* 
+*/
   public async update({ params, request, response }: HttpContextContract) {
-    /**
-    * @swagger
-    * /api/configurations/{id}:
-    *   put:
-    *     description: Actualiza el recurso de configuracion, se pueden actualizar los datos que se necesiten.
-    *     tags:
-    *       - Configuracion
-    *     summary: Acutaliza la configuacion de habito por identificador
-    *     security:
-    *       - bearerAuth: []
-    *     produces:
-    *       - application/json
-    *     requestBody:
-    *       description: Se pueden cambiar los datos que sean necesarios
-    *       required: true
-    *       content:
-    *         application/json:
-    *           schema:
-    *             type: object
-    *             properties:
-    *               data: 
-    *                 type: string
-    *                 descripcion: dato de la configuracion
-    *                 required: false
-    *     parameters:
-    *       - in: path
-    *         name: id
-    *         schema:
-    *           type: number
-    *         required: true
-    *         description: Id de configuracion que se va a actualizar
-    *     responses:
-    *       200:
-    *         description: La actualizacion del recurso fue exitosa
-    *         content:
-    *           application/json:
-    *             schema:
-    *               type: object
-    *               properties:
-    *                 type:
-    *                   type: string
-    *                   descripcion: tipo de respuesta
-    *                 title:
-    *                   type: string
-    *                   descripcion: titulo de la respuesta
-    *                 message:
-    *                   type: string
-    *                   descripcion: mensaje de la respuesta
-    *                 data: 
-    *                   type: object
-    *                   descripcion: Datos de la respuesta
-    *       422:
-    *         description: Los datos en el cuerpo de la solicitud no son procesables porque el formato es incorrecto o falta un elemento en el cuerpo de la solicitud 
-    *         content:
-    *           application/json:
-    *             schema:
-    *               type: object
-    *               properties:
-    *                 errors:
-    *                   type: array
-    *                   items:
-    *                     type: object
-    *                   descripcion: errores en la solicitud  
-    *       400:
-    *         description: Los datos en el cuerpo de la solicitud no estan bien formulados, por un tipo de dato incorrecto 
-    *         content:
-    *           application/json:
-    *             schema:
-    *               type: object
-    *               properties:
-    *                 type:
-    *                   type: string
-    *                   descripcion: tipo de error
-    *                 title:
-    *                   type: string
-    *                   descripcion: titulo del error
-    *                 message:
-    *                   type: string
-    *                   descripcion: mensaje del error
-    *                 errors: 
-    *                   type: object
-    *                   descripcion: Datos del error  
-    *       404:
-    *         description: No se pudo encontrar el recurso de habito para su actualizacion
-    *         content:
-    *           application/json:
-    *             schema:
-    *               type: object
-    *               properties:
-    *                 type:
-    *                   type: string
-    *                   descripcion: tipo de error
-    *                 title:
-    *                   type: string
-    *                   descripcion: titulo del error
-    *                 message:
-    *                   type: string
-    *                   descripcion: mensaje del error
-    *                 errors: 
-    *                   type: object
-    *                   descripcion: Datos del error   
-    *       500:
-    *         description: Hubo un fallo en el servidor durante la solicitud 
-    *         content:
-    *           application/json:
-    *             schema:
-    *               type: object
-    *               properties:
-    *                 type:
-    *                   type: string
-    *                   descripcion: tipo de error
-    *                 title:
-    *                   type: string
-    *                   descripcion: titulo del error
-    *                 message:
-    *                   type: string
-    *                   descripcion: mensaje del error
-    *                 errors: 
-    *                   type: object
-    *                   descripcion: Datos del error 
-    * 
-    */
-
     const body = request.all()
-
+  
     await request.validate({
       schema: schema.create({
         data: schema.string.nullableAndOptional()
       })
     })
-
+  
     var configuration = await Configuration.find(params.id)
     if (!configuration) {
       response.notFound({
         "type": "Error",
         "title": "Recurso no encontrado",
-        "message": "El recurso de habito no pudo encontrarse",
+        "message": "El recurso de configuración no pudo encontrarse",
         "errors": []
       })
       return
     }
-
+  
     try {
       if (body.data) {
         configuration.data = body.data
       }
-      configuration.save()
+      await configuration.save()
+  
+      if (configuration.tipo_configuracion_id === 1 || configuration.tipo_configuracion_id === 2) {
+        const mqttData = parseInt(configuration.data)
+        const url = Env.get('MQTT_HOST') + '/publish'
+        const payload = {
+          "payload_encoding": "plain",
+          "topic": configuration.tipo_configuracion_id === 1 ? "MetaDistancia" : "MetaPasos",
+          "qos": 0,
+          "payload": mqttData,
+          "properties": {
+            "user_properties": {
+              "foo": "bar"
+            }
+          },
+          "retain": true
+        }
+  
+        const res = await axios.post(url, payload, {
+          auth: {
+            username: Env.get('MQTT_API_KEY'),
+            password: Env.get('MQTT_SECRET_KEY')
+          }
+        })
+  
+        if (!res.status || res.status !== 202) {
+          throw new Error("Error al publicar en el tema MQTT")
+        }
+      }
+  
+      response.send({
+        "type": "Exitoso",
+        "title": "Recurso actualizado",
+        "message": "El recurso configuración ha sido actualizado exitosamente",
+        "data": configuration,
+      })
     } catch (error) {
       response.internalServerError({
         "type": "Error",
-        "title": "Error de sevidor",
+        "title": "Error de servidor",
         "message": "Hubo un fallo en el servidor durante el registro de los datos",
         "errors": error
       })
-      return
     }
-
-    response.send({
-      "type": "Exitoso",
-      "title": "Recurso actualizado",
-      "message": "El recurso configuracion ha sido actualizado exitosamente",
-      "data": configuration,
-    })
-
   }
-
   public async destroy({ params, response }: HttpContextContract) {
     /**
     * @swagger
