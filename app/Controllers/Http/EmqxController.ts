@@ -13,6 +13,7 @@ export default class EmqxController {
   *      - bearerAuth: []
   *     tags:
   *       - EMQX
+  *     summary: Obtener el ultimo mensaje de un topico
   *     produces:
   *       - application/json
   *     parameters:
@@ -115,6 +116,7 @@ export default class EmqxController {
      *   post:
      *     tags:
      *       - EMQX
+     *     summary: Publicar un mensaje en un topico
      *     produces:
      *       - application/json
      *     requestBody:
