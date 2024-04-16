@@ -298,8 +298,26 @@ export default class UsersController {
       const lastname = request.input('lastname');
       const email = request.input('email')
       const password = request.input('password');
-  
-      // Validar el formato del correo electrónico
+      
+      const nameRegex = /^[A-Za-z\s]+$/;
+        if (!nameRegex.test(name)) {
+            return response.status(400).json({
+                type: 'Error',
+                title: 'Error de credenciales',
+                message: 'Error al crear usuario',
+                error: 'El nombre solo puede contener letras y espacios',
+            });
+        }
+
+        const lastnameRegex = /^[A-Za-z\s]+$/;
+        if (!lastnameRegex.test(lastname)) {
+            return response.status(400).json({
+                type: 'Error',
+                title: 'Error de credenciales',
+                message: 'Error al crear usuario',
+                error: 'El apellido solo puede contener letras y espacios',
+            });
+        }
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(email)) {
         return response.status(400).json({
