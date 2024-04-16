@@ -304,6 +304,7 @@ export default class UsersController {
       if (!emailRegex.test(email)) {
         return response.status(400).json({
           type: 'Error',
+          title: 'Error de credenciales',
           message: 'Error al crear usuario',
           error: 'Formato de correo electrónico inválido',
         });
