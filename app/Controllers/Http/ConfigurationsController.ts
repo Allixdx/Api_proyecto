@@ -453,12 +453,13 @@ export default class ConfigurationsController {
       await configuration.save()
   
       if (configuration.tipo_configuracion_id === 1 || configuration.tipo_configuracion_id === 2) {
+        const mqttData = parseInt(configuration.data)
         const url = Env.get('MQTT_HOST') + '/publish'
         const payload = {
           "payload_encoding": "plain",
           "topic": configuration.tipo_configuracion_id === 1 ? "MetaDistancia" : "MetaPasos",
           "qos": 0,
-          "payload": configuration.data,
+          "payload": mqttData,
           "properties": {
             "user_properties": {
               "foo": "bar"
