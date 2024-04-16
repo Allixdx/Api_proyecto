@@ -10,7 +10,7 @@ export default class SensorTypesController {
  *    security:
  *      - bearerAuth: []
  *    tags:
- *      - SensorsTypes
+ *      - TiposSensores
  *    summary: Lista de tipos de sensores
  *    produces:
  *      - application/json
@@ -54,7 +54,7 @@ export default class SensorTypesController {
   *     security:
   *      - bearerAuth: []
   *     tags:
-  *       - SensorsTypes
+  *       - TiposSensores
   *     summary: Crear un nuevo tipo de sensor
   *     produces:
   *       - application/json 
@@ -107,7 +107,7 @@ export default class SensorTypesController {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - SensorsTypes
+   *      - TiposSensores
    *    summary:  Actualizar tipo de sensor
    *    parameters:
    *      - name: id
@@ -176,7 +176,7 @@ export default class SensorTypesController {
  *    security:
  *      - bearerAuth: []
  *    tags:
- *      - SensorsTypes
+ *      - TiposSensores
  *    summary: Eliminar tipo de sensor
  *    parameters:
  *      - name: id

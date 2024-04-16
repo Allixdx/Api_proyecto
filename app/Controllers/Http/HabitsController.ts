@@ -9,7 +9,7 @@ export default class HabitsController {
  *   get:
  *     description: Lista de todos los hábitos en el sistema
  *     tags:
- *       - Habits
+ *       - Habitos
  *     security:
  *       - bearerAuth: []
  *     produces:
@@ -72,7 +72,7 @@ public async index({response}: HttpContextContract) {
    *   post:
    *     description: Crea un nuevo recurso de hábito en la base de datos
    *     tags:
-   *       - Habits
+   *       - Habitos
    *     security:
    *       - bearerAuth: []
    *     produces:
@@ -186,7 +186,7 @@ public async index({response}: HttpContextContract) {
    *   get:
    *     description: Muestra un hábito específico identificado por el número id que se pasa como parámetro.
    *     tags:
-   *       - Habits
+   *       - Habitos
    *     security:
    *       - bearerAuth: []
    *     produces:
@@ -282,7 +282,7 @@ public async index({response}: HttpContextContract) {
    *   put:
    *     description: Actualiza el recurso de hábito
    *     tags:
-   *       - Habits
+   *       - Habitos
    *     security:
    *       - bearerAuth: []
    *     produces:
@@ -431,7 +431,7 @@ public async index({response}: HttpContextContract) {
    *   delete:
    *     description: Elimina de la base de datos al hábito identificado por el número id indicado.
    *     tags:
-   *       - Habits
+   *       - Habitos
    *     security:
    *       - bearerAuth: []
    *     produces:

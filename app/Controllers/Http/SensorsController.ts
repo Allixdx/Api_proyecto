@@ -10,7 +10,7 @@ export default class SensorsController {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - Sensors
+   *      - Sensores
    *    summary: list of sensors
    *    produces:
    *      - application/json
@@ -44,7 +44,7 @@ export default class SensorsController {
   *     security:
   *      - bearerAuth: []
   *     tags:
-  *       - Sensors
+  *       - Sensores
   *     summary: Create new sensor
   *     produces:
   *       - application/json 
@@ -101,7 +101,7 @@ export default class SensorsController {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - Sensors
+   *      - Sensores
    *    summary:  Activate sensor by id
    *    parameters:
    *      - name: id
@@ -175,7 +175,7 @@ export default class SensorsController {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - Sensors
+   *      - Sensores
    *    summary:  drop sensor by id
    *    parameters:
    *      - name: id
