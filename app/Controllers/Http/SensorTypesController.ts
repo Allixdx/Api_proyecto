@@ -9,7 +9,7 @@ export default class SensorTypesController {
  *   get:
  *     summary: Obtiene una lista de tipos de sensores
  *     tags:
- *       - SensorsTypes
+ *       - SensorTipo
  *     security:
  *       - bearerAuth: []
  *     produces:
@@ -68,7 +68,7 @@ public async index({ response }: HttpContextContract) {
  *   post:
  *     summary: Crea un nuevo tipo de sensor
  *     tags:
- *       - SensorsTypes
+ *       - SensorTipo
  *     security:
  *       - bearerAuth: []
  *     produces:
@@ -129,7 +129,7 @@ public async index({ response }: HttpContextContract) {
  *   put:
  *     summary: Actualiza un tipo de sensor existente
  *     tags:
- *       - SensorsTypes
+ *       - SensorTipo
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -213,7 +213,7 @@ public async index({ response }: HttpContextContract) {
  *   delete:
  *     summary: Elimina un tipo de sensor por su ID
  *     tags:
- *       - SensorsTypes
+ *       - SensorTipo
  *     security:
  *       - bearerAuth: []
  *     parameters:

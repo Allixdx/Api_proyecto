@@ -8,7 +8,7 @@ export default class SensorsController {
  *   get:
  *     summary: Obtiene la lista de sensores
  *     tags:
- *       - Sensors
+ *       - Sensores
  *     security:
  *       - bearerAuth: []
  *     produces:
@@ -67,7 +67,7 @@ export default class SensorsController {
  *   post:
  *     summary: Crea un nuevo sensor
  *     tags:
- *       - Sensors
+ *       - Sensores
  *     security:
  *       - bearerAuth: []
  *     produces:
@@ -139,7 +139,7 @@ export default class SensorsController {
  *   put:
  *     summary: Activa o desactiva un sensor por su ID
  *     tags:
- *       - Sensors
+ *       - Sensores
  *     security:
  *       - bearerAuth: []
  *     parameters:
@@ -223,7 +223,7 @@ export default class SensorsController {
  *   delete:
  *     summary: Elimina un sensor por su ID
  *     tags:
- *       - Sensors
+ *       - Sensores
  *     security:
  *       - bearerAuth: []
  *     parameters:
