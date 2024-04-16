@@ -90,7 +90,7 @@ public async index({response}: HttpContextContract) {
  *   post:
  *     summary: Crea un nuevo recurso de hábito en la base de datos
  *     tags:
- *       - Habits
+ *       - Habitos
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -215,7 +215,7 @@ public async index({response}: HttpContextContract) {
  *   get:
  *     summary: Muestra un hábito específico identificado por el número de ID proporcionado.
  *     tags:
- *       - Habits
+ *       - Habitos
  *     security:
  *       - bearerAuth: []
  *     produces:
@@ -327,7 +327,7 @@ public async show({params, response}: HttpContextContract) {
  *   put:
  *     summary: Actualiza el recurso de hábito
  *     tags:
- *       - Habits
+ *       - Habitos
  *     security:
  *       - bearerAuth: []
  *     produces:
@@ -493,7 +493,7 @@ public async show({params, response}: HttpContextContract) {
  *   delete:
  *     summary: Elimina un hábito de la base de datos
  *     tags:
- *       - Habits
+ *       - Habitos
  *     security:
  *       - bearerAuth: []
  *     produces:
