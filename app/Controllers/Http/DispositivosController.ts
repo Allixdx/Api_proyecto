@@ -220,6 +220,8 @@ export default class DispositivosController {
       
       if (dispositivoExistente) {
         return response.status(400).json({
+          type: 'Warning',
+          title: 'Maximo de tipos de dispositivos',
           message: 'Ya tienes 2 dispositivos registrados, no puedes agregar más',
         });
       }
@@ -378,6 +380,12 @@ export default class DispositivosController {
  *             schema:
  *               type: object
  *               properties:
+ *                 type:
+ *                   type: string 
+ *                   description: Tipo de respuesta
+ *                 title:
+ *                   type: string
+ *                   description: Titulo de la respuesta
  *                 message:
  *                   type: string
  *                   example: Device not found
@@ -390,13 +398,13 @@ public async show({ params, response }: HttpContextContract) {
         title: 'Recurso obtenido',
         message: 'Exito al obtener el dispositivo por identificador',
         data: dispositivo
-
       });
+  
     } catch (error) {
       return response.status(404).json({
         type: 'Error',
         title: 'Error al obtener recurso',
-        message: 'Se produjo un error al obtener el recurso'
+        message: 'Se produjo un error al obtener el recurso',
       });
     }
   }
@@ -440,6 +448,9 @@ public async show({ params, response }: HttpContextContract) {
  *             schema:
  *               type: object
  *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta
  *                 title:
  *                   type: string
  *                   description: Título de la respuesta
@@ -456,6 +467,9 @@ public async show({ params, response }: HttpContextContract) {
  *             schema:
  *               type: object
  *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta
  *                 title:
  *                   type: string
  *                   description: Título del error
@@ -472,6 +486,9 @@ public async show({ params, response }: HttpContextContract) {
  *             schema:
  *               type: object
  *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta
  *                 title:
  *                   type: string
  *                   description: Título del error
@@ -488,6 +505,9 @@ public async show({ params, response }: HttpContextContract) {
  *             schema:
  *               type: object
  *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta
  *                 title:
  *                   type: string
  *                   description: Título del error
@@ -566,9 +586,18 @@ public async update({params, request, response}: HttpContextContract) {
  *             schema:
  *               type: object
  *               properties:
+ *                 type: 
+ *                   type: string
+ *                   description: Tipo de respuesta
+ *                 title:
+ *                   type: string
+ *                   description: Titulo de la respuesta
  *                 message:
  *                   type: string
- *                   example: Device not found
+ *                   example: Mensaje de error
+ *                 error:
+ *                   type: string
+ *                   example: Error especifico
  *       500:
  *         description: Error interno del servidor
  *         content:
@@ -576,6 +605,12 @@ public async update({params, request, response}: HttpContextContract) {
  *             schema:
  *               type: object
  *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta
+ *                 title: 
+ *                   type: string
+ *                   description: Titulo de la respuesta
  *                 message:
  *                   type: string
  *                   example: Error deleting device
