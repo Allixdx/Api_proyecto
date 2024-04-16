@@ -403,7 +403,8 @@ export default class EmqxController {
    *                       type: string
    *                       description: Mensaje de error detallado.
    */
-  public async obtenerPasos({ response }: HttpContextContract) {
+  public async obtenerPasos({ response, auth }: HttpContextContract) {
+    // hacer la comparacion de config_habit con el ultimo retained_message de pasos
     try {
       const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePasos';
       const sensorType = await SensorType.findBy('name', 'Pasos');
@@ -445,16 +446,39 @@ export default class EmqxController {
       } catch (error) {
         parsedPayload = decodedPayload;
       }
-
-      return response.status(200).send({
-        title: 'pasos más recientes obtenido con éxito',
-        message: 'Los pasos han sido recuperado correctamente.',
-        type: 'success',
-        data: {
-          retained_message: parsedPayload,
-          unit: unit
-        },
-      });
+      const userId = auth.user?.id;
+      const tablaConfig = await Configuration.query()
+      .where('user_id', userId)
+      .whereHas('tipo_configuracion', (query) => {
+        query.where('name', 'alarma_pasos')
+      })
+      .first()
+      
+      const metaPasos = tablaConfig?.data
+      if (parsedPayload == metaPasos) {
+        return response.status(200).send({
+          title: 'Topico obtenido ',
+          message: 'Los datos obtenidos coinciden con la meta',
+          type: 'success',
+          data: {
+            retained_message: parsedPayload,
+            unit: unit,
+            metaPasos: metaPasos,
+          },
+        });
+      } else {
+        return response.status(200).send({
+          title: 'Obtenido',
+          message: 'Los datos se obtuvieron correctamente pero no coinciden con la meta',
+          type: 'Success!!',
+          data:{
+            retained_message: parsedPayload,
+            unit: unit,
+            metaPasos: metaPasos,
+            id: userId
+          },
+        });
+      }
     } catch (error) {
       let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
       if (error.response) {
@@ -532,7 +556,8 @@ export default class EmqxController {
    *                       type: string
    *                       description: Mensaje de error detallado.
    */
-  public async obtenerDistancia({ response }: HttpContextContract) {
+  public async obtenerDistancia({ response,auth }: HttpContextContract) {
+    // hacer la comparacion de config_habit.data con el retained_message del topico Distancia
     try {
       const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteDistancia';
       const sensorType = await SensorType.findBy('name', 'Distancia');
@@ -563,9 +588,11 @@ export default class EmqxController {
         });
       }
 
+      const userId = auth.user?.id;
       const retainedMessage = axiosResponse.data;
 
       const decodedPayload = Buffer.from(retainedMessage.payload, 'base64').toString('utf-8');
+
 
       let parsedPayload;
       try {
@@ -574,15 +601,40 @@ export default class EmqxController {
         parsedPayload = decodedPayload;
       }
 
-      return response.status(200).send({
-        title: 'Distancia más reciente obtenida con éxito',
-        message: 'La Distancia ha sido recuperada correctamente.',
-        type: 'success',
-        data: {
-          retained_message: parsedPayload,
-          unit: unit
-        },
-      });
+      const tablaConfig = await Configuration.query()
+      .where('user_id', userId)
+      .whereHas('tipo_configuracion', (query) => {
+        query.where('name', 'alarma_distancia')
+      })
+      .first()
+     
+      
+      const metaDistancia = tablaConfig?.data
+
+      if (parsedPayload == metaDistancia) {
+        return response.status(200).send({
+          title: 'Topico obtenido',
+          message: 'Los datos obtenidos coinciden con la meta',
+          type: 'Success!!',
+          data: {
+            retained_message: parsedPayload,
+            unit: unit,
+            metaDistancia: metaDistancia,
+          },
+        });
+      } else {
+        return response.status(200).send({
+          title: 'Obtenido',
+          message: 'Los datos se obtuvieron correctamente pero no coinciden con la meta',
+          type: 'Success!!',
+          data:{
+            retained_message: parsedPayload,
+            unit: unit,
+            metaDistancia: metaDistancia,
+            id:userId
+          }
+        });
+      }
     } catch (error) {
       let errorMessage = 'Ocurrió un error interno al procesar la solicitud.';
       if (error.response) {
@@ -975,7 +1027,7 @@ export default class EmqxController {
   * @swagger
   * /api/emqx/obtener-peso:
   *   post:
-  *     security:
+  *    security:
   *      - bearerAuth: []
   *     tags:
   *       - EMQX
@@ -1099,64 +1151,6 @@ export default class EmqxController {
       });
     }
   }
-  /**
-   * @swagger
-   * /api/emqx/meta-pasos:
-   *   post:
-   *     security:
-   *      - bearerAuth: []
-   *     tags:
-   *       - EMQX
-   *     summary: Obtener el último mensaje retenido de pasos.
-   *     description: |
-   *       Esta ruta permite obtener el último mensaje retenido de pasos desde el servidor EMQX.
-   *     responses:
-   *       200:
-   *         description: Último mensaje retenido de pasos obtenido correctamente.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 title:
-   *                   type: string
-   *                   description: Título de la respuesta.
-   *                 message:
-   *                   type: string
-   *                   description: Mensaje de éxito.
-   *                 type:
-   *                   type: string
-   *                   description: Tipo de respuesta.
-   *                 data:
-   *                   type: object
-   *                   description: Datos de respuesta.
-   *                   properties:
-   *                     retained_message:
-   *                       type: object
-   *                       description: Último mensaje retenido del ritmo cardíaco.
-   *       500:
-   *         description: Error interno al procesar la solicitud.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 title:
-   *                   type: string
-   *                 message:
-   *                   type: string
-   *                   description: Descripción del error.
-   *                 type:
-   *                   type: string
-   *                   description: Tipo de error.
-   *                 data:
-   *                   type: object
-   *                   description: Datos adicionales relacionados con el error.
-   *                   properties:
-   *                     error:
-   *                       type: string
-   *                       description: Mensaje de error detallado.
-   */
   public async metaPasos({ response }: HttpContextContract) {
     try {
       const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaletePasos';
@@ -1198,10 +1192,10 @@ export default class EmqxController {
       const metaPasos = tablaConfig.data
 
       const meta = await Configuration.query()
-      .whereHas('tipo_configuracion', (query)=>{
-        query.where('name','alarma_pasos')
-      })
-      .first()
+        .whereHas('tipo_configuracion', (query) => {
+          query.where('name', 'alarma_pasos')
+        })
+        .first()
 
       try {
         parsedPayload = JSON.parse(decodedPayload);
@@ -1219,7 +1213,7 @@ export default class EmqxController {
             retained_message: parsedPayload,
             unit: unit,
             metaPasos: metaPasos,
-            meta:meta
+            meta: meta
           },
         });
       } else {
@@ -1228,7 +1222,7 @@ export default class EmqxController {
           message: 'Los datos obtenidos no coinciden con lo registrado.',
           type: 'error',
           metaPasos: metaPasos,
-          meta:meta
+          meta: meta
         });
       }
 
@@ -1251,64 +1245,6 @@ export default class EmqxController {
       });
     }
   }
-  /**
-   * @swagger
-   * /api/emqx/meta-distancia:
-   *   post:
-   *     security:
-   *      - bearerAuth: []
-   *     tags:
-   *       - EMQX
-   *     summary: Obtener el último mensaje retenido de distancia.
-   *     description: |
-   *       Esta ruta permite obtener el último mensaje retenido de distancia desde el servidor EMQX.
-   *     responses:
-   *       200:
-   *         description: Último mensaje retenido de distancia obtenido correctamente.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 title:
-   *                   type: string
-   *                   description: Título de la respuesta.
-   *                 message:
-   *                   type: string
-   *                   description: Mensaje de éxito.
-   *                 type:
-   *                   type: string
-   *                   description: Tipo de respuesta.
-   *                 data:
-   *                   type: object
-   *                   description: Datos de respuesta.
-   *                   properties:
-   *                     retained_message:
-   *                       type: object
-   *                       description: Último mensaje retenido de distancia.
-   *       500:
-   *         description: Error interno al procesar la solicitud.
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 title:
-   *                   type: string
-   *                 message:
-   *                   type: string
-   *                   description: Descripción del error.
-   *                 type:
-   *                   type: string
-   *                   description: Tipo de error.
-   *                 data:
-   *                   type: object
-   *                   description: Datos adicionales relacionados con el error.
-   *                   properties:
-   *                     error:
-   *                       type: string
-   *                       description: Mensaje de error detallado.
-   */
   public async metaDistancia({ response }: HttpContextContract) {
     try {
       const url = Env.get('MQTT_HOST') + '/mqtt/retainer/message/BrazaleteDistancia';
@@ -1350,10 +1286,10 @@ export default class EmqxController {
       const metaDistancia = tablaConfig.data
 
       const meta = await Configuration.query()
-      .whereHas('tipo_configuracion', (query)=>{
-        query.where('name','alarma_distancia')
-      })
-      .first()
+        .whereHas('tipo_configuracion', (query) => {
+          query.where('name', 'alarma_distancia')
+        })
+        .first()
 
 
       try {
@@ -1378,11 +1314,11 @@ export default class EmqxController {
           title: 'Error',
           message: 'Los datos obtenidos no coinciden con lo registrado.',
           type: 'error',
-          data:{
+          data: {
             retainde_message: parsedPayload,
             unit: unit,
             metaDistancia: metaDistancia,
-            meta:meta
+            meta: meta
           }
         });
       }
