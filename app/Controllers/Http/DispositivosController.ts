@@ -1,4 +1,5 @@
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext';
+import Configuration from 'App/Models/Configuration';
 import Dispositivo from 'App/Models/Dispositivo';
 import Sensor from 'App/Models/Sensor';
 import SensorType from 'App/Models/SensorType'; 
@@ -620,7 +621,33 @@ public async update({params, request, response}: HttpContextContract) {
 public async destroy({ params, response }: HttpContextContract) {
     try {
       const dispositivo = await Dispositivo.findOrFail(params.id);
+      if (dispositivo.tipoDispositivoId==1){
+          const al1= await Configuration.query().where('user_id',dispositivo.id_usuario).where('tipo_configuracion_id',1).first()
+          const al2= await Configuration.query().where('user_id',dispositivo.id_usuario).where('tipo_configuracion_id',2).first()
+          if(al1==null||al2==null){
+            return response.status(500).json({
+              type: 'Error',
+              title: 'Error al eliminar',
+              message: 'Se produjo un error al eliminar el dispositivo',
+              error: [],
+            });
+          }
+          al1.delete()
+          al2.delete()
+      }else if(dispositivo.tipoDispositivoId==2){
+        const cal= await Configuration.query().where('user_id',dispositivo.id_usuario).where('tipo_configuracion_id',3).first()
+        if(cal==null){
+          return response.status(500).json({
+            type: 'Error',
+            title: 'Error al eliminar',
+            message: 'Se produjo un error al eliminar el dispositivo',
+            error: [],
+          });
+        }
+        cal.delete()
+      }
       await dispositivo.delete();
+    
       return response.status(200).json({
         type: 'Exitoso!!',
         title: 'Dispositivo eliminado',

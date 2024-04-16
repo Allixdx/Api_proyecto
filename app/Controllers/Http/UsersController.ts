@@ -762,7 +762,6 @@ public async update({ auth, request, response }: HttpContextContract) {
       const user = await User.query()
         .where('email', user_email)
         .where('verification_code', verificationCode)
-        .whereNull('deleted_at')
         .first();
 
       if (!user || user.verificationCode !== verificationCode) {
@@ -948,8 +947,11 @@ public async update({ auth, request, response }: HttpContextContract) {
         return response.status(401).json({ message: 'Contraseña incorrecta' });
       }
       // Verificar si el usuario ya está verificado con su código
-      if (user.verificationCode !== null) {
-        return response.status(401).json({ message: 'El usuario aún no está verificado. Por favor, verifique su cuenta.' });
+      if (user.emailVerifiedAt == null) {
+        return response.status(401).json({       
+           type: 'Error',
+        title: 'Error al iniciar sesion',
+         message: 'El usuario aún no está verificado. Por favor, verifique su cuenta.' });
       }
 
       const token = await auth.use('api').generate(user, { expiresIn: '3 days' });
