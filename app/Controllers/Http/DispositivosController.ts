@@ -6,41 +6,41 @@ import TipoDispositivo from 'App/Models/TipoDispositivo';
 
 
 export default class DispositivosController {
-  /**
-   * @swagger
-   * /api/dispositivos:
-   *   get:
-   *     security:
-   *       - bearerAuth: []
-   *     tags:
-   *       - Dispositivos
-   *     summary: Obtener todos los dispositivos
-   *     responses:
-   *       200:
-   *         description: Respuesta exitosa
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 status:
-   *                   type: string
-   *                   example: success
-   *                 message:
-   *                   type: string
-   *                   example: Successfully retrieved all devices
-   *                 data:
-   *                   type: array
-   *                   items:
-   *                     $ref: '#/components/schemas/Dispositivo'
-   */
+/**
+ * @swagger
+ * /api/dispositivos:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Dispositivos
+ *     summary: Obtiene todos los dispositivos
+ *     responses:
+ *       200:
+ *         description: Respuesta exitosa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Successfully retrieved all devices
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Dispositivo'
+ */
   public async index({ response }: HttpContextContract) {
     try {
       const dispositivos = await Dispositivo.query()
         .preload('sensores');
       return response.status(200).send({
         type: 'Success!!',
-        title: 'Acceso a lista de dispositivos',
+        title: 'Recurso de lista de dispositivos obtenido con exito',
         message: 'Lista de dispositivos',
         data: dispositivos,
       });
@@ -52,64 +52,64 @@ export default class DispositivosController {
       });
     }
   }
-  /**
-   * @swagger
-   * /api/dispositivos:
-   *   post:
-   *     security:
-   *       - bearerAuth: []
-   *     tags:
-   *       - TiposDispositivos
-   *     summary: Crear un nuevo tipo dispositivo
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               tipoDispositivo:
-   *                 type: string
-   *                 description: Tipo de dispositivo ('pesa' o 'reloj')
-   *     responses:
-   *       201:
-   *         description: Dispositivo creado exitosamente
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 status:
-   *                   type: string
-   *                   example: success
-   *                 message:
-   *                   type: string
-   *                   example: Device created successfully
-   *                 data:
-   *                   $ref: '#/components/schemas/Dispositivo'
-   *       400:
-   *         description: Bad Request
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Tipo de dispositivo inválido
-   *       500:
-   *         description: Error interno del servidor
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Error creating device
-   *                 error:
-   *                   type: string
-   */
+/**
+ * @swagger
+ * /api/dispositivos:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - TiposDispositivos
+ *     summary: Crear un nuevo tipo dispositivo
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tipoDispositivo:
+ *                 type: string
+ *                 description: Tipo de dispositivo ('pesa' o 'brazalete')
+ *     responses:
+ *       201:
+ *         description: Dispositivo creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Device created successfully
+ *                 data:
+ *                   $ref: '#/components/schemas/Dispositivo'
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Tipo de dispositivo inválido
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error creating device
+ *                 error:
+ *                   type: string
+ */
   public async store({ request, response }: HttpContextContract) {
     try {
       const name = request.input('tipoDispositivo');
@@ -138,67 +138,67 @@ export default class DispositivosController {
       });
     }
   }
-  /**
-   * @swagger
-   * /api/dispositivos/crear-dispositivo:
-   *   post:
-   *     security:
-   *       - bearerAuth: []
-   *     tags:
-   *       - Dispositivos
-   *     summary: Crear un nuevo dispositivo
-   *     requestBody:
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               tipoDispositivo:
-   *                 type: string
-   *                 description: Tipo de dispositivo  ( 'brazalete':1,'pesa':2)
-   *               nombre:
-   *                 type: string
-   *                 description: Nombre de dispositivo
-   *     responses:
-   *       201:
-   *         description: Dispositivo creado exitosamente
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 status:
-   *                   type: string
-   *                   example: success
-   *                 message:
-   *                   type: string
-   *                   example: Dispositivo creado exitosamente
-   *                 data:
-   *                   $ref: '#/components/schemas/TipoDispositivo'
-   *       400:
-   *         description: Bad Request
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Tipo de dispositivo inválido
-   *       500:
-   *         description: Error interno del servidor
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Error al crear el dispositivo
-   *                 error:
-   *                   type: string
-   */
+/**
+ * @swagger
+ * /api/dispositivos/crear-dispositivo:
+ *   post:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Dispositivos
+ *     summary: Crear un nuevo dispositivo
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               tipoDispositivo:
+ *                 type: string
+ *                 description: Tipo de dispositivo ('brazalete' o 'pesa')
+ *               nombre:
+ *                 type: string
+ *                 description: Nombre del dispositivo
+ *     responses:
+ *       201:
+ *         description: Dispositivo creado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 status:
+ *                   type: string
+ *                   example: success
+ *                 message:
+ *                   type: string
+ *                   example: Dispositivo creado exitosamente
+ *                 data:
+ *                   $ref: '#/components/schemas/TipoDispositivo'
+ *       400:
+ *         description: Bad Request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Tipo de dispositivo inválido
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error al crear el dispositivo
+ *                 error:
+ *                   type: string
+ */
   public async creardispositivo({ request, response, auth }: HttpContextContract) {
     // en este el sensor_type son todos los tipos de sensores que hay pesa Peso y Brazalete 5 sensores diferentes
     try {
@@ -347,41 +347,42 @@ export default class DispositivosController {
       });
     }
   }
-  /**
-     * @swagger
-     * /api/dispositivos/{id}:
-     *   get:
-     *     security:
-     *       - bearerAuth: []
-     *     tags:
-     *       - Dispositivos
-     *     summary: Obtener un dispositivo por su ID
-     *     parameters:
-     *       - name: id
-     *         in: path
-     *         required: true
-     *         description: ID del dispositivo a obtener
-     *         schema:
-     *           type: integer
-     *     responses:
-     *       200:
-     *         description: Dispositivo encontrado
-     *         content:
-     *           application/json:
-     *             schema:
-     *               $ref: '#/components/schemas/Dispositivo'
-     *       404:
-     *         description: Dispositivo no encontrado
-     *         content:
-     *           application/json:
-     *             schema:
-     *               type: object
-     *               properties:
-     *                 message:
-     *                   type: string
-     *                   example: Device not found
-     */
-  public async show({ params, response }: HttpContextContract) {
+
+/**
+ * @swagger
+ * /api/dispositivos/{id}:
+ *   get:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Dispositivos
+ *     summary: Obtener un dispositivo por su ID
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del dispositivo a obtener
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       200:
+ *         description: Dispositivo encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/Dispositivo'
+ *       404:
+ *         description: Dispositivo no encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Device not found
+ */
+public async show({ params, response }: HttpContextContract) {
     try {
       const dispositivo = await Dispositivo.findOrFail(params.id);
       return response.status(200).json({
@@ -399,103 +400,105 @@ export default class DispositivosController {
       });
     }
   }
-   /**
-   * @swagger
-   * /api/dispositivos/{id}:
-   *   put:
-   *     description: Actualiza el recurso de dispositivo
-   *     tags:
-   *       - Dispositivos
-   *     security:
-   *       - bearerAuth: []
-   *     produces:
-   *       - application/json
-   *     requestBody:
-   *       description: Se pueden cambiar los datos que sean necesarios
-   *       required: true
-   *       content:
-   *         application/json:
-   *           schema:
-   *             type: object
-   *             properties:
-   *               name:
-   *                 type: string
-   *                 description: Nombre del dispositivo
-   *                 required: true
-   *     parameters:
-   *       - in: path
-   *         name: id
-   *         schema:
-   *           type: number
-   *         required: true
-   *         description: Id de dispositivo que se va a actualizar
-   *     responses:
-   *       200:
-   *         description: La actualización del recurso fue exitosa
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 title:
-   *                   type: string
-   *                   description: Título de la respuesta
-   *                 message:
-   *                   type: string
-   *                   description: Mensaje de la respuesta
-   *                 data: 
-   *                   type: object
-   *                   description: Datos de la respuesta
-   *       422:
-   *         description: Los datos en el cuerpo de la solicitud no son procesables 
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 title:
-   *                   type: string
-   *                   description: Título del error
-   *                 message:
-   *                   type: string
-   *                   description: Mensaje del error
-   *                 errors: 
-   *                   type: object
-   *                   description: Datos del error  
-   *       404:
-   *         description: No se pudo encontrar el recurso de dispositivo para su actualización
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 title:
-   *                   type: string
-   *                   description: Título del error
-   *                 message:
-   *                   type: string
-   *                   description: Mensaje del error
-   *                 errors: 
-   *                   type: object
-   *                   description: Datos del error   
-   *       500:
-   *         description: Hubo un fallo en el servidor durante la solicitud 
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 title:
-   *                   type: string
-   *                   description: Título del error
-   *                 message:
-   *                   type: string
-   *                   description: Mensaje del error
-   *                 errors: 
-   *                   type: object
-   *                   description: Datos del error 
-   */
-   public async update({params, request, response}: HttpContextContract) {
+
+/**
+ * @swagger
+ * /api/dispositivos/{id}:
+ *   put:
+ *     description: Actualiza el recurso de dispositivo
+ *     tags:
+ *       - Dispositivos
+ *     summary: Actualizar Dispositivo
+ *     security:
+ *       - bearerAuth: []
+ *     produces:
+ *       - application/json
+ *     requestBody:
+ *       description: Se pueden cambiar los datos que sean necesarios
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Nombre del dispositivo
+ *                 required: true
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: number
+ *         required: true
+ *         description: Id de dispositivo que se va a actualizar
+ *     responses:
+ *       200:
+ *         description: La actualización del recurso fue exitosa
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                   description: Título de la respuesta
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de la respuesta
+ *                 data: 
+ *                   type: object
+ *                   description: Datos de la respuesta
+ *       422:
+ *         description: Los datos en el cuerpo de la solicitud no son procesables 
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                   description: Título del error
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje del error
+ *                 errors: 
+ *                   type: object
+ *                   description: Datos del error  
+ *       404:
+ *         description: No se pudo encontrar el recurso de dispositivo para su actualización
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                   description: Título del error
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje del error
+ *                 errors: 
+ *                   type: object
+ *                   description: Datos del error   
+ *       500:
+ *         description: Hubo un fallo en el servidor durante la solicitud 
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                   description: Título del error
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje del error
+ *                 errors: 
+ *                   type: object
+ *                   description: Datos del error 
+ */
+public async update({params, request, response}: HttpContextContract) {
     try {
 
       const device = await Dispositivo.findOrFail(params.id)
@@ -505,6 +508,7 @@ export default class DispositivosController {
       await device.save()
 
       return response.status(200).send({
+        type: 'Exitoso',
         title: 'Recurso actualizado',
         message: 'El recurso hábito ha sido actualizado exitosamente',
         data: device
@@ -512,6 +516,7 @@ export default class DispositivosController {
     } catch (error) {
       if (error.messages) {
         return response.status(422).send({
+          type:'Error',
           title: 'Error de validación',
           message: 'Los datos en el cuerpo de la solicitud no son procesables',
           errors: error.messages
@@ -520,6 +525,7 @@ export default class DispositivosController {
 
       if (error.code === 'E_ROW_NOT_FOUND') {
         return response.status(404).send({
+          type:'Error',
           title: 'Recurso no encontrado',
           message: 'El recurso de hábito no pudo encontrarse',
           errors: []
@@ -527,55 +533,56 @@ export default class DispositivosController {
       }
 
       return response.status(500).send({
+        type: 'Error',
         title: 'Error de servidor',
         message: 'Hubo un fallo en el servidor durante la solicitud',
         errors: error
       })
     }
   }
-  /**
-   * @swagger
-   * /api/dispositivos/{id}:
-   *   delete:
-   *     security:
-     *       - bearerAuth: []
-   *     tags:
-   *       - Dispositivos
-   *     summary: Eliminar un dispositivo por su ID
-   *     parameters:
-   *       - name: id
-   *         in: path
-   *         required: true
-   *         description: ID del dispositivo a eliminar
-   *         schema:
-   *           type: integer
-   *     responses:
-   *       204:
-   *         description: Dispositivo eliminado correctamente
-   *       404:
-   *         description: Dispositivo no encontrado
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Device not found
-   *       500:
-   *         description: Error interno del servidor
-   *         content:
-   *           application/json:
-   *             schema:
-   *               type: object
-   *               properties:
-   *                 message:
-   *                   type: string
-   *                   example: Error deleting device
-   *                 error:
-   *                   type: string
-   */
-  public async destroy({ params, response }: HttpContextContract) {
+/**
+ * @swagger
+ * /api/dispositivos/{id}:
+ *   delete:
+ *     security:
+ *       - bearerAuth: []
+ *     tags:
+ *       - Dispositivos
+ *     summary: Eliminar un dispositivo por su ID
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del dispositivo a eliminar
+ *         schema:
+ *           type: integer
+ *     responses:
+ *       204:
+ *         description: Dispositivo eliminado correctamente
+ *       404:
+ *         description: Dispositivo no encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Device not found
+ *       500:
+ *         description: Error interno del servidor
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: Error deleting device
+ *                 error:
+ *                   type: string
+ */
+public async destroy({ params, response }: HttpContextContract) {
     try {
       const dispositivo = await Dispositivo.findOrFail(params.id);
       await dispositivo.delete();

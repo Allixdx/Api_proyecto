@@ -29,6 +29,8 @@ Route.group(() => {
 
   Route.post('/recuperar-contra','UsersController.correorecuperacion')
 
+  Route.post('/RecuperarPassword','UsersController.RecuperarPassword')
+
   Route.put('/update-password','UsersController.updatePassword').middleware('auth:api')
 
 }).prefix('/api/users')

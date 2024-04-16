@@ -30,6 +30,12 @@ export default class EdamamsController {
  *             schema:
  *               type: object
  *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta.
+ *                 title:
+ *                   type: string
+ *                   description: Título de la respuesta.
  *                 message:
  *                   type: string
  *                   description: Mensaje de éxito.
@@ -49,12 +55,34 @@ export default class EdamamsController {
  *             schema:
  *               type: object
  *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta.
+ *                 title:
+ *                   type: string
+ *                   description: Título del error.
  *                 message:
  *                   type: string
  *                   description: Mensaje de error.
  *                 error:
  *                   type: string
  *                   description: Descripción del error.
+ *       404:
+ *         description: No se encontraron resultados para el alimento especificado.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta.
+ *                 title:
+ *                   type: string
+ *                   description: Título del error.
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de error.
  */
 public async findFood({ request, response }: HttpContextContract) {
   try {
@@ -184,7 +212,6 @@ public async findFood({ request, response }: HttpContextContract) {
  *                   type: string
  *                   description: Descripción del error.
  */
-
 public async calculateNutrition({ request, response }) {
   try {
     const sensorType = await SensorType.findBy('name', 'Peso');

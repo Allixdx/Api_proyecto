@@ -2,39 +2,54 @@ import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import SensorType from 'App/Models/SensorType'
 
 export default class SensorTypesController {
-  /**
- * 
+
+/**
  * @swagger
  * /api/sensor-type:
- *  get:
- *    security:
- *      - bearerAuth: []
- *    tags:
- *      - SensorsTypes
- *    summary: Lista de tipos de sensores
- *    produces:
- *      - application/json
- *    responses:
- *      200:
- *        description: Success!!
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                title:
- *                  type: string
- *                  description: titulo
- *                data:
- *                  type: string 
- *                  description: descripcion
+ *   get:
+ *     summary: Obtiene una lista de tipos de sensores
+ *     tags:
+ *       - SensorsTypes
+ *     security:
+ *       - bearerAuth: []
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: ¡Éxito!
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 title:
+ *                   type: string
+ *                   description: Título de la respuesta
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de la respuesta
+ *                 data:
+ *                   type: array
+ *                   description: Lista de tipos de sensores
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: integer
+ *                         description: ID del tipo de sensor
+ *                       name:
+ *                         type: string
+ *                         description: Nombre del tipo de sensor
+ *                       description:
+ *                         type: string
+ *                         description: Descripción del tipo de sensor
  */
-  public async index({ response }: HttpContextContract) {
+public async index({ response }: HttpContextContract) {
    try{
     const SensorTypes = await SensorType.all()
     return response.status(200).send({
       type: 'Exitoso!!',
-      title: 'Tipos de sensores obtenidos',
+      title: 'Recurso de Sensortype obtenido con exito',
       message: 'Tipos de sensores obtenidos exitosamente',
       data: SensorTypes
     });
@@ -47,45 +62,54 @@ export default class SensorTypesController {
     });
   }
 }
-  /**
-  * @swagger
-  * /api/sensor-type:
-  *   post:
-  *     security:
-  *      - bearerAuth: []
-  *     tags:
-  *       - SensorsTypes
-  *     summary: Crear un nuevo tipo de sensor
-  *     produces:
-  *       - application/json 
-  *     requestBody:
-  *       response: true
-  *       content:
-  *         application/json:
-  *           schema:
-  *             type: object
-  *             properties:
-  *               name:
-  *                 type: string
-  *                 description: nombre
-  *               unit:
-  *                 type: string
-  *                 description: unidad
-  *     responses:
-  *       200:
-  *         description: Success! Tout va bien :)
-  *         content:
-  *           application/json:
-  *             schema:
-  *               type: object
-  *               properties:
-  *                 name:
-  *                   type: string
-  *                   description: titulo
-  *                 unit:
-  *                   type: string
-  *                   description: unidad
-  */ 
+/**
+ * @swagger
+ * /api/sensor-type:
+ *   post:
+ *     summary: Crea un nuevo tipo de sensor
+ *     tags:
+ *       - SensorsTypes
+ *     security:
+ *       - bearerAuth: []
+ *     produces:
+ *       - application/json
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Nombre del tipo de sensor
+ *               unit:
+ *                 type: string
+ *                 description: Unidad de medida del sensor
+ *     responses:
+ *       200:
+ *         description: ¡Éxito!
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 type: string
+ *                 title: Respuesta exitosa
+ *                 message: Mensaje de éxito
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       description: ID del tipo de sensor creado
+ *                     name:
+ *                       type: string
+ *                       description: Nombre del tipo de sensor
+ *                     unit:
+ *                       type: string
+ *                       description: Unidad de medida del sensor
+ */
   public async store({response, request}: HttpContextContract) {
     const {name, unit} = request.body()
     const newSensorType = new SensorType()
@@ -99,53 +123,67 @@ export default class SensorTypesController {
       data:newSensorType
     })
   }
-  /**
-   * 
-   * @swagger
-   * /api/sensor-type/{id}:
-   *  put:
-   *    security:
-   *      - bearerAuth: []
-   *    tags:
-   *      - SensorsTypes
-   *    summary:  Actualizar tipo de sensor
-   *    parameters:
-   *      - name: id
-   *        in: path
-   *        required: true
-   *        description: id sensor
-   *        schema: 
-   *          type: integer 
-   *    produces:
-   *      - application/json
-   *    requestBody:
-   *      response: true
-   *      content:
-   *        application/json:
-   *          schema:
-   *            type: object
-   *            properties:
-   *              name:
-   *                type: string
-   *                description: Nombre
-   *              unit:
-   *                type: string
-   *                description: Unidad
-   *    responses:
-   *      200:
-   *        description: Success! Tout va bien :)
-   *        content:
-   *          application/json:
-   *            schema:
-   *              type: object
-   *              properties:
-   *                title:
-   *                  type: string
-   *                  description: Titulo de la respuestinha sinha sinha
-   *                data:
-   *                  type: string
-   *                  description: datos de respuesta
-   */
+/**
+ * @swagger
+ * /api/sensor-type/{id}:
+ *   put:
+ *     summary: Actualiza un tipo de sensor existente
+ *     tags:
+ *       - SensorsTypes
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del tipo de sensor que se va a actualizar
+ *         schema:
+ *           type: integer
+ *     produces:
+ *       - application/json
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *                 description: Nombre del tipo de sensor
+ *               unit:
+ *                 type: string
+ *                 description: Unidad de medida del sensor
+ *     responses:
+ *       200:
+ *         description: ¡Éxito!
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta
+ *                 title:
+ *                   type: string
+ *                   description: Título de la respuesta
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de la respuesta
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       description: ID del tipo de sensor actualizado
+ *                     name:
+ *                       type: string
+ *                       description: Nombre del tipo de sensor actualizado
+ *                     unit:
+ *                       type: string
+ *                       description: Unidad de medida del sensor actualizado
+ */
   public async update({request, params, response}: HttpContextContract) {
     try {
       const {name, unit} = request.body()
@@ -169,38 +207,69 @@ export default class SensorTypesController {
       }
     }
   }
- /**
+/**
  * @swagger
  * /api/sensor-type/{id}:
- *  delete:
- *    security:
- *      - bearerAuth: []
- *    tags:
- *      - SensorsTypes
- *    summary: Eliminar tipo de sensor
- *    parameters:
- *      - name: id
- *        in: path
- *        required: true
- *        description: Id del cliente
- *        schema:
- *          type: integer
- *    produces:
- *      - application/json
- *    responses:
- *      200:
- *        description: Success! Tout va bien :)
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                title:
- *                  type: string
- *                  description: Titulo de la respuestinha sinha sinha
- *                data:
- *                  type: string
- *                  description: datos de respuesta
+ *   delete:
+ *     summary: Elimina un tipo de sensor por su ID
+ *     tags:
+ *       - SensorsTypes
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID del tipo de sensor que se va a eliminar
+ *         schema:
+ *           type: integer
+ *     produces:
+ *       - application/json
+ *     responses:
+ *       200:
+ *         description: ¡Éxito!
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta
+ *                 title:
+ *                   type: string
+ *                   description: Título de la respuesta
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de la respuesta
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       description: ID del tipo de sensor eliminado
+ *                     name:
+ *                       type: string
+ *                       description: Nombre del tipo de sensor eliminado
+ *                     unit:
+ *                       type: string
+ *                       description: Unidad de medida del sensor eliminado
+ *       404:
+ *         description: Tipo de sensor no encontrado
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta
+ *                 title:
+ *                   type: string
+ *                   description: Título del error
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje del error
  */
   public async destroy({params, response}: HttpContextContract) {
     try {

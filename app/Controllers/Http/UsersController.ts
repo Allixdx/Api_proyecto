@@ -255,15 +255,24 @@ export default class UsersController {
    *          - email
    *          - password
    */
-  public async register({ request, response}: HttpContextContract) {
+  public async register({ request, response }: HttpContextContract) {
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     try {
       const name = request.input('name');
       const lastname = request.input('lastname');
       const email = request.input('email')
       const password = request.input('password');
-
-      // Verificar si el correo electrónico ya existe
+  
+      // Validar el formato del correo electrónico
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        return response.status(400).json({
+          type: 'Error',
+          message: 'Error al crear usuario',
+          error: 'Formato de correo electrónico inválido',
+        });
+      }
+  
       const existingUser = await User.findBy('email', email);
       if (existingUser) {
         return response.status(400).json({
@@ -272,7 +281,7 @@ export default class UsersController {
           error: 'Correo electrónico ya registrado',
         });
       }
-
+  
       if (password.length < 8) {
         return response.status(400).json({
           type: 'Error',
@@ -280,20 +289,20 @@ export default class UsersController {
           error: 'La contraseña debe tener al menos 8 caracteres',
         });
       }
-
+  
       const newUser = new User();
       newUser.name = name;
       newUser.lastname = lastname;
       newUser.email = email;
       newUser.password = await Hash.make(password);
-
+  
       const verificationCode = this.generateVerificationCode();
       newUser.verificationCode = verificationCode;
-
+  
       await newUser.save();
-
+  
       const emailData = { code: verificationCode };
-
+  
       await Mail.send((message) => {
         message
           .from(Env.get('SMTP_USERNAME'), 'Healthy App')
@@ -301,19 +310,17 @@ export default class UsersController {
           .subject('Healthy App - Verificación de cuenta')
           .htmlView('emails/welcome', emailData);
       });
-      
+  
       const accountSid = Env.get('TWILIO_ACCOUNT_SID')
       const authToken = Env.get('TWILIO_AUTH_TOKEN')
       const client = require('twilio')(accountSid, authToken)
-
-
-   
+  
       await client.messages.create({
         body: "Gracias por registrarte en HealthyApp :D",
         from: Env.get('TWILIO_FROM_NUMBER'),
         to:`+528714446301`
       })
-
+  
       return response.status(201).json({
         type: 'Success!!',
         title: 'Registro correctamente',
@@ -323,7 +330,7 @@ export default class UsersController {
           name: newUser.name,
           lastname: newUser.lastname,
           email: newUser.email,
-        message: 'Se ha enviado un codigo de verificacion a tu correo electromico'
+          message: 'Se ha enviado un codigo de verificacion a tu correo electromico'
         },
       });
     } catch (error) {
@@ -334,7 +341,7 @@ export default class UsersController {
         error: error.message,
       });
     }
-  }
+  }  
   private generateVerificationCode() {
     const randomNumber = Math.floor(1000 + Math.random() * 9000);
     return randomNumber.toString();
@@ -955,4 +962,103 @@ public async update({ auth, request, response }: HttpContextContract) {
     const randomNumber = Math.floor(1000 + Math.random() * 9000)
     return randomNumber.toString()
   }
+  /**
+* @swagger
+* /api/users/RecuperarPassword:
+*   post:
+*     tags:
+*       - users
+*     summary: Recuperar la contraseña del usuario utilizando un código de recuperación
+*     requestBody:
+*       required: true
+*       content:
+*         application/json:
+*           schema:
+*             type: object
+*             required:
+*               - email
+*               - verificationCode
+*               - newPassword
+*             properties:
+*               email:
+*                 type: string
+*                 format: email
+*               verificationCode:
+*                 type: string
+*               newPassword:
+*                 type: string
+*                 format: password
+*     responses:
+*       200:
+*         description: Contraseña actualizada exitosamente
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 message:
+*                   type: string
+*                   example: Contraseña actualizada exitosamente.
+*       400:
+*         description: Código de recuperación no válido
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 message:
+*                   type: string
+*                   example: El código de recuperación no es válido.
+*       404:
+*         description: Administrador no encontrado
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 message:
+*                   type: string
+*                   example: No se encontró un administrador con este correo electrónico.
+*       500:
+*         description: Error del servidor
+*         content:
+*           application/json:
+*             schema:
+*               type: object
+*               properties:
+*                 message:
+*                   type: string
+*                   example: Error al actualizar la contraseña.
+*                 error:
+*                   type: string
+*                   example: Mensaje de error detallado
+*/
+public async RecuperarPassword({ request, response }: HttpContextContract) {
+  try {
+    const { email, verificationCode, newPassword } = request.only(['email', 'verificationCode', 'newPassword'])
+    const user = await User.findByOrFail('email', email)
+
+    if (user.verificationCode!== verificationCode || !user.verificationCode) {
+      return response.status(400).json({
+        message: 'El código de recuperación no es válido.',
+      });
+    }      
+    user.password = await Hash.make(newPassword)
+    user.verificationCode = null
+    await user.save()
+
+    return response.status(200).json({
+      "type": "Exitoso",
+      "title": "Recursos encontrados",
+      "message": "La Contrasena fue actualizada con exito",
+    })
+  } catch (error) {
+    return response.internalServerError({
+      "type": "Error",
+      "title": "Error de sevidor",
+      "message": "Hubo un fallo en el servidor durante el registro de los datos",
+      "errors": error.message
+    })
+  }
+}
 }
