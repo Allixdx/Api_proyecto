@@ -1119,7 +1119,7 @@ public async update({ auth, request, response }: HttpContextContract) {
 * /api/users/RecuperarPassword:
 *   post:
 *     tags:
-*       - users
+*       - Usuarios
 *     summary: Recuperar la contraseña del usuario utilizando un código de recuperación
 *     requestBody:
 *       required: true
