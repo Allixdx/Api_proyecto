@@ -975,7 +975,7 @@ export default class EmqxController {
   * @swagger
   * /api/emqx/obtener-peso:
   *   post:
-  *    security:
+  *     security:
   *      - bearerAuth: []
   *     tags:
   *       - EMQX
