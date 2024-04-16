@@ -443,7 +443,44 @@ public async update({ auth, request, response }: HttpContextContract) {
     }
     
     const { name, lastname, email } = request.only(['name', 'lastname', 'email']);
+ 
+    const nameRegex = /^[A-Za-z\s]+$/;
+    if (!nameRegex.test(name)) {
+        return response.status(400).json({
+            type: 'Error',
+            title: 'Error de credenciales',
+            message: 'Error al crear usuario',
+            error: 'El nombre solo puede contener letras y espacios',
+        });
+    }
 
+    const lastnameRegex = /^[A-Za-z\s]+$/;
+    if (!lastnameRegex.test(lastname)) {
+        return response.status(400).json({
+            type: 'Error',
+            title: 'Error de credenciales',
+            message: 'Error al crear usuario',
+            error: 'El apellido solo puede contener letras y espacios',
+        });
+    }
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return response.status(400).json({
+      type: 'Error',
+      title: 'Error de credenciales',
+      message: 'Error al crear usuario',
+      error: 'Formato de correo electrónico inválido',
+    });
+  }
+
+  const existingUser = await User.findBy('email', email);
+  if (existingUser) {
+    return response.status(400).json({
+      type: 'Error',
+      message: 'Error al crear usuario',
+      error: 'Correo electrónico ya registrado',
+    });
+  }
     // Construye un objeto con los campos que se van a actualizar
     const updates: { [key: string]: any } = {};
     if (name !== undefined) {
