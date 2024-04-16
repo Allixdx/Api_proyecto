@@ -12,7 +12,7 @@ export default class ConfigurationsController {
     *     description: Lista de todas las configuraciones de los habitos en el sistema
     *     tags:
     *       - Configuracion
-    *     summary: Lista de todas las configuraciones de los habitos en el sistema
+    *     summary: Lista de las configuraciones de habitos 
     *     security:
     *       - bearerAuth: []
     *     produces:
@@ -79,7 +79,7 @@ export default class ConfigurationsController {
     *     description: Crea un nuevo recurso de configuracion de habito en la base de datos. 
     *     tags:
     *       - Configuracion
-    *     summary: Crear un nuevo recuerso de configuracion de habito.
+    *     summary: Crear un nuevo recurso de configuracion de habito.
     *     security:
     *       - bearerAuth: []
     *     produces:
@@ -208,7 +208,7 @@ export default class ConfigurationsController {
     *     description: Muestra una configuracion especifica identificada por el numero id que se pasa como parametro.
     *     tags:
     *       - Configuracion
-    *     summary: Mostrar configuracion de habito especifica por identificador.
+    *     summary: Mostrar configuracion de habito especifica por identificador
     *     security:
     *       - bearerAuth: []
     *     produces:
