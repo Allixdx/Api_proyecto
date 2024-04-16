@@ -9,7 +9,7 @@ export default class HabitsController {
  *   get:
  *     summary: Lista de todos los hábitos en el sistema
  *     tags:
- *       - Habits
+ *       - Habitos
  *     security:
  *       - bearerAuth: []
  *     produces:

@@ -12,7 +12,7 @@ export default class UsersController {
    * /api/users:
    *  get:
    *    tags:
-   *      - users
+   *      - Usuarios
    *    summary: Lista de usuarios
    *    produces:
    *      - application/json
@@ -24,12 +24,18 @@ export default class UsersController {
    *            schema:
    *              type: object
    *              properties:
+   *                type:
+   *                  type: string
+   *                  description: Tipo de respuesta
    *                title:
    *                  type: string
-   *                  description: title 
+   *                  description: Titulo de la respuesta
+   *                messgae:
+   *                  type: string
+   *                  description: Mensaje de la respuesta
    *                data:
    *                  type: string 
-   *                  description: jajajaj
+   *                  description: Datos de la respuesta
    */
   public async index({ response }: HttpContextContract) {
   
@@ -51,7 +57,7 @@ export default class UsersController {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - users
+   *      - Usuarios
    *    summary: Lista de usuarios
    *    produces:
    *      - application/json
@@ -64,18 +70,24 @@ export default class UsersController {
    *          type: integer
    *    responses:
    *      200:
-   *        description: Success!!
+   *        description: Usuario especifico obtenido correctamente
    *        content:
    *          application/json:
    *            schema:
    *              type: object
    *              properties:
+   *                type:
+   *                  type: string
+   *                  description: Tipo de respuesta
    *                title:
    *                  type: string
-   *                  description: title 
+   *                  description: Titulo de la respuesta
+   *                message:
+   *                  type: string
+   *                  description: Mensaje de la respuesta
    *                data:
    *                  type: string 
-   *                  description: jajajaj
+   *                  description: Datos de la respuesta
    */
     public async show({ response,params }: HttpContextContract) {
       const users = await User.query().where('id',params.id).preload('dispositivo',(dispositivo) => {
@@ -117,8 +129,8 @@ export default class UsersController {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - users
-   *    summary: Codigo de verificacion
+   *      - Usuarios
+   *    summary: Reenviar codigo de verificacion
    *    description: Mandar codigo de verificacion 
    *    parameters:
    *      - name: id
@@ -134,8 +146,10 @@ export default class UsersController {
    *          schema:
    *            type: object
    *            properties:
+   *              type: 
    *              email:
    *                type: string
+   *                description: Correo electronico 
    *    responses:
    *       200:
    *        description: Datos de usuario actualizados exitosamente.
@@ -166,6 +180,7 @@ export default class UsersController {
     return response.status(200).send({
       type: 'Success!!',
       title:'Codigo de verificacion enviado a tu correo electronico',
+      message: 'Se mando codigo de verificacion a tu correo electronico'
     })
   }
   /**
@@ -173,7 +188,7 @@ export default class UsersController {
    * /api/users:
    *  post:
    *      tags:
-   *        - users
+   *        - Usuarios
    *      summary: Crear un nuevo usuario
    *      description: Crea un nuevo usuario con los datos proporcionados y envía un correo electrónico de verificación.
    *      requestBody:
@@ -195,6 +210,15 @@ export default class UsersController {
    *              schema:
    *                type: object
    *                properties:
+   *                  type: 
+   *                    type: string
+   *                    description:  Tipo de respuesta
+   *                  title:
+   *                    type: string  
+   *                    description:  Titulo de la respuesta
+   *                  message: 
+   *                    type: string
+   *                    description:  Mesaje de la respuesta
    *                  data:
    *                    type: object
    *                    properties:
@@ -217,12 +241,18 @@ export default class UsersController {
    *              schema:
    *                type: object
    *                properties:
+   *                  type:
+   *                    type: string
+   *                    description: Tipo de respuesta
+   *                  title:
+   *                    type: string
+   *                    description:  Titulo de la respuesta
    *                  message:
    *                    type: string
-   *                    example: Error al crear usuario
+   *                    description: Mensaje de la respuesta
    *                  error:
    *                    type: string
-   *                    example: Correo electrónico ya registrado
+   *                    description: Correo electrónico ya registrado
    *        500:
    *          description: Error interno del servidor al intentar crear el usuario.
    *          content:
@@ -230,6 +260,12 @@ export default class UsersController {
    *              schema:
    *                type: object
    *                properties:
+   *                  type:
+   *                    type: string
+   *                    description : Tipo de respuesta
+   *                  title:
+   *                    type: string
+   *                    description: Titulo de la respuesta
    *                  message:
    *                    type: string
    *                    example: Error al crear usuario
@@ -353,7 +389,7 @@ export default class UsersController {
  *    security:
  *      - bearerAuth: []
  *    tags:
- *      - users
+ *      - Usuarios
  *    summary: Actualización de datos de usuario
  *    description: Actualiza los datos de un usuario existente. Cada campo es opcional y se actualizará solo si está presente en la solicitud.
  *    requestBody:
@@ -377,29 +413,37 @@ export default class UsersController {
  *            schema:
  *              type: object
  *              properties:
+ *                type:
+ *                  type: string
+ *                  description:  Tipo de respuesta
+ *                title:
+ *                  type: string
+ *                  description:  Titulo de la respuesta
  *                message:
  *                  type: string
- *                  description: Mensaje indicando el éxito de la actualización.
- *       401:
- *        description: Usuario no autenticado.
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                error:
+ *                  description:  Mensaje de la respuesta
+ *                data:
  *                  type: string
- *                  description: Mensaje indicando el error de autenticación.
- *       500:
+ *                  description:  Datos de la respuesta
+ *       401:
  *        description: Error interno del servidor al actualizar los datos del usuario.
  *        content:
  *          application/json:
  *            schema:
  *              type: object
  *              properties:
+ *                type: 
+ *                  type: string
+ *                  description:  Tipo de respuesta
+ *                title:
+ *                  type: string
+ *                  description:  Titulo de la respuesta
  *                message:
  *                  type: string
  *                  description: Mensaje indicando el error interno del servidor.
+ *                error:
+ *                  type: string
+ *                  description:  Error
  */
 public async update({ auth, request, response }: HttpContextContract) {
   process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
@@ -472,7 +516,7 @@ public async update({ auth, request, response }: HttpContextContract) {
  *     security:
  *       - bearerAuth: []
  *     tags:
- *       - users
+ *       - Usuarios
  *     summary: Actualización de contraseña de usuario
  *     description: Actualiza la contraseña de un usuario autenticado.
  *     requestBody:
@@ -494,9 +538,18 @@ public async update({ auth, request, response }: HttpContextContract) {
  *             schema:
  *               type: object
  *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta
+ *                 title:
+ *                   type: string
+ *                   description: Titulo de la respuesta
  *                 message:
  *                   type: string
  *                   description: Mensaje indicando el éxito de la actualización de contraseña.
+ *                 data:
+ *                   type: string
+ *                   description: Datos de la respuesta
  *       400:
  *         description: Error de solicitud debido a datos faltantes o inválidos.
  *         content:
@@ -504,6 +557,15 @@ public async update({ auth, request, response }: HttpContextContract) {
  *             schema:
  *               type: object
  *               properties:
+ *                 type:  
+ *                   type: string
+ *                   description: Tipo de respuesta 
+ *                 title:
+ *                   type: string 
+ *                   description: Titulo de la respuesta
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de la respuesta    
  *                 error:
  *                   type: string
  *                   description: Mensaje de error indicando el problema con la solicitud.
@@ -514,6 +576,15 @@ public async update({ auth, request, response }: HttpContextContract) {
  *             schema:
  *               type: object
  *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta
+ *                 title:
+ *                   type: string
+ *                   description: Titulo de la respuesta
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de la respuesta
  *                 error:
  *                   type: string
  *                   description: Mensaje de error indicando la falta de autorización.
@@ -524,6 +595,15 @@ public async update({ auth, request, response }: HttpContextContract) {
  *             schema:
  *               type: object
  *               properties:
+ *                 type:
+ *                   type: string
+ *                   description: Tipo de respuesta
+ *                 title:
+ *                   type: string
+ *                   description: Titulo de la respuesta
+ *                 message:
+ *                   type: string
+ *                   description: Mensaje de la respuesta 
  *                 error:
  *                   type: string
  *                   description: Mensaje de error indicando el problema interno del servidor.
@@ -599,7 +679,7 @@ public async update({ auth, request, response }: HttpContextContract) {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - users
+   *      - Usuarios
    *    summary: Eliminación de cuenta de usuario
    *    description: Elimina la cuenta de usuario actual.
    *    responses:
@@ -610,9 +690,18 @@ public async update({ auth, request, response }: HttpContextContract) {
    *            schema:
    *              type: object
    *              properties:
+   *                type:
+   *                  type: string
+   *                  description:  Tipo de respuesta
+   *                title:
+   *                  type: string
+   *                  description: Titulo de la respuesta
    *                message:
    *                  type: string
-   *                  description: Mensaje indicando el éxito de la eliminación.
+   *                  description: Mensaje de la respuesta
+   *                data:
+   *                  type: string
+   *                  description: Datos de la respuesta
    */
   public async destroy({ response, auth }: HttpContextContract) {
     try {
@@ -638,7 +727,7 @@ public async update({ auth, request, response }: HttpContextContract) {
    * /api/users/auth-login:
    *  post:
    *    tags:
-   *      - users
+   *      - Usuarios
    *    summary: Verificar sesión de usuario.
    *    description: Inicia sesión de usuario verificando el correo electrónico y el código de verificación.
    *    requestBody:
@@ -665,20 +754,26 @@ public async update({ auth, request, response }: HttpContextContract) {
    *        content:
    *          application/json:
    *            example:
+   *              type: Tipo de respuesta
+   *              title: Titulo de la respuesta
    *              message: Inicio de sesión exitoso
+   *              data: Datos de la respuesta
    *      401:
    *        description: Datos inválidos o usuario no verificado.
    *        content:
    *          application/json:
    *            example:
+   *              type: Warning
    *              title: Datos inválidos
    *              message: Usuario no verificado o datos incorrectos
-   *              type: warning
+   *              error: Datos incorrectos 
    *      400:
    *        description: Error al iniciar sesión.
    *        content:
    *          application/json:
    *            example:
+   *              type: Tipo de respuesta
+   *              title: Titulo de la respuesta
    *              message: Error al iniciar sesión
    *              error: Descripción del error
    */
@@ -735,7 +830,7 @@ public async update({ auth, request, response }: HttpContextContract) {
    *    security:
    *      - bearerAuth: []
    *    tags:
-   *      - users
+   *      - Usuarios
    *    summary: Cierre de sesión de usuario
    *    description: Cierra la sesión actual del usuario.
    *    responses:
@@ -746,9 +841,18 @@ public async update({ auth, request, response }: HttpContextContract) {
    *            schema:
    *              type: object
    *              properties:
+   *                type:
+   *                  type: string
+   *                  description: Tipo de respuesta
+   *                title:
+   *                  type: string
+   *                  description:  Titulo de la respuesta
    *                message:
    *                  type: string
    *                  description: Mensaje indicando el éxito del cierre de sesión.
+   *                data:
+   *                  type: string
+   *                  description: Datos de la respuesta
    */
   public async logout({ auth, response }: HttpContextContract) {
     try {
@@ -773,7 +877,7 @@ public async update({ auth, request, response }: HttpContextContract) {
    * /api/users/login:
    *  post:
    *    tags:
-   *      - users
+   *      - Usuarios
    *    summary: Iniciar sesión de usuario
    *    requestBody:
    *      required: true
@@ -796,6 +900,15 @@ public async update({ auth, request, response }: HttpContextContract) {
    *            schema:
    *              type: object
    *              properties:
+   *                type:
+   *                  type: string
+   *                  description: Tipo de respuesta
+   *                title:
+   *                  type: string
+   *                  description: Titulo de la respuesta
+   *                message:
+   *                  type:
+   *                  description: Mensaje de la respuesta
    *                token:
    *                  type: string
    *                  description: Token de autenticación generado
@@ -806,9 +919,18 @@ public async update({ auth, request, response }: HttpContextContract) {
    *            schema:
    *              type: object
    *              properties:
+   *                type:
+   *                  type: string
+   *                  description: Tipo de respuesta
+   *                title:
+   *                  type: string
+   *                  description: Titulo de la respuesta
    *                message:
    *                  type: string
    *                  example: Usuario no encontrado
+   *                error:
+   *                  type: string
+   *                  example: Error usuario no encontrado
    *      500:
    *        description: Error interno del servidor
    *        content:
@@ -816,6 +938,12 @@ public async update({ auth, request, response }: HttpContextContract) {
    *            schema:
    *              type: object
    *              properties:
+   *                type:
+   *                  type: string
+   *                  description: Tipo de respuesta
+   *                title: 
+   *                  type: string
+   *                  description: Titulo de la respuesta
    *                message:
    *                  type: string
    *                  example: Error al iniciar sesión
@@ -871,7 +999,7 @@ public async update({ auth, request, response }: HttpContextContract) {
    * /api/users/recuperar-contra:
    *   post:
    *     tags:
-   *       - users
+   *       - Usuarios
    *     summary: Solicitar recuperación de contraseña
    *     requestBody:
    *       required: true
@@ -892,9 +1020,18 @@ public async update({ auth, request, response }: HttpContextContract) {
    *             schema:
    *               type: object
    *               properties:
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de respuesta
+   *                 title: 
+   *                   type: string
+   *                   description: Titulo de la respuesta
    *                 message:
    *                   type: string
    *                   example: Se ha enviado un correo electrónico con un código de recuperación.
+   *                 data:
+   *                   type: string
+   *                   example: Codigo de verificacion
    *       400:
    *         description: Correo electrónico no encontrado
    *         content:
@@ -902,9 +1039,18 @@ public async update({ auth, request, response }: HttpContextContract) {
    *             schema:
    *               type: object
    *               properties:
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de respuesta
+   *                 title: 
+   *                   type: string
+   *                   description: Titulo de la respuesta
    *                 message:
    *                   type: string
    *                   example: No se encontró un administrador con este correo electrónico.
+   *                 error:
+   *                   type: string
+   *                   example: Administrador no encontrado
    *       500:
    *         description: Error del servidor
    *         content:
@@ -912,6 +1058,12 @@ public async update({ auth, request, response }: HttpContextContract) {
    *             schema:
    *               type: object
    *               properties:
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de respuesta
+   *                 title: 
+   *                   type: string
+   *                   description: Titulo de la respuesta
    *                 message:
    *                   type: string
    *                   example: Error al enviar el correo electrónico de recuperación.
