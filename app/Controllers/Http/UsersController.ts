@@ -122,46 +122,6 @@ export default class UsersController {
 
   }
 
-  /**
-   * @swagger
-   * /api/users/code-verify/{id}:
-   *  post:
-   *    security:
-   *      - bearerAuth: []
-   *    tags:
-   *      - Usuarios
-   *    summary: Reenviar codigo de verificacion
-   *    description: Mandar codigo de verificacion 
-   *    parameters:
-   *      - name: id
-   *        in: path
-   *        required: true
-   *        description: Id
-   *        schema:
-   *          type: string
-   *    requestBody:
-   *      required: true
-   *      content:
-   *        application/json:
-   *          schema:
-   *            type: object
-   *            properties:
-   *              type: 
-   *              email:
-   *                type: string
-   *                description: Correo electronico 
-   *    responses:
-   *       200:
-   *        description: Datos de usuario actualizados exitosamente.
-   *        content:
-   *          application/json:
-   *            schema:
-   *              type: object
-   *              properties:
-   *                message:
-   *                  type: string
-   *                  description: Mensaje indicando el éxito de la actualización.
-   */
   public async SendCodigo({response, params}:HttpContextContract){
     process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
     const user = await User.findOrFail(params.id);
@@ -691,37 +651,7 @@ public async update({ auth, request, response }: HttpContextContract) {
       error: error.message});
   }
 }
-  /**
-   * @swagger
-   * /api/users/{id}:
-   *  delete:
-   *    security:
-   *      - bearerAuth: []
-   *    tags:
-   *      - Usuarios
-   *    summary: Eliminación de cuenta de usuario
-   *    description: Elimina la cuenta de usuario actual.
-   *    responses:
-   *      '200':
-   *        description: Cuenta de usuario eliminada exitosamente.
-   *        content:
-   *          application/json:
-   *            schema:
-   *              type: object
-   *              properties:
-   *                type:
-   *                  type: string
-   *                  description:  Tipo de respuesta
-   *                title:
-   *                  type: string
-   *                  description: Titulo de la respuesta
-   *                message:
-   *                  type: string
-   *                  description: Mensaje de la respuesta
-   *                data:
-   *                  type: string
-   *                  description: Datos de la respuesta
-   */
+
   public async destroy({ response, auth }: HttpContextContract) {
     try {
       const usuario = auth.user!
