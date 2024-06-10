@@ -50,7 +50,7 @@ export default class UsersController {
     })
   }
 
-    /**
+  /**
    * @swagger
    * /api/users/{id}:
    *  get:
@@ -89,7 +89,7 @@ export default class UsersController {
    *                  type: string 
    *                  description: Datos de la respuesta
    */
-    public async show({ response,params }: HttpContextContract) {
+  public async show({ response,params }: HttpContextContract) {
       const users = await User.query().where('id',params.id).preload('dispositivo',(dispositivo) => {
         dispositivo.preload('sensores',(sensor)=>{
           sensor.preload('sensorType')
@@ -361,324 +361,324 @@ export default class UsersController {
     const randomNumber = Math.floor(1000 + Math.random() * 9000);
     return randomNumber.toString();
   }
-/**
- * @swagger
- * /api/users/actualizar:
- *  put:
- *    security:
- *      - bearerAuth: []
- *    tags:
- *      - Usuarios
- *    summary: Actualización de datos de usuario
- *    description: Actualiza los datos de un usuario existente. Cada campo es opcional y se actualizará solo si está presente en la solicitud.
- *    requestBody:
- *      required: true
- *      content:
- *        application/json:
- *          schema:
- *            type: object
- *            properties:
- *              name:
- *                type: string
- *              lastname:
- *                type: string
- *              email:
- *                type: string
- *    responses:
- *       200:
- *        description: Datos de usuario actualizados exitosamente.
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                type:
- *                  type: string
- *                  description:  Tipo de respuesta
- *                title:
- *                  type: string
- *                  description:  Titulo de la respuesta
- *                message:
- *                  type: string
- *                  description:  Mensaje de la respuesta
- *                data:
- *                  type: string
- *                  description:  Datos de la respuesta
- *       401:
- *        description: Error interno del servidor al actualizar los datos del usuario.
- *        content:
- *          application/json:
- *            schema:
- *              type: object
- *              properties:
- *                type: 
- *                  type: string
- *                  description:  Tipo de respuesta
- *                title:
- *                  type: string
- *                  description:  Titulo de la respuesta
- *                message:
- *                  type: string
- *                  description: Mensaje indicando el error interno del servidor.
- *                error:
- *                  type: string
- *                  description:  Error
- */
-public async update({ auth, request, response }: HttpContextContract) {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-  try {
-    const user = await User.query().where('id',auth.user?.id).preload('dispositivo',(dispositivo) => {
-      dispositivo.preload('sensores',(sensor)=>{
-        sensor.preload('sensorType')
-      }).preload('tipoDispositivo')
-    }).preload('configurations').first();
+  /**
+   * @swagger
+   * /api/users/actualizar:
+   *  put:
+   *    security:
+   *      - bearerAuth: []
+   *    tags:
+   *      - Usuarios
+   *    summary: Actualización de datos de usuario
+   *    description: Actualiza los datos de un usuario existente. Cada campo es opcional y se actualizará solo si está presente en la solicitud.
+   *    requestBody:
+   *      required: true
+   *      content:
+   *        application/json:
+   *          schema:
+   *            type: object
+   *            properties:
+   *              name:
+   *                type: string
+   *              lastname:
+   *                type: string
+   *              email:
+   *                type: string
+   *    responses:
+   *       200:
+   *        description: Datos de usuario actualizados exitosamente.
+   *        content:
+   *          application/json:
+   *            schema:
+   *              type: object
+   *              properties:
+   *                type:
+   *                  type: string
+   *                  description:  Tipo de respuesta
+   *                title:
+   *                  type: string
+   *                  description:  Titulo de la respuesta
+   *                message:
+   *                  type: string
+   *                  description:  Mensaje de la respuesta
+   *                data:
+   *                  type: string
+   *                  description:  Datos de la respuesta
+   *       401:
+   *        description: Error interno del servidor al actualizar los datos del usuario.
+   *        content:
+   *          application/json:
+   *            schema:
+   *              type: object
+   *              properties:
+   *                type: 
+   *                  type: string
+   *                  description:  Tipo de respuesta
+   *                title:
+   *                  type: string
+   *                  description:  Titulo de la respuesta
+   *                message:
+   *                  type: string
+   *                  description: Mensaje indicando el error interno del servidor.
+   *                error:
+   *                  type: string
+   *                  description:  Error
+   */
+  public async update({ auth, request, response }: HttpContextContract) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    try {
+      const user = await User.query().where('id',auth.user?.id).preload('dispositivo',(dispositivo) => {
+        dispositivo.preload('sensores',(sensor)=>{
+          sensor.preload('sensorType')
+        }).preload('tipoDispositivo')
+      }).preload('configurations').first();
 
-    if(!user){
-      return response.status(404).json({ 
+      if(!user){
+        return response.status(404).json({ 
+          type: 'Error',
+          title: 'Usuario no encontrado',
+          message: 'Error al encontrar los datos del usuario', 
+          error: [] 
+        })
+      }
+      
+      const { name, lastname, email } = request.only(['name', 'lastname', 'email']);
+  
+      // Construye un objeto con los campos que se van a actualizar
+      const updates: { [key: string]: any } = {};
+      if (name !== undefined) {
+        const nameRegex = /^[A-Za-z\s]+$/;
+      if (!nameRegex.test(name)) {
+          return response.status(400).json({
+              type: 'Error',
+              title: 'Error de credenciales',
+              message: 'Error al crear usuario',
+              error: 'El nombre solo puede contener letras y espacios',
+          });
+      }
+        updates.name = name;
+      }
+
+      if (lastname !== undefined) {
+        const lastnameRegex = /^[A-Za-z\s]+$/;
+      if (!lastnameRegex.test(lastname)) {
+          return response.status(400).json({
+              type: 'Error',
+              title: 'Error de credenciales',
+              message: 'Error al crear usuario',
+              error: 'El apellido solo puede contener letras y espacios',
+          });
+      }
+        updates.lastname = lastname;
+      }
+
+      if (email !== undefined) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return response.status(400).json({
         type: 'Error',
-        title: 'Usuario no encontrado',
-        message: 'Error al encontrar los datos del usuario', 
-        error: [] 
-      })
+        title: 'Error de credenciales',
+        message: 'Error al crear usuario',
+        error: 'Formato de correo electrónico inválido',
+      });
     }
-    
-    const { name, lastname, email } = request.only(['name', 'lastname', 'email']);
- 
-    // Construye un objeto con los campos que se van a actualizar
-    const updates: { [key: string]: any } = {};
-    if (name !== undefined) {
-      const nameRegex = /^[A-Za-z\s]+$/;
-    if (!nameRegex.test(name)) {
-        return response.status(400).json({
-            type: 'Error',
-            title: 'Error de credenciales',
-            message: 'Error al crear usuario',
-            error: 'El nombre solo puede contener letras y espacios',
-        });
-    }
-      updates.name = name;
-    }
+        updates.email = email;
+      }
 
-    if (lastname !== undefined) {
-      const lastnameRegex = /^[A-Za-z\s]+$/;
-    if (!lastnameRegex.test(lastname)) {
-        return response.status(400).json({
-            type: 'Error',
-            title: 'Error de credenciales',
-            message: 'Error al crear usuario',
-            error: 'El apellido solo puede contener letras y espacios',
-        });
-    }
-      updates.lastname = lastname;
-    }
+      // Actualiza los datos del usuario en la base de datos directamente
+      await Database.from('users').where('id', user.id).update(updates);
 
-    if (email !== undefined) {
-      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
-    return response.status(400).json({
-      type: 'Error',
-      title: 'Error de credenciales',
-      message: 'Error al crear usuario',
-      error: 'Formato de correo electrónico inválido',
-    });
-  }
-      updates.email = email;
-    }
+      // Obtiene los datos actualizados del usuario
+      const updatedUser = await Database.from('users').where('id', user.id).first();
 
-    // Actualiza los datos del usuario en la base de datos directamente
-    await Database.from('users').where('id', user.id).update(updates);
+      // Envía el correo electrónico
+      await Mail.send((message) => {
+        message
+          .from(Env.get('SMTP_USERNAME'), 'Healthy App')
+          .to(user.email)
+          .subject('Healthy App - Personalizacion de cuenta')
+          .htmlView('emails/actualizarUser', { name: updates.name || user.name, lastname: updates.lastname || user.lastname, email: updates.email || user.email });
+      });
 
-    // Obtiene los datos actualizados del usuario
-    const updatedUser = await Database.from('users').where('id', user.id).first();
-
-    // Envía el correo electrónico
-    await Mail.send((message) => {
-      message
-        .from(Env.get('SMTP_USERNAME'), 'Healthy App')
-        .to(user.email)
-        .subject('Healthy App - Personalizacion de cuenta')
-        .htmlView('emails/actualizarUser', { name: updates.name || user.name, lastname: updates.lastname || user.lastname, email: updates.email || user.email });
-    });
-
-    return response.status(200).json({
-      type: 'Success!!',
-      title: 'Datos actualizados',
-      message: 'Datos de usuario actualizados', 
-      data: updatedUser 
-    });
-  } catch (error) {
-    return response.status(500).json({ 
-      type: 'Error',
-      title: 'Error de servidor',
-      message: 'Error interno del servidor al actualizar los datos del usuario', 
-      error: error.message 
-    });
-  }
-}
- /**
- * @swagger
- * /api/users/update-password:
- *   put:
- *     security:
- *       - bearerAuth: []
- *     tags:
- *       - Usuarios
- *     summary: Actualización de contraseña de usuario
- *     description: Actualiza la contraseña de un usuario autenticado.
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             properties:
- *               oldPassword:
- *                 type: string
- *               newPassword:
- *                 type: string
- *     responses:
- *       200:
- *         description: Contraseña de usuario actualizada exitosamente.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 type:
- *                   type: string
- *                   description: Tipo de respuesta
- *                 title:
- *                   type: string
- *                   description: Titulo de la respuesta
- *                 message:
- *                   type: string
- *                   description: Mensaje indicando el éxito de la actualización de contraseña.
- *                 data:
- *                   type: string
- *                   description: Datos de la respuesta
- *       400:
- *         description: Error de solicitud debido a datos faltantes o inválidos.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 type:  
- *                   type: string
- *                   description: Tipo de respuesta 
- *                 title:
- *                   type: string 
- *                   description: Titulo de la respuesta
- *                 message:
- *                   type: string
- *                   description: Mensaje de la respuesta    
- *                 error:
- *                   type: string
- *                   description: Mensaje de error indicando el problema con la solicitud.
- *       401:
- *         description: No autorizado, token de acceso inválido o no proporcionado.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 type:
- *                   type: string
- *                   description: Tipo de respuesta
- *                 title:
- *                   type: string
- *                   description: Titulo de la respuesta
- *                 message:
- *                   type: string
- *                   description: Mensaje de la respuesta
- *                 error:
- *                   type: string
- *                   description: Mensaje de error indicando la falta de autorización.
- *       500:
- *         description: Error interno del servidor al actualizar la contraseña del usuario.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 type:
- *                   type: string
- *                   description: Tipo de respuesta
- *                 title:
- *                   type: string
- *                   description: Titulo de la respuesta
- *                 message:
- *                   type: string
- *                   description: Mensaje de la respuesta 
- *                 error:
- *                   type: string
- *                   description: Mensaje de error indicando el problema interno del servidor.
- */
- public async updatePassword({ auth, request, response }: HttpContextContract) {
-  process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-  try {
-    const userId = auth.user?.id;
-
-    if (!userId) {
-      return response.status(401).json({ error: 'Usuario no autenticado' });
-    }
-
-    const user = await User.query()
-    .where('id', userId)
-    .preload('dispositivo',(dispositivo) => {
-      dispositivo.preload('sensores',(sensor)=>{
-        sensor.preload('sensorType')
-      }).preload('tipoDispositivo')
-    }).preload('configurations').first();
-
-    if(!user){
-      return response.status(404).json({ 
+      return response.status(200).json({
+        type: 'Success!!',
+        title: 'Datos actualizados',
+        message: 'Datos de usuario actualizados', 
+        data: updatedUser 
+      });
+    } catch (error) {
+      return response.status(500).json({ 
         type: 'Error',
-        title: 'Usuario no encontrado',
-        message: 'Error al encontrar los datos del usuario', 
-        error: [] 
-      })
+        title: 'Error de servidor',
+        message: 'Error interno del servidor al actualizar los datos del usuario', 
+        error: error.message 
+      });
     }
-
-
-    const oldPassword: string = request.input('oldPassword');
-    const newPassword: string = request.input('newPassword');
-
-    const isPasswordValid = await Hash.verify(user.password, oldPassword);
-    if (!isPasswordValid) {
-      return response.status(401).json({ error: 'La contraseña anterior es incorrecta' });
-    }
-
-    if (newPassword.length < 8) {
-      return response.status(400).json({ error: 'La nueva contraseña debe tener al menos 8 caracteres' });
-    }
-
-    user.password = await Hash.make(newPassword);
-    await user.save();
-
-    await Mail.send((message) => {
-      message
-        .from(Env.get('SMTP_USERNAME'), 'Healthy App')
-        .to(user.email)
-        .subject('Healthy App - Recuperacion de Contraseña')
-        .htmlView('emails/nuevaContrasena', { email: user.email });
-    });
-
-    return response.status(200).json({ 
-      type: 'Exitoso!!',
-      title: 'Contraseña actualizada',
-      message: 'Contraseña de usuario actualizada' ,
-      data: user
-    });
-  } catch (error) {
-    return response.status(500).json({ 
-      type: 'Error',
-      title: 'Error al actualizar contraseña',
-      message: 'Error interno del servidor al actualizar la contraseña del usuario', 
-      error: error.message});
   }
-}
+  /**
+   * @swagger
+   * /api/users/update-password:
+   *   put:
+   *     security:
+   *       - bearerAuth: []
+   *     tags:
+   *       - Usuarios
+   *     summary: Actualización de contraseña de usuario
+   *     description: Actualiza la contraseña de un usuario autenticado.
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               oldPassword:
+   *                 type: string
+   *               newPassword:
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: Contraseña de usuario actualizada exitosamente.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de respuesta
+   *                 title:
+   *                   type: string
+   *                   description: Titulo de la respuesta
+   *                 message:
+   *                   type: string
+   *                   description: Mensaje indicando el éxito de la actualización de contraseña.
+   *                 data:
+   *                   type: string
+   *                   description: Datos de la respuesta
+   *       400:
+   *         description: Error de solicitud debido a datos faltantes o inválidos.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 type:  
+   *                   type: string
+   *                   description: Tipo de respuesta 
+   *                 title:
+   *                   type: string 
+   *                   description: Titulo de la respuesta
+   *                 message:
+   *                   type: string
+   *                   description: Mensaje de la respuesta    
+   *                 error:
+   *                   type: string
+   *                   description: Mensaje de error indicando el problema con la solicitud.
+   *       401:
+   *         description: No autorizado, token de acceso inválido o no proporcionado.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de respuesta
+   *                 title:
+   *                   type: string
+   *                   description: Titulo de la respuesta
+   *                 message:
+   *                   type: string
+   *                   description: Mensaje de la respuesta
+   *                 error:
+   *                   type: string
+   *                   description: Mensaje de error indicando la falta de autorización.
+   *       500:
+   *         description: Error interno del servidor al actualizar la contraseña del usuario.
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 type:
+   *                   type: string
+   *                   description: Tipo de respuesta
+   *                 title:
+   *                   type: string
+   *                   description: Titulo de la respuesta
+   *                 message:
+   *                   type: string
+   *                   description: Mensaje de la respuesta 
+   *                 error:
+   *                   type: string
+   *                   description: Mensaje de error indicando el problema interno del servidor.
+   */
+  public async updatePassword({ auth, request, response }: HttpContextContract) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+    try {
+      const userId = auth.user?.id;
 
+      if (!userId) {
+        return response.status(401).json({ error: 'Usuario no autenticado' });
+      }
+
+      const user = await User.query()
+      .where('id', userId)
+      .preload('dispositivo',(dispositivo) => {
+        dispositivo.preload('sensores',(sensor)=>{
+          sensor.preload('sensorType')
+        }).preload('tipoDispositivo')
+      }).preload('configurations').first();
+
+      if(!user){
+        return response.status(404).json({ 
+          type: 'Error',
+          title: 'Usuario no encontrado',
+          message: 'Error al encontrar los datos del usuario', 
+          error: [] 
+        })
+      }
+
+
+      const oldPassword: string = request.input('oldPassword');
+      const newPassword: string = request.input('newPassword');
+
+      const isPasswordValid = await Hash.verify(user.password, oldPassword);
+      if (!isPasswordValid) {
+        return response.status(401).json({ error: 'La contraseña anterior es incorrecta' });
+      }
+
+      if (newPassword.length < 8) {
+        return response.status(400).json({ error: 'La nueva contraseña debe tener al menos 8 caracteres' });
+      }
+
+      user.password = await Hash.make(newPassword);
+      await user.save();
+
+      await Mail.send((message) => {
+        message
+          .from(Env.get('SMTP_USERNAME'), 'Healthy App')
+          .to(user.email)
+          .subject('Healthy App - Recuperacion de Contraseña')
+          .htmlView('emails/nuevaContrasena', { email: user.email });
+      });
+
+      return response.status(200).json({ 
+        type: 'Exitoso!!',
+        title: 'Contraseña actualizada',
+        message: 'Contraseña de usuario actualizada' ,
+        data: user
+      });
+    } catch (error) {
+      return response.status(500).json({ 
+        type: 'Error',
+        title: 'Error al actualizar contraseña',
+        message: 'Error interno del servidor al actualizar la contraseña del usuario', 
+        error: error.message});
+    }
+  }
+  
   public async destroy({ response, auth }: HttpContextContract) {
     try {
       const usuario = auth.user!
@@ -1163,32 +1163,32 @@ public async update({ auth, request, response }: HttpContextContract) {
 *                   type: string
 *                   example: Mensaje de error detallado
 */
-public async RecuperarPassword({ request, response }: HttpContextContract) {
-  try {
-    const { email, verificationCode, newPassword } = request.only(['email', 'verificationCode', 'newPassword'])
-    const user = await User.findByOrFail('email', email)
+  public async RecuperarPassword({ request, response }: HttpContextContract) {
+    try {
+      const { email, verificationCode, newPassword } = request.only(['email', 'verificationCode', 'newPassword'])
+      const user = await User.findByOrFail('email', email)
 
-    if (user.verificationCode!== verificationCode || !user.verificationCode) {
-      return response.status(400).json({
-        message: 'El código de recuperación no es válido.',
-      });
-    }      
-    user.password = await Hash.make(newPassword)
-    user.verificationCode = null
-    await user.save()
+      if (user.verificationCode!== verificationCode || !user.verificationCode) {
+        return response.status(400).json({
+          message: 'El código de recuperación no es válido.',
+        });
+      }      
+      user.password = await Hash.make(newPassword)
+      user.verificationCode = null
+      await user.save()
 
-    return response.status(200).json({
-      "type": "Exitoso",
-      "title": "Recursos encontrados",
-      "message": "La Contrasena fue actualizada con exito",
-    })
-  } catch (error) {
-    return response.internalServerError({
-      "type": "Error",
-      "title": "Error de sevidor",
-      "message": "Hubo un fallo en el servidor durante el registro de los datos",
-      "errors": error.message
-    })
+      return response.status(200).json({
+        "type": "Exitoso",
+        "title": "Recursos encontrados",
+        "message": "La Contrasena fue actualizada con exito",
+      })
+    } catch (error) {
+      return response.internalServerError({
+        "type": "Error",
+        "title": "Error de sevidor",
+        "message": "Hubo un fallo en el servidor durante el registro de los datos",
+        "errors": error.message
+      })
+    }
   }
-}
 }
