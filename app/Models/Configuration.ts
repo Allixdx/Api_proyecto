@@ -29,7 +29,7 @@ import TipoConfiguracion from './TipoConfiguracion'
  *        - tipo_configuracion_id
  */
 export default class Configuration extends BaseModel {
-  public static table = "configuracion_habito"
+  public static table = "configuracion_habitos"
 
   @column({ isPrimary: true })
   public id: number

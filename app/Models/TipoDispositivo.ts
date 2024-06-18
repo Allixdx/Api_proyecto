@@ -22,7 +22,7 @@ import Dispositivo from './Dispositivo';
  *        - name
  */
 export default class TipoDispositivo extends BaseModel {
-  public static table='tipo_dispositivo'
+  public static table='tipo_dispositivos'
   @column({ isPrimary: true })
   public id: number;
 

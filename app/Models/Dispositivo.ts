@@ -32,7 +32,7 @@ import Sensor from './Sensor';
 
 export default class Dispositivo extends BaseModel {
 
-  public static table = 'dispositivo';
+  public static table = 'dispositivos';
 
   @column({ isPrimary: true })
   public id: number;
