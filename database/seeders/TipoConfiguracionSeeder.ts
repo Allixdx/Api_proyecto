@@ -8,6 +8,7 @@ export default class extends BaseSeeder {
       { id: 2, name: 'alarma_pasos' },
       { id: 3, name: 'meta_calorica' },
       { id: 4, name: 'alarma_temperatura' },
+      { id: 5, name: 'alarma bpm' }
     ])
   }
 }
