@@ -20,7 +20,7 @@ import Configuration from './Configuration'
  *        - name
  */
 export default class TipoConfiguracion extends BaseModel {
-  public static table = "tipo_configuracion"
+  public static table = "tipo_configuracions"
 
   @column({ isPrimary: true })
   public id: number

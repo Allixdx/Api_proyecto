@@ -33,14 +33,44 @@ const databaseConfig: DatabaseConfig = {
     | npm i mysql2
     |
     */
-    mysql: {
-      client: 'mysql2',
+    // mysql: {
+    //   client: 'mysql2',
+    //   connection: {
+    //     host: Env.get('MYSQL_HOST'),
+    //     port: Env.get('MYSQL_PORT'),
+    //     user: Env.get('MYSQL_USER'),
+    //     password: Env.get('MYSQL_PASSWORD', ''),
+    //     database: Env.get('MYSQL_DB_NAME'),
+    //   },
+    //   migrations: {
+    //     naturalSort: true,
+    //   },
+    //   healthCheck: false,
+    //   debug: false,
+    // },
+
+    // ! Ahora con PG, ya se usó "npm i pg"
+    // * con Node 20.0.11
+    /*
+    |--------------------------------------------------------------------------
+    | PostgreSQL config
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for PostgreSQL database. Make sure to install the driver
+    | from npm when using this connection
+    |
+    | npm i pg
+    |
+    */
+
+    pg: {
+      client: 'pg',
       connection: {
-        host: Env.get('MYSQL_HOST'),
-        port: Env.get('MYSQL_PORT'),
-        user: Env.get('MYSQL_USER'),
-        password: Env.get('MYSQL_PASSWORD', ''),
-        database: Env.get('MYSQL_DB_NAME'),
+        host: Env.get('PG_HOST'),
+        port: Env.get('PG_PORT'),
+        user: Env.get('PG_USER'),
+        password: Env.get('PG_PASSWORD', ''),
+        database: Env.get('PG_DB_NAME'),
       },
       migrations: {
         naturalSort: true,
